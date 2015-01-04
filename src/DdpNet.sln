@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30324.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DdpNet", "DdpNet\DdpNet.csproj", "{21168F58-994B-4018-A702-AE47C719770E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DdpNet.UnitTest", "..\DdpNet.UnitTest\DdpNet.UnitTest.csproj", "{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21168F58-994B-4018-A702-AE47C719770E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21168F58-994B-4018-A702-AE47C719770E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21168F58-994B-4018-A702-AE47C719770E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21168F58-994B-4018-A702-AE47C719770E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
