@@ -36,6 +36,11 @@
 
         public async Task ConnectAsync()
         {
+            this.ConnectAsync(true);
+        }
+
+        internal async Task ConnectAsync(bool startReceiveThread)
+        {
             if (this.state != DdpClientState.NotConnected)
             {
                 throw new InvalidOperationException("Client is already connected");
@@ -51,9 +56,12 @@
 
             await this.SendObject(connectMessage);
 
-            this.receiveThread = new Thread(this.BackgroundReceive);
-            this.receiveThread.IsBackground = true;
-            this.receiveThread.Start();
+            if (startReceiveThread)
+            {
+                this.receiveThread = new Thread(this.BackgroundReceive);
+                this.receiveThread.IsBackground = true;
+                this.receiveThread.Start();
+            }
 
             this.state = DdpClientState.Connected;
         }
@@ -81,7 +89,7 @@
             }
         }
 
-        private async Task ReceiveAsync()
+        internal async Task ReceiveAsync()
         {
             var result = await this.webSocketConnection.ReceiveAsync();
             this.handler.HandleMessage(this, result);
