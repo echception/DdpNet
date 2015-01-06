@@ -4,6 +4,9 @@
     using System.Linq;
     using System.Reflection;
     using MessageHandlers;
+    using Messages;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     internal class MessageHandler
     {
@@ -14,13 +17,21 @@
             this.GetHandlers();
         }
 
-        internal void HandleMessage(DdpClient client, string message)
+        internal void HandleMessage(DdpClient client, string messageText)
         {
-            foreach (var handler in this.handlers)
+            dynamic message = JObject.Parse(messageText);
+
+            var msg = message.msg;
+
+            if (msg != null)
             {
-                if (handler.CanHandle(message))
+                var messageType = (string) msg;
+                foreach (var handler in this.handlers)
                 {
-                    handler.HandleMessage(client, message);
+                    if (handler.CanHandle(messageType))
+                    {
+                        handler.HandleMessage(client, messageText);
+                    }
                 }
             }
         }
@@ -30,6 +41,7 @@
             this.handlers = new List<IMessageHandler>();
 
             this.handlers.Add(new ConnectedHandler());
+            this.handlers.Add(new PingHandler());
         }
     }
 }

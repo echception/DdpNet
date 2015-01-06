@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    internal abstract class BaseMessage
+    internal class BaseMessage
     {
         [JsonProperty(PropertyName = "msg")]
         public string MessageType { get; set; }

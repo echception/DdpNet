@@ -49,13 +49,18 @@
                 VersionsSupported = this.supportedVersions
             };
 
-            await this.webSocketConnection.SendAsync(JsonConvert.SerializeObject(connectMessage));
+            await this.SendObject(connectMessage);
 
             this.receiveThread = new Thread(this.BackgroundReceive);
             this.receiveThread.IsBackground = true;
             this.receiveThread.Start();
 
             this.state = DdpClientState.Connected;
+        }
+
+        internal Task SendObject(object objectToSend)
+        {
+            return this.webSocketConnection.SendAsync(JsonConvert.SerializeObject(objectToSend));
         }
 
         internal void SetSession(string session)
