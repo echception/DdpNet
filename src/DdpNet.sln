@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DdpNet", "DdpNet\DdpNet.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DdpNet.UnitTest", "..\DdpNet.UnitTest\DdpNet.UnitTest.csproj", "{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DdpNet.Test.Console", "DdpNet.Test.Console\DdpNet.Test.Console.csproj", "{F8E00C61-4674-4F08-AF3C-2DC14BBFF17A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA9BC198-5639-4114-86F6-F5F6CE79BC2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8E00C61-4674-4F08-AF3C-2DC14BBFF17A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8E00C61-4674-4F08-AF3C-2DC14BBFF17A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8E00C61-4674-4F08-AF3C-2DC14BBFF17A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8E00C61-4674-4F08-AF3C-2DC14BBFF17A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
