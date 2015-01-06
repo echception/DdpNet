@@ -29,7 +29,6 @@
         {
             this.handlers = new List<IMessageHandler>();
 
-            this.handlers.Add(new ConsoleLogHandler());
             this.handlers.Add(new ConnectedHandler());
         }
     }

@@ -12,7 +12,7 @@ namespace DdpNet.Test.Console
     {
         static void Main(string[] args)
         {
-            var client = new DdpClient(new Uri("ws://localhost:3000/websocket"));
+            var client = new DdpClient(new ConsoleLoggingConnection(new WebSocketConnection(new Uri("ws://localhost:3000/websocket"))));
             client.ConnectAsync().Wait();
 
             Console.ReadKey();

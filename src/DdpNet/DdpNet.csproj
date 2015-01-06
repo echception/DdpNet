@@ -50,7 +50,6 @@
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlers\BaseMessageHandler.cs" />
     <Compile Include="MessageHandlers\ConnectedHandler.cs" />
-    <Compile Include="MessageHandlers\ConsoleLogHandler.cs" />
     <Compile Include="MessageHandlers\IMessageHandler.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\Connect.cs" />
