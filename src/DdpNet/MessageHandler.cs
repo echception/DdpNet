@@ -40,8 +40,8 @@
         {
             this.handlers = new List<IMessageHandler>();
 
-            this.handlers.Add(new ConnectedHandler());
             this.handlers.Add(new PingHandler());
+            this.handlers.Add(new ResultMessageHandler());
         }
     }
 }

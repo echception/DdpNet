@@ -1,10 +1,12 @@
 ﻿namespace DdpNet
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Messages;
     using Newtonsoft.Json;
+    using Results;
 
     public class DdpClient
     {
@@ -22,6 +24,8 @@
 
         private MessageHandler handler;
 
+        internal ResultHandler ResultHandler { get; private set; }
+
         public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
         {
             
@@ -32,6 +36,7 @@
             this.webSocketConnection = webSocketConnection;
             this.state = DdpClientState.NotConnected;
             this.handler = new MessageHandler();
+            this.ResultHandler = new ResultHandler();
         }
 
         public async Task ConnectAsync()
@@ -63,6 +68,11 @@
                 this.receiveThread.Start();
             }
 
+            var resultMessage = await this.ResultHandler.WaitForResult(result => result.MessageType == "connected");
+
+            var connected = JsonConvert.DeserializeObject<Connected>(resultMessage.Message);
+            this.SetSession(connected.Session);
+
             this.state = DdpClientState.Connected;
         }
 
@@ -71,7 +81,7 @@
             return this.webSocketConnection.SendAsync(JsonConvert.SerializeObject(objectToSend));
         }
 
-        internal void SetSession(string session)
+        private void SetSession(string session)
         {
             if (!string.IsNullOrWhiteSpace(this.sessionId))
             {
