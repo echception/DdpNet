@@ -18,7 +18,7 @@
 
         private Thread receiveThread;
 
-        private string sessionId;
+        internal string SessionId { get; private set; }
 
         private DdpClientState state;
 
@@ -39,12 +39,7 @@
             this.ResultHandler = new ResultHandler();
         }
 
-        public async Task ConnectAsync()
-        {
-            this.ConnectAsync(true);
-        }
-
-        internal async Task ConnectAsync(bool startReceiveThread)
+        internal async Task ConnectAsync()
         {
             if (this.state != DdpClientState.NotConnected)
             {
@@ -61,12 +56,9 @@
 
             await this.SendObject(connectMessage);
 
-            if (startReceiveThread)
-            {
-                this.receiveThread = new Thread(this.BackgroundReceive);
-                this.receiveThread.IsBackground = true;
-                this.receiveThread.Start();
-            }
+            this.receiveThread = new Thread(this.BackgroundReceive);
+            this.receiveThread.IsBackground = true;
+            this.receiveThread.Start();
 
             var resultMessage = await this.ResultHandler.WaitForResult(result => result.MessageType == "connected");
 
@@ -83,12 +75,12 @@
 
         private void SetSession(string session)
         {
-            if (!string.IsNullOrWhiteSpace(this.sessionId))
+            if (!string.IsNullOrWhiteSpace(this.SessionId))
             {
                 throw new InvalidOperationException("Session has already been set.");
             }
 
-            this.sessionId = session;
+            this.SessionId = session;
         }
 
         private async void BackgroundReceive()
@@ -102,7 +94,11 @@
         internal async Task ReceiveAsync()
         {
             var result = await this.webSocketConnection.ReceiveAsync();
-            this.handler.HandleMessage(this, result);
+
+            if (!String.IsNullOrWhiteSpace(result))
+            {
+                this.handler.HandleMessage(this, result);
+            }
         }
     }
 }

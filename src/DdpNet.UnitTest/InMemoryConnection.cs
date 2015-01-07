@@ -35,13 +35,22 @@ namespace DdpNet.UnitTest
 
         public Task<string> ReceiveAsync()
         {
-            var result = this.receiveQueue.Dequeue();
-            return Task.FromResult(result);
+            if (this.receiveQueue.Any())
+            {
+                var result = this.receiveQueue.Dequeue();
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult(string.Empty);
         }
 
         public string GetSentMessage()
         {
-            return this.sendQueue.Dequeue();
+            if (this.sendQueue.Any())
+            {
+                return this.sendQueue.Dequeue();
+            }
+            return string.Empty;
         }
 
         public void Reply(string message)

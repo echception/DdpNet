@@ -17,6 +17,8 @@
 
         private List<RegisteredResultWait> waits;
 
+        private object lockObject = new object();
+
         internal ResultHandler()
         {
             this.callbacks = new List<RegisteredResultCallback>();
@@ -28,16 +30,22 @@
         {
             return Task.Factory.StartNew(() =>
             {
-                var existingResult = this.FindMatchingResult(filter);
+                AutoResetEvent waitEvent;
 
-                if (existingResult != null)
+                lock (lockObject)
                 {
-                    this.unhandledResults.Remove(existingResult);
-                    return existingResult;
+                    var existingResult = this.FindMatchingResult(filter);
 
+                    if (existingResult != null)
+                    {
+                        this.unhandledResults.Remove(existingResult);
+                        return existingResult;
+
+                    }
+
+                    waitEvent = new AutoResetEvent(false);
+                    this.waits.Add(new RegisteredResultWait(filter, waitEvent));
                 }
-                var waitEvent = new AutoResetEvent(false);
-                this.waits.Add(new RegisteredResultWait(filter, waitEvent));
 
                 if (!waitEvent.WaitOne(TimeSpan.FromSeconds(30)))
                 {
@@ -72,36 +80,38 @@
 
         internal void AddResult(Result newResult)
         {
-            this.unhandledResults.Add(newResult);
-
-            var resultsToRemove = new List<Result>();
-
-            foreach (var result in this.unhandledResults)
+            lock (lockObject)
             {
-                foreach (var wait in this.waits)
+                this.unhandledResults.Add(newResult);
+
+                var resultsToRemove = new List<Result>();
+
+                foreach (var result in this.unhandledResults)
                 {
-                    if (wait.Filter(result))
+                    foreach (var wait in this.waits)
                     {
-                        wait.WaitEvent.Set();
-                        resultsToRemove.Add(result);
-                        continue;
+                        if (wait.Filter(result))
+                        {
+                            wait.WaitEvent.Set();
+                            continue;
+                        }
+                    }
+
+                    foreach (var callback in this.callbacks)
+                    {
+                        if (callback.Filter(result))
+                        {
+                            resultsToRemove.Add(result);
+                            callback.Callback(result);
+                            continue;
+                        }
                     }
                 }
 
-                foreach (var callback in this.callbacks)
+                foreach (var result in resultsToRemove)
                 {
-                    if (callback.Filter(result))
-                    {
-                        callback.Callback(result);
-                        resultsToRemove.Add(result);
-                        continue;
-                    }
+                    this.unhandledResults.Remove(result);
                 }
-            }
-
-            foreach (var result in resultsToRemove)
-            {
-                this.unhandledResults.Remove(result);
             }
         }
 
