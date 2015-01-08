@@ -39,7 +39,7 @@
             this.ResultHandler = new ResultHandler();
         }
 
-        internal async Task ConnectAsync()
+        internal async Task ConnectAsync(bool startBackgroundThread)
         {
             if (this.state != DdpClientState.NotConnected)
             {
@@ -54,20 +54,33 @@
                 VersionsSupported = this.supportedVersions
             };
 
-            var waitHandle = this.ResultHandler.RegisterWaitHandler(result => result.MessageType == "connected");
+            var waitHandle = this.ResultHandler.RegisterWaitHandler(result => result.MessageType == "connected" || result.MessageType == "failed");
 
             await this.SendObject(connectMessage);
 
-            this.receiveThread = new Thread(this.BackgroundReceive);
-            this.receiveThread.IsBackground = true;
-            this.receiveThread.Start();
+            if (startBackgroundThread)
+            {
+                this.receiveThread = new Thread(this.BackgroundReceive);
+                this.receiveThread.IsBackground = true;
+                this.receiveThread.Start();
+            }
 
             var resultMessage = await this.ResultHandler.WaitForResult(waitHandle);
+
+            if (resultMessage.MessageType == "failed")
+            {
+                throw new InvalidOperationException("Server version is incompatible with the version of this client");
+            }
 
             var connected = JsonConvert.DeserializeObject<Connected>(resultMessage.Message);
             this.SetSession(connected.Session);
 
             this.state = DdpClientState.Connected;
+        }
+
+        public Task ConnectAsync()
+        {
+            return this.ConnectAsync(true);
         }
 
         internal Task SendObject(object objectToSend)

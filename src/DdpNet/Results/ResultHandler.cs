@@ -78,7 +78,7 @@
             {
                 if (wait.Value.Filter(newResult))
                 {
-                    System.Diagnostics.Debug.WriteLine("Set")                    this.waitResults.Add(wait.Value, newResult);
+                    this.waitResults.Add(wait.Value, newResult);
                     wait.Value.WaitEvent.Set();
                     waitsToRemove.Add(wait.Key);
                 }

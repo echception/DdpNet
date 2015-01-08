@@ -1,5 +1,6 @@
 ﻿namespace DdpNet.UnitTest
 {
+    using System;
     using System.Linq;
     using Messages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,6 +51,27 @@
             task.Wait();
 
             Assert.AreEqual(this.client.SessionId, "TestSession", "Session should be set after successful connection.");
+        }
+
+        [TestMethod]
+        public void DdpClient_ConnectAsync_ThrowsExceptionOnFailedConnect()
+        {
+            try
+            {
+                var task = this.client.ConnectAsync();
+
+                var failed = new Failed { Version = "pre1" };
+                this.testConnection.Reply(JsonConvert.SerializeObject(failed));
+
+                task.Wait();
+            }
+            catch (AggregateException e)
+            {
+                Assert.IsTrue(e.InnerException is InvalidOperationException, "Expected InvalidOperationException");
+                return;
+            }
+            
+            Assert.Fail("Expected AggregateException");
         }
     }
 }
