@@ -54,13 +54,15 @@
                 VersionsSupported = this.supportedVersions
             };
 
+            var waitHandle = this.ResultHandler.RegisterWaitHandler(result => result.MessageType == "connected");
+
             await this.SendObject(connectMessage);
 
             this.receiveThread = new Thread(this.BackgroundReceive);
             this.receiveThread.IsBackground = true;
             this.receiveThread.Start();
 
-            var resultMessage = await this.ResultHandler.WaitForResult(result => result.MessageType == "connected");
+            var resultMessage = await this.ResultHandler.WaitForResult(waitHandle);
 
             var connected = JsonConvert.DeserializeObject<Connected>(resultMessage.Message);
             this.SetSession(connected.Session);

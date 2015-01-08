@@ -62,6 +62,7 @@
     <Compile Include="Results\RegisteredResultWait.cs" />
     <Compile Include="Results\Result.cs" />
     <Compile Include="Results\ResultHandler.cs" />
+    <Compile Include="Results\WaitHandle.cs" />
     <Compile Include="WebSocketConnection.cs" />
   </ItemGroup>
   <ItemGroup>

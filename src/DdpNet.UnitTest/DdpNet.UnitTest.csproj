@@ -57,6 +57,7 @@
     <Compile Include="ConnectionTests.cs" />
     <Compile Include="InMemoryConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DdpNet\DdpNet.csproj">

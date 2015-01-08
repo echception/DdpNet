@@ -11,121 +11,97 @@
 
     internal class ResultHandler
     {
-        private List<Result> unhandledResults;
-
         private List<RegisteredResultCallback> callbacks;
 
-        private List<RegisteredResultWait> waits;
+        private Dictionary<WaitHandle, RegisteredResultWait> waits;
 
-        private object lockObject = new object();
+        private Dictionary<RegisteredResultWait, Result> waitResults;
 
         internal ResultHandler()
         {
             this.callbacks = new List<RegisteredResultCallback>();
-            this.waits = new List<RegisteredResultWait>();
-            this.unhandledResults = new List<Result>();
+            this.waits = new Dictionary<WaitHandle, RegisteredResultWait>();
+            this.waitResults = new Dictionary<RegisteredResultWait, Result>();
         }
  
-        internal Task<Result> WaitForResult(ResultFilter filter)
+        internal WaitHandle RegisterWaitHandler(ResultFilter filter)
+        {
+            var waitEvent = new ManualResetEvent(false);
+            var registeredWait = new RegisteredResultWait(filter, waitEvent);
+            var handle = new WaitHandle();
+            this.waits.Add(handle, registeredWait);
+
+            return handle;
+        }
+
+        internal void RegisterResultCallback(ResultFilter filter, ResultCallback callback)
+        {
+            this.callbacks.Add(new RegisteredResultCallback(filter, callback));
+        }
+
+        internal Task<Result> WaitForResult(WaitHandle waitHandle)
         {
             return Task.Factory.StartNew(() =>
             {
-                AutoResetEvent waitEvent;
-
-                lock (lockObject)
+                if (waitHandle.Triggered)
                 {
-                    var existingResult = this.FindMatchingResult(filter);
-
-                    if (existingResult != null)
-                    {
-                        this.unhandledResults.Remove(existingResult);
-                        return existingResult;
-
-                    }
-
-                    waitEvent = new AutoResetEvent(false);
-                    this.waits.Add(new RegisteredResultWait(filter, waitEvent));
+                    throw new InvalidOperationException("WaitHandle has already been triggered");
                 }
 
-                if (!waitEvent.WaitOne(TimeSpan.FromSeconds(30)))
+                RegisteredResultWait wait;
+                if (!this.waits.TryGetValue(waitHandle, out wait))
                 {
-                    throw new TimeoutException("Result was never received from the server");
+                    throw new InvalidOperationException("Specified WaitHandle does not exist");
                 }
 
-                var result = this.FindMatchingResult(filter);
-
-                if (result == null)
+                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(5)))
                 {
-                    throw new InvalidOperationException("Wait handle was triggered, but no matching result was found");
+                    throw new TimeoutException("Response was never received");
                 }
 
-                this.unhandledResults.Remove(result);
+                Result result;
+                if (!this.waitResults.TryGetValue(wait, out result))
+                {
+                    throw new InvalidOperationException("Wait was triggered, but no result was available");
+                }
 
                 return result;
             });
         }
 
-        internal void RegisterResultCallback(ResultFilter filter, ResultCallback callback)
-        {
-            var existingResult = this.FindMatchingResult(filter);
-
-            if (existingResult != null)
-            {
-                this.unhandledResults.Remove(existingResult);
-                callback(existingResult);
-            }
-
-            this.callbacks.Add(new RegisteredResultCallback(filter, callback));
-        }
-
         internal void AddResult(Result newResult)
         {
-            lock (lockObject)
+            var waitsToRemove = new List<WaitHandle>();
+            var callbacksToRemove = new List<RegisteredResultCallback>();
+
+            foreach (var wait in this.waits)
             {
-                this.unhandledResults.Add(newResult);
-
-                var resultsToRemove = new List<Result>();
-
-                foreach (var result in this.unhandledResults)
+                if (wait.Value.Filter(newResult))
                 {
-                    foreach (var wait in this.waits)
-                    {
-                        if (wait.Filter(result))
-                        {
-                            wait.WaitEvent.Set();
-                            continue;
-                        }
-                    }
-
-                    foreach (var callback in this.callbacks)
-                    {
-                        if (callback.Filter(result))
-                        {
-                            resultsToRemove.Add(result);
-                            callback.Callback(result);
-                            continue;
-                        }
-                    }
-                }
-
-                foreach (var result in resultsToRemove)
-                {
-                    this.unhandledResults.Remove(result);
-                }
-            }
-        }
-
-        private Result FindMatchingResult(ResultFilter filter)
-        {
-            foreach (var result in this.unhandledResults)
-            {
-                if (filter(result))
-                {
-                    return result;
+                    System.Diagnostics.Debug.WriteLine("Set")                    this.waitResults.Add(wait.Value, newResult);
+                    wait.Value.WaitEvent.Set();
+                    waitsToRemove.Add(wait.Key);
                 }
             }
 
-            return null;
+            foreach (var callback in this.callbacks)
+            {
+                if (callback.Filter(newResult))
+                {
+                    callback.Callback(newResult);
+                    callbacksToRemove.Add(callback);
+                }
+            }
+
+            foreach (var removedCallback in callbacksToRemove)
+            {
+                this.callbacks.Remove(removedCallback);
+            }
+
+            foreach (var removedWait in waitsToRemove)
+            {
+                this.waits.Remove(removedWait);
+            }
         }
     }
 }

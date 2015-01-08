@@ -11,6 +11,9 @@ namespace DdpNet.UnitTest
         private Queue<string> sendQueue;
         private Queue<string> receiveQueue;
 
+        private object sendQueueSync = new object();
+        private object receiveQueueSync = new object();
+
         public InMemoryConnection()
         {
             this.sendQueue = new Queue<string>();
@@ -29,16 +32,22 @@ namespace DdpNet.UnitTest
 
         public Task SendAsync(string text)
         {
-            this.sendQueue.Enqueue(text);
+            lock (sendQueueSync)
+            {
+                this.sendQueue.Enqueue(text);
+            }
             return Task.FromResult(true);
         }
 
         public Task<string> ReceiveAsync()
         {
-            if (this.receiveQueue.Any())
+            lock (receiveQueueSync)
             {
-                var result = this.receiveQueue.Dequeue();
-                return Task.FromResult(result);
+                if (this.receiveQueue.Any())
+                {
+                    var result = this.receiveQueue.Dequeue();
+                    return Task.FromResult(result);
+                }
             }
 
             return Task.FromResult(string.Empty);
@@ -48,14 +57,20 @@ namespace DdpNet.UnitTest
         {
             if (this.sendQueue.Any())
             {
-                return this.sendQueue.Dequeue();
+                lock (sendQueueSync)
+                {
+                    return this.sendQueue.Dequeue();
+                }
             }
             return string.Empty;
         }
 
         public void Reply(string message)
         {
-            this.receiveQueue.Enqueue(message);
+            lock (receiveQueueSync)
+            {
+                this.receiveQueue.Enqueue(message);
+            }
         }
     }
 }
