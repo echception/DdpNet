@@ -6,14 +6,14 @@
     using Newtonsoft.Json.Linq;
     using Results;
 
-    internal class ResultMessageHandler : IMessageHandler
+    internal class ReplyMessageHandler : IMessageHandler
     {
         private static readonly string[] resultMessageTypes = new[] {"connected", "failed"};
 
         public Task HandleMessage(DdpClient client, string message)
         {
             dynamic parsedObject = JObject.Parse(message);
-            var result = new Result((string)parsedObject.msg, parsedObject, message);
+            var result = new ReturnedObject((string)parsedObject.msg, parsedObject, message);
 
             client.ResultHandler.AddResult(result);
 

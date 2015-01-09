@@ -41,7 +41,7 @@
             this.handlers = new List<IMessageHandler>();
 
             this.handlers.Add(new PingHandler());
-            this.handlers.Add(new ResultMessageHandler());
+            this.handlers.Add(new ReplyMessageHandler());
         }
     }
 }

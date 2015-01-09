@@ -5,9 +5,9 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal delegate bool ResultFilter(Result result);
+    internal delegate bool ResultFilter(ReturnedObject returnedObject);
 
-    internal delegate void ResultCallback(Result result);
+    internal delegate void ResultCallback(ReturnedObject returnedObject);
 
     internal class ResultHandler
     {
@@ -15,13 +15,13 @@
 
         private Dictionary<WaitHandle, RegisteredResultWait> waits;
 
-        private Dictionary<RegisteredResultWait, Result> waitResults;
+        private Dictionary<RegisteredResultWait, ReturnedObject> waitResults;
 
         internal ResultHandler()
         {
             this.callbacks = new List<RegisteredResultCallback>();
             this.waits = new Dictionary<WaitHandle, RegisteredResultWait>();
-            this.waitResults = new Dictionary<RegisteredResultWait, Result>();
+            this.waitResults = new Dictionary<RegisteredResultWait, ReturnedObject>();
         }
  
         internal WaitHandle RegisterWaitHandler(ResultFilter filter)
@@ -39,7 +39,7 @@
             this.callbacks.Add(new RegisteredResultCallback(filter, callback));
         }
 
-        internal Task<Result> WaitForResult(WaitHandle waitHandle)
+        internal Task<ReturnedObject> WaitForResult(WaitHandle waitHandle)
         {
             return Task.Factory.StartNew(() =>
             {
@@ -59,26 +59,26 @@
                     throw new TimeoutException("Response was never received");
                 }
 
-                Result result;
-                if (!this.waitResults.TryGetValue(wait, out result))
+                ReturnedObject returnedObject;
+                if (!this.waitResults.TryGetValue(wait, out returnedObject))
                 {
                     throw new InvalidOperationException("Wait was triggered, but no result was available");
                 }
 
-                return result;
+                return returnedObject;
             });
         }
 
-        internal void AddResult(Result newResult)
+        internal void AddResult(ReturnedObject newReturnedObject)
         {
             var waitsToRemove = new List<WaitHandle>();
             var callbacksToRemove = new List<RegisteredResultCallback>();
 
             foreach (var wait in this.waits)
             {
-                if (wait.Value.Filter(newResult))
+                if (wait.Value.Filter(newReturnedObject))
                 {
-                    this.waitResults.Add(wait.Value, newResult);
+                    this.waitResults.Add(wait.Value, newReturnedObject);
                     wait.Value.WaitEvent.Set();
                     waitsToRemove.Add(wait.Key);
                 }
@@ -86,9 +86,9 @@
 
             foreach (var callback in this.callbacks)
             {
-                if (callback.Filter(newResult))
+                if (callback.Filter(newReturnedObject))
                 {
-                    callback.Callback(newResult);
+                    callback.Callback(newReturnedObject);
                     callbacksToRemove.Add(callback);
                 }
             }

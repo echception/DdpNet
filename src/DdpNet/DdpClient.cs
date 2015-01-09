@@ -115,5 +115,46 @@
                 this.handler.HandleMessage(this, result);
             }
         }
+
+        public async Task Call(string methodName, List<object> parameters)
+        {
+            await this.CallGetResult(methodName, parameters);
+        }
+
+        public async Task<T> Call<T>(string methodName, List<object> parameters)
+        {
+            var resultObject = await this.CallGetResult(methodName, parameters);
+
+            if (resultObject.ResultObject == null)
+            {
+                throw new InvalidOperationException("Server did not return an object when a return value was expected");
+            }
+
+            return resultObject.ResultObject.ToObject<T>();
+        }
+
+        private async Task<Result> CallGetResult(string methodName, List<object> parameters)
+        {
+            
+            var id = Utilities.GenerateID();
+
+            var waitHandler = this.ResultHandler.RegisterWaitHandler(
+                returnedObject =>
+                    returnedObject.MessageType == "result" && (string)returnedObject.ParsedObject.id == id);
+
+            var method = new Method(methodName, parameters, id);
+            await this.SendObject(method);
+
+            var result = await this.ResultHandler.WaitForResult(waitHandler);
+
+            var resultObject = JsonConvert.DeserializeObject<Result>(result.Message);
+
+            if (resultObject.Error != null)
+            {
+                throw new InvalidOperationException(string.Format("Server returned an error {0}. Details: {1}. Reason: {2}", resultObject.Error.ErrorMessage, resultObject.Error.Details, resultObject.Error.Reason));
+            }
+
+            return resultObject;
+        }
     }
 }
