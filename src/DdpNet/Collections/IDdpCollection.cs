@@ -11,5 +11,6 @@ namespace DdpNet.Collections
     internal interface IDdpCollection
     {
         void Add(string id, JObject jObject);
+        void Change(string id, Dictionary<string, JToken> fields, string[] cleared);
     }
 }

@@ -38,6 +38,7 @@
             this.handlers.Add(new PingHandler());
             this.handlers.Add(new ReplyMessageHandler());
             this.handlers.Add(new AddedHandler());
+            this.handlers.Add(new ChangedHandler());
         }
     }
 }

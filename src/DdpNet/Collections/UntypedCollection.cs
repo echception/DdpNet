@@ -27,5 +27,10 @@ namespace DdpNet.Collections
         {
             this.objects.Add(id, value);
         }
+
+        public void Change(string id, Dictionary<string, JToken> fields, string[] cleared)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

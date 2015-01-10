@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Collections\CollectionManager.cs" />
     <Compile Include="Collections\IDdpCollection.cs" />
+    <Compile Include="Collections\ObjectChanger.cs" />
     <Compile Include="Collections\TypedCollection.cs" />
     <Compile Include="Collections\UntypedCollection.cs" />
     <Compile Include="DdpClient.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="DdpObject.cs" />
     <Compile Include="DdpSubscription.cs" />
     <Compile Include="IWebSocketConnection.cs" />
+    <Compile Include="MessageHandlers\ChangedHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\AddedHandler.cs" />
     <Compile Include="MessageHandlers\BaseMessageHandler.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="MessageHandlers\ReplyMessageHandler.cs" />
     <Compile Include="Messages\Added.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
+    <Compile Include="Messages\Changed.cs" />
     <Compile Include="Messages\Connect.cs" />
     <Compile Include="Messages\Connected.cs" />
     <Compile Include="Messages\Error.cs" />

@@ -13,7 +13,7 @@
             this.collections = new Dictionary<string, IDdpCollection>();
         }
 
-        public void Add(Added message)
+        internal void Add(Added message)
         {
             if (!this.collections.ContainsKey(message.Collection))
             {
@@ -21,6 +21,16 @@
             }
 
             this.collections[message.Collection].Add(message.ID, message.Fields);
+        }
+
+        internal void Changed(Changed message)
+        {
+            if (!this.collections.ContainsKey(message.Collection))
+            {
+                return;
+            }
+
+            this.collections[message.Collection].Change(message.ID, message.Fields, message.Cleared);
         }
 
         public DdpSubscription<T> GetSubscription<T>(string subscriptionName) where T: DdpObject
