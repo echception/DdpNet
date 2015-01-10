@@ -44,14 +44,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\CollectionManager.cs" />
+    <Compile Include="Collections\IDdpCollection.cs" />
+    <Compile Include="Collections\TypedCollection.cs" />
+    <Compile Include="Collections\UntypedCollection.cs" />
     <Compile Include="DdpClient.cs" />
     <Compile Include="DdpClientState.cs" />
+    <Compile Include="DdpObject.cs" />
+    <Compile Include="DdpSubscription.cs" />
     <Compile Include="IWebSocketConnection.cs" />
-    <Compile Include="MessageHandler.cs" />
+    <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\AddedHandler.cs" />
     <Compile Include="MessageHandlers\BaseMessageHandler.cs" />
     <Compile Include="MessageHandlers\IMessageHandler.cs" />
     <Compile Include="MessageHandlers\PingHandler.cs" />
     <Compile Include="MessageHandlers\ReplyMessageHandler.cs" />
+    <Compile Include="Messages\Added.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\Connect.cs" />
     <Compile Include="Messages\Connected.cs" />
@@ -61,10 +69,12 @@
     <Compile Include="Messages\Ping.cs" />
     <Compile Include="Messages\Pong.cs" />
     <Compile Include="Messages\Result.cs" />
+    <Compile Include="Messages\Subscribe.cs" />
     <Compile Include="MeteorClient.cs" />
     <Compile Include="ParameterObjects\LoginPasswordParameters.cs" />
     <Compile Include="ParameterObjects\Password.cs" />
     <Compile Include="ParameterObjects\User.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\RegisteredResultCallback.cs" />
     <Compile Include="Results\RegisteredResultWait.cs" />

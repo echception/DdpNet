@@ -1,11 +1,6 @@
-﻿namespace DdpNet
+﻿namespace DdpNet.MessageHandlers
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using MessageHandlers;
-    using Messages;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     internal class MessageHandler
@@ -42,6 +37,7 @@
 
             this.handlers.Add(new PingHandler());
             this.handlers.Add(new ReplyMessageHandler());
+            this.handlers.Add(new AddedHandler());
         }
     }
 }

@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Collections;
+    using MessageHandlers;
     using Messages;
     using Newtonsoft.Json;
     using Results;
@@ -26,6 +28,8 @@
 
         internal ResultHandler ResultHandler { get; private set; }
 
+        internal CollectionManager CollectionManager { get; private set; }
+
         public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
         {
             
@@ -37,6 +41,7 @@
             this.state = DdpClientState.NotConnected;
             this.handler = new MessageHandler();
             this.ResultHandler = new ResultHandler();
+            this.CollectionManager = new CollectionManager();
         }
 
         internal async Task ConnectAsync(bool startBackgroundThread)
@@ -133,9 +138,35 @@
             return resultObject.ResultObject.ToObject<T>();
         }
 
+        public DdpSubscription<T> Subscribe<T>(string subscriptionName) where T : DdpObject
+        {
+            return this.Subscribe<T>(subscriptionName, subscriptionName);
+        }
+
+        public DdpSubscription<T> Subscribe<T>(string subscriptionName, string collectionName) where T : DdpObject
+        {
+            return this.Subscribe<T>(subscriptionName, collectionName, new List<object>());
+        }
+
+        public DdpSubscription<T> Subscribe<T>(string subscriptionName, List<object> parameters) where T : DdpObject
+        {
+            return this.Subscribe<T>(subscriptionName, subscriptionName, parameters);
+        }
+
+        public DdpSubscription<T> Subscribe<T>(string subscriptionName, string collectionName, List<object> parameters)
+            where T : DdpObject
+        {
+            var subscription = this.CollectionManager.GetSubscription<T>(subscriptionName, collectionName);
+
+            var sub = new Subscribe(Utilities.GenerateID(), subscriptionName, parameters.ToArray());
+
+            this.SendObject(sub);
+
+            return subscription;
+        }
+
         private async Task<Result> CallGetResult(string methodName, List<object> parameters)
         {
-            
             var id = Utilities.GenerateID();
 
             var waitHandler = this.ResultHandler.RegisterWaitHandler(

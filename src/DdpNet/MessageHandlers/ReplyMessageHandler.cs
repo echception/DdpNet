@@ -8,7 +8,7 @@
 
     internal class ReplyMessageHandler : IMessageHandler
     {
-        private static readonly string[] resultMessageTypes = new[] {"connected", "failed"};
+        private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result"};
 
         public Task HandleMessage(DdpClient client, string message)
         {
