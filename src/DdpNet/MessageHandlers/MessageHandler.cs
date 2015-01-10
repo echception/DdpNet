@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.MessageHandlers
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
 
     internal class MessageHandler
@@ -12,7 +13,7 @@
             this.GetHandlers();
         }
 
-        internal void HandleMessage(DdpClient client, string messageText)
+        internal async Task HandleMessage(DdpClient client, string messageText)
         {
             dynamic message = JObject.Parse(messageText);
 
@@ -25,7 +26,7 @@
                 {
                     if (handler.CanHandle(messageType))
                     {
-                        handler.HandleMessage(client, messageText);
+                        await handler.HandleMessage(client, messageText);
                     }
                 }
             }

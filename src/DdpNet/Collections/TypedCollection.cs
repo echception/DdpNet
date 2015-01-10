@@ -1,7 +1,9 @@
 ﻿namespace DdpNet.Collections
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Cryptography;
     using Newtonsoft.Json.Linq;
 
     internal class TypedCollection<T> : IDdpCollection where T: DdpObject
@@ -26,7 +28,7 @@
         {
             var deserializedObject = jObject.ToObject<T>();
             deserializedObject.ID = id;
-
+            
             this.objects.Add(id, deserializedObject);
 
             foreach (var subscription in this.subscriptions)

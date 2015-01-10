@@ -117,7 +117,7 @@
 
             if (!String.IsNullOrWhiteSpace(result))
             {
-                this.handler.HandleMessage(this, result);
+                await this.handler.HandleMessage(this, result);
             }
         }
 
