@@ -30,6 +30,8 @@
 
         internal CollectionManager CollectionManager { get; private set; }
 
+        private Dictionary<string, string> subscriptions; 
+
         public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
         {
             
@@ -42,6 +44,7 @@
             this.handler = new MessageHandler();
             this.ResultHandler = new ResultHandler();
             this.CollectionManager = new CollectionManager();
+            this.subscriptions = new Dictionary<string, string>();
         }
 
         internal async Task ConnectAsync(bool startBackgroundThread)
@@ -138,31 +141,23 @@
             return resultObject.ResultObject.ToObject<T>();
         }
 
-        public DdpSubscription<T> Subscribe<T>(string subscriptionName) where T : DdpObject
+        public Task Subscribe(string subscriptionName)
         {
-            return this.Subscribe<T>(subscriptionName, subscriptionName);
+            return this.Subscribe(subscriptionName, new List<object>());
         }
 
-        public DdpSubscription<T> Subscribe<T>(string subscriptionName, string collectionName) where T : DdpObject
+        public async Task Subscribe(string subscriptionName, List<object> parameters)
         {
-            return this.Subscribe<T>(subscriptionName, collectionName, new List<object>());
+            var id = Utilities.GenerateID();
+            this.subscriptions.Add(subscriptionName, id);
+            var sub = new Subscribe(id, subscriptionName, parameters.ToArray());
+
+            await this.SendObject(sub);
         }
 
-        public DdpSubscription<T> Subscribe<T>(string subscriptionName, List<object> parameters) where T : DdpObject
+        public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
         {
-            return this.Subscribe<T>(subscriptionName, subscriptionName, parameters);
-        }
-
-        public DdpSubscription<T> Subscribe<T>(string subscriptionName, string collectionName, List<object> parameters)
-            where T : DdpObject
-        {
-            var subscription = this.CollectionManager.GetSubscription<T>(subscriptionName, collectionName);
-
-            var sub = new Subscribe(Utilities.GenerateID(), subscriptionName, parameters.ToArray());
-
-            this.SendObject(sub);
-
-            return subscription;
+            return this.CollectionManager.GetCollection<T>(collectionName);
         }
 
         private async Task<Result> CallGetResult(string methodName, List<object> parameters)

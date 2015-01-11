@@ -1,5 +1,6 @@
 ﻿namespace DdpNet.Collections
 {
+    using System;
     using System.Collections.Generic;
     using Messages;
     using Newtonsoft.Json.Linq;
@@ -13,72 +14,96 @@
             this.collections = new Dictionary<string, IDdpCollection>();
         }
 
-        internal void Add(Added message)
+        internal void Added(Added message)
         {
             if (!this.collections.ContainsKey(message.Collection))
             {
                 this.collections.Add(message.Collection, new UntypedCollection(message.Collection));
             }
 
-            this.collections[message.Collection].Add(message.ID, message.Fields);
+            try
+            {
+                this.collections[message.Collection].Added(message.ID, message.Fields);
+            }
+            catch (InactiveCollectionException)
+            {
+                this.collections[message.Collection].Added(message.ID, message.Fields);
+            }
+            
         }
 
         internal void Changed(Changed message)
         {
             if (!this.collections.ContainsKey(message.Collection))
             {
-                return;
+                throw new InvalidOperationException("Object to change was not present");
             }
 
-            this.collections[message.Collection].Change(message.ID, message.Fields, message.Cleared);
+            try
+            {
+                this.collections[message.Collection].Changed(message.ID, message.Fields, message.Cleared);
+            }
+            catch (InactiveCollectionException)
+            {
+                this.collections[message.Collection].Changed(message.ID, message.Fields, message.Cleared);
+            }
+            
         }
 
         internal void Removed(Removed message)
         {
             if (!this.collections.ContainsKey(message.Collection))
             {
-                return;
+                throw new InvalidOperationException("Object to remove was not present");
             }
 
-            this.collections[message.Collection].Remove(message.ID);
+            try
+            {
+                this.collections[message.Collection].Removed(message.ID);
+            }
+            catch (InactiveCollectionException)
+            {
+                this.collections[message.Collection].Removed(message.ID);
+            }
+            
         }
 
-        public DdpSubscription<T> GetSubscription<T>(string subscriptionName) where T: DdpObject
-        {
-            return this.GetSubscription<T>(subscriptionName, subscriptionName);
-        }
-
-        public DdpSubscription<T> GetSubscription<T>(string subscriptionName, string collectionName) where T: DdpObject
+        public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
         {
             IDdpCollection collection;
 
             if (!this.collections.TryGetValue(collectionName, out collection))
             {
-                collection = new TypedCollection<T>(collectionName);
+                collection = new DdpCollection<T>(collectionName);
                 this.collections.Add(collectionName, collection);
             }
             else if (collection is UntypedCollection)
             {
-                var convertedCollection = this.ConvertToTypedCollection<T>((UntypedCollection) collection);
-                this.collections[collectionName] = convertedCollection;
+                var convertedCollection = this.ConvertToTypedCollection<T>(collectionName, (UntypedCollection) collection);
                 collection = convertedCollection;
             }
 
-            var typedCollection = (TypedCollection<T>) collection;
-
-            return typedCollection.GetSubscription(subscriptionName);
-        }
-
-        private TypedCollection<T> ConvertToTypedCollection<T>(UntypedCollection collection) where T: DdpObject
-        {
-            var typedCollection = new TypedCollection<T>(collection.CollectionName);
-
-            foreach (var item in collection.Objects)
-            {
-                typedCollection.Add(item.Key, item.Value);
-            }
+            var typedCollection = (DdpCollection<T>) collection;
 
             return typedCollection;
+        }
+
+        private DdpCollection<T> ConvertToTypedCollection<T>(string collectionName, UntypedCollection collection) where T: DdpObject
+        {
+            lock (collection.syncObject)
+            {
+                var typedCollection = new DdpCollection<T>(collection.CollectionName);
+                this.collections[collectionName] = typedCollection;
+
+                var ddpCollection = (IDdpCollection) typedCollection;
+
+                foreach (var item in collection.Objects)
+                {
+                    ddpCollection.Added(item.Key, item.Value);
+                }
+
+                return typedCollection;
+            }
         }
     }
 }

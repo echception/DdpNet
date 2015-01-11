@@ -10,9 +10,9 @@ namespace DdpNet.Collections
 
     internal interface IDdpCollection
     {
-        void Add(string id, JObject jObject);
-        void Change(string id, Dictionary<string, JToken> fields, string[] cleared);
+        void Added(string id, JObject jObject);
+        void Changed(string id, Dictionary<string, JToken> fields, string[] cleared);
 
-        void Remove(string id);
+        void Removed(string id);
     }
 }

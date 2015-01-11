@@ -46,13 +46,13 @@
   <ItemGroup>
     <Compile Include="Collections\CollectionManager.cs" />
     <Compile Include="Collections\IDdpCollection.cs" />
+    <Compile Include="Collections\InactiveCollectionException.cs" />
     <Compile Include="Collections\ObjectChanger.cs" />
-    <Compile Include="Collections\TypedCollection.cs" />
     <Compile Include="Collections\UntypedCollection.cs" />
     <Compile Include="DdpClient.cs" />
     <Compile Include="DdpClientState.cs" />
     <Compile Include="DdpObject.cs" />
-    <Compile Include="DdpSubscription.cs" />
+    <Compile Include="DdpCollection.cs" />
     <Compile Include="IWebSocketConnection.cs" />
     <Compile Include="MessageHandlers\ChangedHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />

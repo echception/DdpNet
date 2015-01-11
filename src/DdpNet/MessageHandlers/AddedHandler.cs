@@ -16,7 +16,7 @@
             return Task.Factory.StartNew(() =>
             {
                 var parsedObject = JsonConvert.DeserializeObject<Added>(message);
-                client.CollectionManager.Add(parsedObject);
+                client.CollectionManager.Added(parsedObject);
             });
         }
     }

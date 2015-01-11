@@ -19,33 +19,63 @@ namespace DdpNet.Collections
 
         private ObjectChanger changer;
 
+        internal readonly object syncObject = new object();
+
+        private bool active;
+
         public UntypedCollection(string collectionName)
         {
             this.CollectionName = collectionName;
             this.objects = new Dictionary<string, JObject>();
             this.changer = new ObjectChanger();
+            this.active = true;
         }
 
-        public void Add(string id, JObject value)
+        public void Added(string id, JObject value)
         {
-            this.objects.Add(id, value);
-        }
-
-        public void Change(string id, Dictionary<string, JToken> fields, string[] cleared)
-        {
-            var objectToChange = this.objects[id];
-
-            if (objectToChange == null)
+            lock (this.syncObject)
             {
-                return;
+                this.ThrowIfInactive();
+                this.objects.Add(id, value);
             }
-
-            this.changer.ChangeObject(objectToChange, fields, cleared);
         }
 
-        public void Remove(string id)
+        public void Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
         {
-            this.objects.Remove(id);
+            lock (this.syncObject)
+            {
+                this.ThrowIfInactive();
+                var objectToChange = this.objects[id];
+
+                if (objectToChange == null)
+                {
+                    return;
+                }
+
+                this.changer.ChangeObject(objectToChange, fields, cleared);
+            }
+        }
+
+        public void Removed(string id)
+        {
+            lock (this.syncObject)
+            {
+                this.ThrowIfInactive();
+                this.objects.Remove(id);
+            }
+        }
+
+        internal void ThrowIfInactive()
+        {
+            if (!this.active)
+            {
+                throw new InactiveCollectionException();
+            }
+        }
+
+        internal void SetInactive()
+        {
+            this.active = false;
         }
     }
 }
