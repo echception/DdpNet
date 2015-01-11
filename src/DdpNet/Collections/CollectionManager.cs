@@ -33,6 +33,16 @@
             this.collections[message.Collection].Change(message.ID, message.Fields, message.Cleared);
         }
 
+        internal void Removed(Removed message)
+        {
+            if (!this.collections.ContainsKey(message.Collection))
+            {
+                return;
+            }
+
+            this.collections[message.Collection].Remove(message.ID);
+        }
+
         public DdpSubscription<T> GetSubscription<T>(string subscriptionName) where T: DdpObject
         {
             return this.GetSubscription<T>(subscriptionName, subscriptionName);

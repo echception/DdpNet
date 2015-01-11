@@ -49,6 +49,21 @@
             this.changer.ChangeObject(objectToChange, fields, cleared);
         }
 
+        public void Remove(string id)
+        {
+            var objectToRemove = this.objects[id];
+
+            if (objectToRemove != null)
+            {
+                this.objects.Remove(id);
+
+                foreach (var subscription in this.subscriptions)
+                {
+                    subscription.Value.Remove(objectToRemove);
+                }
+            }
+        }
+
         public DdpSubscription<T> GetSubscription(string subscriptionName)
         {
             if (!this.subscriptions.ContainsKey(subscriptionName))
