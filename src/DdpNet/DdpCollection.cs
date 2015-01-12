@@ -6,19 +6,34 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using Collections;
+    using Messages;
     using Newtonsoft.Json.Linq;
 
     public class DdpCollection<T> : ObservableCollection<T>, IDdpCollection where T: DdpObject
     {
         internal string CollectionName { get; private set; }
+        private DdpClient client;
 
         private SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
         private ObjectChanger changer = new ObjectChanger();
 
-        internal DdpCollection(string collectionName)
+        internal DdpCollection(DdpClient client, string collectionName)
         {
             this.CollectionName = collectionName;
+            this.client = client;
+        }
+
+        public Task InsertAsync(T item)
+        {
+            var methodName = string.Format(@"/{0}/insert", this.CollectionName);
+            return this.client.Call(methodName, new List<object>() {item});
+        }
+
+        protected override void InsertItem(int index, T item)
+        {
+            this.InsertAsync(item).Wait();
         }
 
         void IDdpCollection.Added(string id, JObject jObject)

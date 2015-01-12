@@ -43,7 +43,7 @@
             this.state = DdpClientState.NotConnected;
             this.handler = new MessageHandler();
             this.ResultHandler = new ResultHandler();
-            this.CollectionManager = new CollectionManager();
+            this.CollectionManager = new CollectionManager(this);
             this.subscriptions = new Dictionary<string, string>();
         }
 

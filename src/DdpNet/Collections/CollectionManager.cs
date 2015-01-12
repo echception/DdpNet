@@ -9,9 +9,12 @@
     {
         private readonly Dictionary<string, IDdpCollection> collections;
 
-        public CollectionManager()
+        private DdpClient client;
+
+        public CollectionManager(DdpClient client)
         {
             this.collections = new Dictionary<string, IDdpCollection>();
+            this.client = client;
         }
 
         internal void Added(Added message)
@@ -74,7 +77,7 @@
 
             if (!this.collections.TryGetValue(collectionName, out collection))
             {
-                collection = new DdpCollection<T>(collectionName);
+                collection = new DdpCollection<T>(this.client, collectionName);
                 this.collections.Add(collectionName, collection);
             }
             else if (collection is UntypedCollection)
@@ -92,7 +95,7 @@
         {
             lock (collection.syncObject)
             {
-                var typedCollection = new DdpCollection<T>(collection.CollectionName);
+                var typedCollection = new DdpCollection<T>(this.client, collection.CollectionName);
                 this.collections[collectionName] = typedCollection;
 
                 var ddpCollection = (IDdpCollection) typedCollection;

@@ -25,6 +25,8 @@ namespace DdpNet.Test.Console
 
             posts.CollectionChanged += (sender, eventArgs) => Console.WriteLine(posts.Count);
 
+            posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
+
             Console.ReadKey();
         }
     }
