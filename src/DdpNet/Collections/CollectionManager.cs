@@ -11,6 +11,8 @@
 
         private DdpClient client;
 
+        private object collectionsSyncObject = new object();
+
         public CollectionManager(DdpClient client)
         {
             this.collections = new Dictionary<string, IDdpCollection>();
@@ -21,7 +23,13 @@
         {
             if (!this.collections.ContainsKey(message.Collection))
             {
-                this.collections.Add(message.Collection, new UntypedCollection(message.Collection));
+                lock (this.collectionsSyncObject)
+                {
+                    if (!this.collections.ContainsKey(message.Collection))
+                    {
+                        this.collections.Add(message.Collection, new UntypedCollection(message.Collection));
+                    }
+                }
             }
 
             try
@@ -75,20 +83,24 @@
         {
             IDdpCollection collection;
 
-            if (!this.collections.TryGetValue(collectionName, out collection))
+            lock (this.collectionsSyncObject)
             {
-                collection = new DdpCollection<T>(this.client, collectionName);
-                this.collections.Add(collectionName, collection);
-            }
-            else if (collection is UntypedCollection)
-            {
-                var convertedCollection = this.ConvertToTypedCollection<T>(collectionName, (UntypedCollection) collection);
-                collection = convertedCollection;
-            }
+                if (!this.collections.TryGetValue(collectionName, out collection))
+                {
+                    collection = new DdpCollection<T>(this.client, collectionName);
+                    this.collections.Add(collectionName, collection);
+                }
+                else if (collection is UntypedCollection)
+                {
+                    var convertedCollection = this.ConvertToTypedCollection<T>(collectionName,
+                        (UntypedCollection) collection);
+                    collection = convertedCollection;
+                }
 
-            var typedCollection = (DdpCollection<T>) collection;
+                var typedCollection = (DdpCollection<T>) collection;
 
-            return typedCollection;
+                return typedCollection;
+            }
         }
 
         private DdpCollection<T> ConvertToTypedCollection<T>(string collectionName, UntypedCollection collection) where T: DdpObject

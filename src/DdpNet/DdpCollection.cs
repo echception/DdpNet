@@ -36,12 +36,17 @@
             this.InsertAsync(item).Wait();
         }
 
+        internal void AddInternal(T item)
+        {
+            base.InsertItem(this.Count, item);
+        }
+
         void IDdpCollection.Added(string id, JObject jObject)
         {
             var deserializedObject = jObject.ToObject<T>();
             deserializedObject.ID = id;
 
-            this.Add(deserializedObject);
+            this.AddInternal(deserializedObject);
         }
 
         void IDdpCollection.Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
