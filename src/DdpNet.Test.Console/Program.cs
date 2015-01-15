@@ -23,7 +23,19 @@ namespace DdpNet.Test.Console
             client.Subscribe("posts").Wait();
             var posts = client.GetCollection<Post>("posts");
 
-            posts.CollectionChanged += (sender, eventArgs) => Console.WriteLine(posts.Count);
+            posts.CollectionChanged += (sender, eventArgs) =>
+            {
+                Console.WriteLine(posts.Count);
+                foreach (var post in posts)
+                {
+                    Console.WriteLine(post.title);
+                }
+            };
+
+            foreach (var post in posts)
+            {
+                
+            }
 
             //posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
 
