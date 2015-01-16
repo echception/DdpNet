@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -45,7 +46,7 @@
             {
                 if (waitHandle.Triggered)
                 {
-                    throw new InvalidOperationException("WaitHandle has already been triggered");
+                    throw new InvalidOperationException("WaitHandle has already completed");
                 }
 
                 RegisteredResultWait wait;
@@ -54,10 +55,12 @@
                     throw new InvalidOperationException("Specified WaitHandle does not exist");
                 }
 
-                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(5)))
+                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(50)))
                 {
                     throw new TimeoutException("Response was never received");
                 }
+
+                waitHandle.Triggered = true;
 
                 ReturnedObject returnedObject;
                 if (!this.waitResults.TryGetValue(wait, out returnedObject))
@@ -65,26 +68,29 @@
                     throw new InvalidOperationException("Wait was triggered, but no result was available");
                 }
 
+                this.waitResults.Remove(wait);
+
                 return returnedObject;
             });
         }
 
         internal void AddResult(ReturnedObject newReturnedObject)
         {
-            var waitsToRemove = new List<WaitHandle>();
             var callbacksToRemove = new List<RegisteredResultCallback>();
 
-            foreach (var wait in this.waits)
+            var waitsToIterate = this.waits.ToList();
+            var callbacksToIterate = this.callbacks.ToList();
+
+            foreach (var wait in waitsToIterate)
             {
                 if (wait.Value.Filter(newReturnedObject))
                 {
                     this.waitResults.Add(wait.Value, newReturnedObject);
                     wait.Value.WaitEvent.Set();
-                    waitsToRemove.Add(wait.Key);
                 }
             }
 
-            foreach (var callback in this.callbacks)
+            foreach (var callback in callbacksToIterate)
             {
                 if (callback.Filter(newReturnedObject))
                 {
@@ -96,11 +102,6 @@
             foreach (var removedCallback in callbacksToRemove)
             {
                 this.callbacks.Remove(removedCallback);
-            }
-
-            foreach (var removedWait in waitsToRemove)
-            {
-                this.waits.Remove(removedWait);
             }
         }
     }

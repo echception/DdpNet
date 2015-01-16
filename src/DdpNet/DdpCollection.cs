@@ -41,17 +41,12 @@
             return this.client.Call(methodName, new List<object>() {item});
         }
 
-        internal void AddInternal(T item)
-        {
-            this.internalList.Add(item);
-        }
-
         void IDdpCollection.Added(string id, JObject jObject)
         {
             var deserializedObject = jObject.ToObject<T>();
             deserializedObject.ID = id;
 
-            this.AddInternal(deserializedObject);
+            this.internalList.Add(deserializedObject);
             this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, deserializedObject));
             this.OnPropertyChanged(new PropertyChangedEventArgs("Count"));
         }

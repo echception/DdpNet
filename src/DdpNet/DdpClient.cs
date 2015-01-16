@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Collections;
@@ -124,9 +125,19 @@
             }
         }
 
-        public async Task Call(string methodName, List<object> parameters)
+        public Task Call(string methodName)
         {
-            await this.CallGetResult(methodName, parameters);
+            return this.Call(methodName, new List<object>());
+        }
+
+        public Task<T> Call<T>(string methodName)
+        {
+            return this.Call<T>(methodName, new List<object>());
+        }
+
+        public Task Call(string methodName, List<object> parameters)
+        {
+            return this.CallGetResult(methodName, parameters);
         }
 
         public async Task<T> Call<T>(string methodName, List<object> parameters)
@@ -152,7 +163,24 @@
             this.subscriptions.Add(subscriptionName, id);
             var sub = new Subscribe(id, subscriptionName, parameters.ToArray());
 
+            var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(
+                returnedObject =>
+                {
+                    if (returnedObject.MessageType == "ready")
+                    {
+                        var readyObject = returnedObject.ParsedObject.ToObject<Ready>();
+
+                        if (readyObject.SubscriptionsReady.Contains(id))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+
             await this.SendObject(sub);
+
+            await this.ResultHandler.WaitForResult(readyWaitHandler);
         }
 
         public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
@@ -164,14 +192,30 @@
         {
             var id = Utilities.GenerateID();
 
-            var waitHandler = this.ResultHandler.RegisterWaitHandler(
+            var resultWaitHandler = this.ResultHandler.RegisterWaitHandler(
                 returnedObject =>
-                    returnedObject.MessageType == "result" && (string)returnedObject.ParsedObject.id == id);
+                    returnedObject.MessageType == "result" && ((string)(returnedObject.ParsedObject["id"])) == id);
+
+            var updatedWaitHandler = this.ResultHandler.RegisterWaitHandler(
+                returnedObject =>
+                {
+                    if (returnedObject.MessageType == "updated")
+                    {
+                        var updatedObject = returnedObject.ParsedObject.ToObject<Updated>();
+
+                        if (updatedObject.Methods.Contains(id))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
 
             var method = new Method(methodName, parameters, id);
             await this.SendObject(method);
 
-            var result = await this.ResultHandler.WaitForResult(waitHandler);
+            var result = await this.ResultHandler.WaitForResult(resultWaitHandler);
+            var updated = await this.ResultHandler.WaitForResult(updatedWaitHandler);
 
             var resultObject = JsonConvert.DeserializeObject<Result>(result.Message);
 

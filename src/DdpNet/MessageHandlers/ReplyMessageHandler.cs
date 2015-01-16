@@ -8,12 +8,12 @@
 
     internal class ReplyMessageHandler : IMessageHandler
     {
-        private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result"};
+        private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result", "ready", "updated"};
 
         public Task HandleMessage(DdpClient client, string message)
         {
-            dynamic parsedObject = JObject.Parse(message);
-            var result = new ReturnedObject((string)parsedObject.msg, parsedObject, message);
+            JObject parsedObject = JObject.Parse(message);
+            var result = new ReturnedObject((string)parsedObject["msg"], parsedObject, message);
 
             client.ResultHandler.AddResult(result);
 

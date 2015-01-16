@@ -38,6 +38,9 @@ namespace DdpNet.Test.Console
             }
 
             //posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
+            var task = client.Call<string>("testMethod");
+            task.Wait();
+            Console.WriteLine(task.Result);
 
             Console.ReadKey();
         }

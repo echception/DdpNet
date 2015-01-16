@@ -4,7 +4,7 @@
 
     internal class WaitHandle
     {
-        internal bool Triggered { get; private set; }
+        internal bool Triggered { get; set; }
 
         internal WaitHandle()
         {

@@ -72,9 +72,11 @@
     <Compile Include="Messages\Method.cs" />
     <Compile Include="Messages\Ping.cs" />
     <Compile Include="Messages\Pong.cs" />
+    <Compile Include="Messages\Ready.cs" />
     <Compile Include="Messages\Removed.cs" />
     <Compile Include="Messages\Result.cs" />
     <Compile Include="Messages\Subscribe.cs" />
+    <Compile Include="Messages\Updated.cs" />
     <Compile Include="MeteorClient.cs" />
     <Compile Include="ParameterObjects\LoginPasswordParameters.cs" />
     <Compile Include="ParameterObjects\Password.cs" />
