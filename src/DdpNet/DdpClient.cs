@@ -63,7 +63,7 @@
                 VersionsSupported = this.supportedVersions
             };
 
-            var waitHandle = this.ResultHandler.RegisterWaitHandler(result => result.MessageType == "connected" || result.MessageType == "failed");
+            var waitHandle = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateConnectResultFilter());
 
             await this.SendObject(connectMessage);
 
@@ -163,20 +163,7 @@
             this.subscriptions.Add(subscriptionName, id);
             var sub = new Subscribe(id, subscriptionName, parameters.ToArray());
 
-            var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(
-                returnedObject =>
-                {
-                    if (returnedObject.MessageType == "ready")
-                    {
-                        var readyObject = returnedObject.ParsedObject.ToObject<Ready>();
-
-                        if (readyObject.SubscriptionsReady.Contains(id))
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+            var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateSubscribeResultFilter(id));
 
             await this.SendObject(sub);
 
@@ -192,30 +179,13 @@
         {
             var id = Utilities.GenerateID();
 
-            var resultWaitHandler = this.ResultHandler.RegisterWaitHandler(
-                returnedObject =>
-                    returnedObject.MessageType == "result" && ((string)(returnedObject.ParsedObject["id"])) == id);
-
-            var updatedWaitHandler = this.ResultHandler.RegisterWaitHandler(
-                returnedObject =>
-                {
-                    if (returnedObject.MessageType == "updated")
-                    {
-                        var updatedObject = returnedObject.ParsedObject.ToObject<Updated>();
-
-                        if (updatedObject.Methods.Contains(id))
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+            var resultWaitHandler =
+                this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));
 
             var method = new Method(methodName, parameters, id);
             await this.SendObject(method);
 
             var result = await this.ResultHandler.WaitForResult(resultWaitHandler);
-            var updated = await this.ResultHandler.WaitForResult(updatedWaitHandler);
 
             var resultObject = JsonConvert.DeserializeObject<Result>(result.Message);
 

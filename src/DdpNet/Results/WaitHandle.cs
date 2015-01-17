@@ -4,11 +4,16 @@
 
     internal class WaitHandle
     {
-        internal bool Triggered { get; set; }
+        internal bool Triggered { get; private set; }
 
         internal WaitHandle()
         {
             this.Triggered = false;
+        }
+
+        internal void SetTriggered()
+        {
+            this.Triggered = true;
         }
     }
 }

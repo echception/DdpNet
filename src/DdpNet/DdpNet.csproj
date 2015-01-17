@@ -83,10 +83,15 @@
     <Compile Include="ParameterObjects\User.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\ConnectedResultFilter.cs" />
+    <Compile Include="Results\MethodCallResultFilter.cs" />
     <Compile Include="Results\RegisteredResultCallback.cs" />
     <Compile Include="Results\RegisteredResultWait.cs" />
+    <Compile Include="Results\ResultFilter.cs" />
+    <Compile Include="Results\ResultFilterFactory.cs" />
     <Compile Include="Results\ReturnedObject.cs" />
     <Compile Include="Results\ResultHandler.cs" />
+    <Compile Include="Results\SubscribeResultFilter.cs" />
     <Compile Include="Results\WaitHandle.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WebSocketConnection.cs" />

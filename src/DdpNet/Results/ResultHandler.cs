@@ -6,8 +6,6 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal delegate bool ResultFilter(ReturnedObject returnedObject);
-
     internal delegate void ResultCallback(ReturnedObject returnedObject);
 
     internal class ResultHandler
@@ -16,13 +14,10 @@
 
         private Dictionary<WaitHandle, RegisteredResultWait> waits;
 
-        private Dictionary<RegisteredResultWait, ReturnedObject> waitResults;
-
         internal ResultHandler()
         {
             this.callbacks = new List<RegisteredResultCallback>();
             this.waits = new Dictionary<WaitHandle, RegisteredResultWait>();
-            this.waitResults = new Dictionary<RegisteredResultWait, ReturnedObject>();
         }
  
         internal WaitHandle RegisterWaitHandler(ResultFilter filter)
@@ -60,17 +55,10 @@
                     throw new TimeoutException("Response was never received");
                 }
 
-                waitHandle.Triggered = true;
+                waitHandle.SetTriggered();
+                this.waits.Remove(waitHandle);
 
-                ReturnedObject returnedObject;
-                if (!this.waitResults.TryGetValue(wait, out returnedObject))
-                {
-                    throw new InvalidOperationException("Wait was triggered, but no result was available");
-                }
-
-                this.waitResults.Remove(wait);
-
-                return returnedObject;
+                return wait.Filter.GetReturnedObject();
             });
         }
 
@@ -83,16 +71,18 @@
 
             foreach (var wait in waitsToIterate)
             {
-                if (wait.Value.Filter(newReturnedObject))
+                wait.Value.Filter.HandleReturnObject(newReturnedObject);
+
+                if (wait.Value.Filter.IsCompleted())
                 {
-                    this.waitResults.Add(wait.Value, newReturnedObject);
                     wait.Value.WaitEvent.Set();
                 }
             }
 
             foreach (var callback in callbacksToIterate)
             {
-                if (callback.Filter(newReturnedObject))
+                callback.Filter.HandleReturnObject(newReturnedObject);
+                if (callback.Filter.IsCompleted())
                 {
                     callback.Callback(newReturnedObject);
                     callbacksToRemove.Add(callback);
