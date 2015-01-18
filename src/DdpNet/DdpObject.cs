@@ -3,11 +3,13 @@
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using Annotations;
+    using Newtonsoft.Json;
 
     public abstract class DdpObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [JsonIgnore]
         public string ID { get; internal set; }
 
         [NotifyPropertyChangedInvocator]

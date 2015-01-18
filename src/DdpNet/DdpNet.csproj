@@ -81,6 +81,7 @@
     <Compile Include="MeteorClient.cs" />
     <Compile Include="ParameterObjects\LoginPasswordParameters.cs" />
     <Compile Include="ParameterObjects\Password.cs" />
+    <Compile Include="ParameterObjects\Set.cs" />
     <Compile Include="ParameterObjects\User.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

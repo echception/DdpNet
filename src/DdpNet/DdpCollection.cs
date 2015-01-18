@@ -1,5 +1,6 @@
 ﻿namespace DdpNet
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@
     using Collections;
     using Messages;
     using Newtonsoft.Json.Linq;
+    using ParameterObjects;
 
     public class DdpCollection<T> : IEnumerable<T>, INotifyCollectionChanged, INotifyPropertyChanged, IDdpCollection where T: DdpObject
     {
@@ -44,7 +46,15 @@
         public Task RemoveAsync(T item)
         {
             var methodName = string.Format(@"/{0}/remove", this.CollectionName);
-            return this.client.Call(methodName, new List<object>() { new IdParameter(item.ID)});
+            return this.client.Call(methodName, new List<object>() {new IdParameter(item.ID)});
+        }
+
+        public Task UpdateAsync(T item)
+        {
+            var methodName = string.Format(@"/{0}/update", this.CollectionName);
+            var selector = new IdParameter(item.ID);
+            var set = new Set(item);
+            return this.client.Call(methodName, new List<object>() {selector, set});
         }
 
         void IDdpCollection.Added(string id, JObject jObject)
