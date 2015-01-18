@@ -1,4 +1,4 @@
-﻿namespace DdpNet.Messages
+﻿namespace DdpNet.ParameterObjects
 {
     using Newtonsoft.Json;
 
