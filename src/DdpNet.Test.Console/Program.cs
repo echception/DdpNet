@@ -32,10 +32,7 @@ namespace DdpNet.Test.Console
                 }
             };
 
-            foreach (var post in posts)
-            {
-                
-            }
+            posts.RemoveAsync(posts.First()).Wait();
 
             //posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
             var task = client.Call<string>("testMethod");

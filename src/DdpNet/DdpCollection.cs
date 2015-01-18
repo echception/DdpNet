@@ -41,6 +41,12 @@
             return this.client.Call(methodName, new List<object>() {item});
         }
 
+        public Task RemoveAsync(T item)
+        {
+            var methodName = string.Format(@"/{0}/remove", this.CollectionName);
+            return this.client.Call(methodName, new List<object>() { new IdParameter(item.ID)});
+        }
+
         void IDdpCollection.Added(string id, JObject jObject)
         {
             var deserializedObject = jObject.ToObject<T>();
