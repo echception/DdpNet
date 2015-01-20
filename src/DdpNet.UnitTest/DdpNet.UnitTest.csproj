@@ -54,6 +54,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Collections\ObjectChangerTestObjects\ComplexObject.cs" />
+    <Compile Include="Collections\ObjectChangerTestObjects\SimpleField.cs" />
+    <Compile Include="Collections\ObjectChangerTestObjects\SimpleProperty.cs" />
+    <Compile Include="Collections\ObjectChangerTests.cs" />
     <Compile Include="ConnectionTests.cs" />
     <Compile Include="HeartbeatsTest.cs" />
     <Compile Include="InMemoryConnection.cs" />
