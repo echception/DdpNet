@@ -107,6 +107,7 @@
         {
             lock (collection.syncObject)
             {
+                collection.SetInactive();
                 var typedCollection = new DdpCollection<T>(this.client, collection.CollectionName);
                 this.collections[collectionName] = typedCollection;
 
