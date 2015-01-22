@@ -40,7 +40,7 @@
         /// <summary>
         /// Responsible for applying changes to an object
         /// </summary>
-        private ObjectChanger changer;
+        private UntypedObjectChanger changer;
 
         /// <summary>
         /// See the class summary. Sync object for locking
@@ -60,7 +60,7 @@
         {
             this.CollectionName = collectionName;
             this.objects = new Dictionary<string, JObject>();
-            this.changer = new ObjectChanger();
+            this.changer = new UntypedObjectChanger();
             this.active = true;
         }
 

@@ -4,6 +4,7 @@
     using System.Runtime.CompilerServices;
     using Annotations;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public class SimpleProperty : INotifyPropertyChanged
     {
@@ -67,6 +68,11 @@
                 BoolProperty = this.BoolProperty,
                 ActualNameInJsonAttribute = this.ActualNameInJsonAttribute
             };
+        }
+
+        public JToken CreateJToken()
+        {
+            return JToken.FromObject(this);
         }
     }
 }

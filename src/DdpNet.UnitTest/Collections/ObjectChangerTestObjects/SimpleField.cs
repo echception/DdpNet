@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.UnitTest.Collections.ObjectChangerTestObjects
 {
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     internal class SimpleField
     {
@@ -25,6 +26,11 @@
                 integerField = this.integerField,
                 actualFieldNameIsInAttribute = this.actualFieldNameIsInAttribute
             };
+        }
+
+        public JToken CreateJToken()
+        {
+            return JToken.FromObject(this);
         }
     }
 }

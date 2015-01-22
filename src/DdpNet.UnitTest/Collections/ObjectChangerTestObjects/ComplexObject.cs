@@ -1,5 +1,7 @@
 ﻿namespace DdpNet.UnitTest.Collections.ObjectChangerTestObjects
 {
+    using Newtonsoft.Json.Linq;
+
     public class ComplexObject
     {
         public float testField;
@@ -16,6 +18,11 @@
                 testField = this.testField,
                 NestedObject = this.NestedObject.CreateCopy()
             };
+        }
+
+        public JToken CreateJToken()
+        {
+            return JToken.FromObject(this);
         }
     }
 

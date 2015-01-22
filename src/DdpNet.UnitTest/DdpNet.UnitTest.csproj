@@ -59,6 +59,7 @@
     <Compile Include="Collections\ObjectChangerTestObjects\SimpleProperty.cs" />
     <Compile Include="Collections\ObjectChangerTests.cs" />
     <Compile Include="Collections\UntypedCollectionTests.cs" />
+    <Compile Include="Collections\UntypedObjectChangerTests.cs" />
     <Compile Include="ConnectionTests.cs" />
     <Compile Include="HeartbeatsTest.cs" />
     <Compile Include="InMemoryConnection.cs" />
