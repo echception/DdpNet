@@ -16,7 +16,7 @@
     /// All modifications to the UntypedCollection utilize double checked locking to ensure only one thread can update it at a time.
     /// This also ensures that when the collection is converted to a typed collection, the write operations will be going to the correct collection
     /// </summary>
-    internal class CollectionManager
+    internal class CollectionManager : ICollectionManager
     {
         /// <summary>
         /// The untyped collections being managed
@@ -54,7 +54,7 @@
         /// If the collection does not yet exist, an UntypedCollection will be created to store the object in
         /// </summary>
         /// <param name="message">The Added message to process</param>
-        internal void Added(Added message)
+        public void Added(Added message)
         {
             IDdpCollection collection;
 
@@ -92,7 +92,7 @@
         /// If the collection does not exist, will throw InvalidOperationException
         /// </summary>
         /// <param name="message">The Changed message to process</param>
-        internal void Changed(Changed message)
+        public void Changed(Changed message)
         {
             IDdpCollection collection;
 
@@ -129,7 +129,7 @@
         /// If the collection does not exist, throws an InvalidOperationException
         /// </summary>
         /// <param name="message">The Removed message to process</param>
-        internal void Removed(Removed message)
+        public void Removed(Removed message)
         {
             IDdpCollection collection;
 

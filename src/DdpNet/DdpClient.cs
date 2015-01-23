@@ -27,9 +27,9 @@
 
         private MessageHandler handler;
 
-        internal ResultHandler ResultHandler { get; private set; }
+        internal IResultHandler ResultHandler { get; private set; }
 
-        internal CollectionManager CollectionManager { get; private set; }
+        internal ICollectionManager CollectionManager { get; private set; }
 
         private Dictionary<string, string> subscriptions; 
 

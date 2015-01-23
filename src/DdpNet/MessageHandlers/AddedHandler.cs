@@ -13,11 +13,10 @@
 
         public override Task HandleMessage(DdpClient client, string message)
         {
-            return Task.Factory.StartNew(() =>
-            {
-                var parsedObject = JsonConvert.DeserializeObject<Added>(message);
-                client.CollectionManager.Added(parsedObject);
-            });
+            var parsedObject = JsonConvert.DeserializeObject<Added>(message);
+            client.CollectionManager.Added(parsedObject);
+
+            return Task.FromResult(true);
         }
     }
 }
