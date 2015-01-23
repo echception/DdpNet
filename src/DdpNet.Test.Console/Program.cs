@@ -32,10 +32,6 @@ namespace DdpNet.Test.Console
                 }
             };
 
-            var objectToUpdate = posts.First();
-            objectToUpdate.title = "updated w00t2";
-            posts.UpdateAsync(objectToUpdate).Wait();
-
             //posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
             var task = client.Call<string>("testMethod");
             task.Wait();

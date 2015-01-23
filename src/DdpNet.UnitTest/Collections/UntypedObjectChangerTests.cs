@@ -6,7 +6,7 @@
     using DdpNet.Collections;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json.Linq;
-    using ObjectChangerTestObjects;
+    using TestObjects;
 
     [TestClass]
     public class UntypedObjectChangerTests

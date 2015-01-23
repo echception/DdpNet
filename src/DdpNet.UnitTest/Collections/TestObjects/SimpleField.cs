@@ -1,4 +1,4 @@
-﻿namespace DdpNet.UnitTest.Collections.ObjectChangerTestObjects
+﻿namespace DdpNet.UnitTest.Collections.TestObjects
 {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

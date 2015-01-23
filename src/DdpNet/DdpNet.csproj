@@ -48,6 +48,7 @@
     <Compile Include="Collections\IDdpCollection.cs" />
     <Compile Include="Collections\InactiveCollectionException.cs" />
     <Compile Include="Collections\ObjectChanger.cs" />
+    <Compile Include="Collections\InvalidCollectionTypeException.cs" />
     <Compile Include="Collections\UntypedCollection.cs" />
     <Compile Include="Collections\UntypedObjectChanger.cs" />
     <Compile Include="DdpClient.cs" />

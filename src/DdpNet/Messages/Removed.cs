@@ -10,7 +10,7 @@
         [JsonProperty(PropertyName = "id")]
         public string ID { get; set; }
 
-        protected Removed() : base("removed")
+        internal Removed() : base("removed")
         {
         }
     }

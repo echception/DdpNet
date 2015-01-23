@@ -54,9 +54,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Collections\ObjectChangerTestObjects\ComplexObject.cs" />
-    <Compile Include="Collections\ObjectChangerTestObjects\SimpleField.cs" />
-    <Compile Include="Collections\ObjectChangerTestObjects\SimpleProperty.cs" />
+    <Compile Include="Collections\CollectionManagerTests.cs" />
+    <Compile Include="Collections\TestObjects\ComplexObject.cs" />
+    <Compile Include="Collections\TestObjects\SimpleDdpObject.cs" />
+    <Compile Include="Collections\TestObjects\TestDdpObject.cs" />
+    <Compile Include="Collections\TestObjects\SimpleField.cs" />
+    <Compile Include="Collections\TestObjects\SimpleProperty.cs" />
     <Compile Include="Collections\ObjectChangerTests.cs" />
     <Compile Include="Collections\UntypedCollectionTests.cs" />
     <Compile Include="Collections\UntypedObjectChangerTests.cs" />

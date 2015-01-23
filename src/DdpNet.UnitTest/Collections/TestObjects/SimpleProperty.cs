@@ -1,4 +1,4 @@
-﻿namespace DdpNet.UnitTest.Collections.ObjectChangerTestObjects
+﻿namespace DdpNet.UnitTest.Collections.TestObjects
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;

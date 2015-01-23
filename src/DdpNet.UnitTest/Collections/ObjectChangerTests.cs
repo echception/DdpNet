@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json.Bson;
     using Newtonsoft.Json.Linq;
-    using ObjectChangerTestObjects;
+    using TestObjects;
 
     [TestClass]
     public class ObjectChangerTests

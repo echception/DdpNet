@@ -18,7 +18,7 @@
         [JsonProperty(PropertyName = "cleared")]
         public string[] Cleared { get; set; } 
 
-        protected Changed() : base("changed")
+        internal Changed() : base("changed")
         {
         }
     }
