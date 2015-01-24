@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace DdpNet
 {
     using System.Security.Cryptography;
+    using Connection;
     using ParameterObjects;
 
     public class MeteorClient : DdpClient

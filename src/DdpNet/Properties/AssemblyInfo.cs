@@ -37,3 +37,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("DdpNet.Test.Console")]
 [assembly: InternalsVisibleTo("DdpNet.UnitTest")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

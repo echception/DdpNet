@@ -6,12 +6,13 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Collections;
+    using Connection;
     using MessageHandlers;
     using Messages;
     using Newtonsoft.Json;
     using Results;
 
-    public class DdpClient
+    public class DdpClient : IDdpConnectionSender
     {
         private readonly IWebSocketConnection webSocketConnection;
 
@@ -27,9 +28,9 @@
 
         private MessageHandler handler;
 
-        internal IResultHandler ResultHandler { get; private set; }
+        internal ResultHandler ResultHandler { get; private set; }
 
-        internal ICollectionManager CollectionManager { get; private set; }
+        internal CollectionManager CollectionManager { get; private set; }
 
         private Dictionary<string, string> subscriptions; 
 
@@ -92,7 +93,12 @@
             return this.ConnectAsync(true);
         }
 
-        internal Task SendObject(object objectToSend)
+        private Task SendObject(object objectToSend)
+        {
+            return ((IDdpConnectionSender) this).SendObject(objectToSend);
+        }
+
+        Task IDdpConnectionSender.SendObject(object objectToSend)
         {
             return this.webSocketConnection.SendAsync(JsonConvert.SerializeObject(objectToSend));
         }
@@ -121,7 +127,7 @@
 
             if (!String.IsNullOrWhiteSpace(result))
             {
-                await this.handler.HandleMessage(this, result);
+                await this.handler.HandleMessage(this, this.CollectionManager, this.ResultHandler, result);
             }
         }
 

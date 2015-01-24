@@ -3,6 +3,8 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Collections;
+    using Connection;
     using Newtonsoft.Json.Linq;
     using Results;
 
@@ -10,12 +12,12 @@
     {
         private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result", "ready", "updated"};
 
-        public Task HandleMessage(DdpClient client, string message)
+        public Task HandleMessage(IDdpConnectionSender client, ICollectionManager collectionManager, IResultHandler resultHandler, string message)
         {
             JObject parsedObject = JObject.Parse(message);
             var result = new ReturnedObject((string)parsedObject["msg"], parsedObject, message);
 
-            client.ResultHandler.AddResult(result);
+            resultHandler.AddResult(result);
 
             return Task.FromResult(true);
         }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
+    using Connection;
 
     internal class ConsoleLoggingConnection : IWebSocketConnection
     {

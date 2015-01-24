@@ -1,4 +1,4 @@
-﻿namespace DdpNet
+﻿namespace DdpNet.Connection
 {
     using System;
     using System.Net.WebSockets;

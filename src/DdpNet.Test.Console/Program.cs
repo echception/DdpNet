@@ -8,6 +8,7 @@ namespace DdpNet.Test.Console
 {
     using System.Collections.Specialized;
     using System.Threading;
+    using Connection;
     using Console = System.Console;
 
     class Program

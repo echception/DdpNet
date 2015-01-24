@@ -1,4 +1,4 @@
-﻿namespace DdpNet
+﻿namespace DdpNet.Connection
 {
     using System.Threading.Tasks;
 

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace DdpNet.UnitTest
 {
+    using Connection;
+
     public class InMemoryConnection : IWebSocketConnection
     {
         private Queue<string> sendQueue;

@@ -2,7 +2,10 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Collections;
+    using Connection;
     using Newtonsoft.Json.Linq;
+    using Results;
 
     internal class MessageHandler
     {
@@ -13,7 +16,7 @@
             this.GetHandlers();
         }
 
-        internal async Task HandleMessage(DdpClient client, string messageText)
+        public async Task HandleMessage(IDdpConnectionSender client, ICollectionManager collectionManager, IResultHandler resultHandler, string messageText)
         {
             dynamic message = JObject.Parse(messageText);
 
@@ -26,7 +29,7 @@
                 {
                     if (handler.CanHandle(messageType))
                     {
-                        await handler.HandleMessage(client, messageText);
+                        await handler.HandleMessage(client, collectionManager, resultHandler, messageText);
                     }
                 }
             }

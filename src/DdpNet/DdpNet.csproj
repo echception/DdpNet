@@ -52,11 +52,12 @@
     <Compile Include="Collections\InvalidCollectionTypeException.cs" />
     <Compile Include="Collections\UntypedCollection.cs" />
     <Compile Include="Collections\UntypedObjectChanger.cs" />
+    <Compile Include="Connection\IDdpConnectionSender.cs" />
     <Compile Include="DdpClient.cs" />
     <Compile Include="DdpClientState.cs" />
     <Compile Include="DdpObject.cs" />
     <Compile Include="DdpCollection.cs" />
-    <Compile Include="IWebSocketConnection.cs" />
+    <Compile Include="Connection\IWebSocketConnection.cs" />
     <Compile Include="MessageHandlers\ChangedHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\AddedHandler.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="Results\SubscribeResultFilter.cs" />
     <Compile Include="Results\WaitHandle.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="WebSocketConnection.cs" />
+    <Compile Include="Connection\WebSocketConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
