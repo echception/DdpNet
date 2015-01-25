@@ -14,7 +14,7 @@
         [JsonProperty(PropertyName = "result")]
         public JToken ResultObject { get; set; }
 
-        protected Result() : base("result")
+        internal Result() : base("result")
         {
         }
     }

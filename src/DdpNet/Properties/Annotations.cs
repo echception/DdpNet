@@ -11,7 +11,9 @@
 
 namespace DdpNet.Annotations
 {
-  /// <summary>
+    using System.Diagnostics.CodeAnalysis;
+
+    /// <summary>
   /// Indicates that the value of the marked element could be <c>null</c> sometimes,
   /// so the check for <c>null</c> is necessary before its usage
   /// </summary>
@@ -57,6 +59,7 @@ namespace DdpNet.Annotations
   [AttributeUsage(
     AttributeTargets.Constructor | AttributeTargets.Method,
     AllowMultiple = false, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class StringFormatMethodAttribute : Attribute
   {
     /// <param name="formatParameterName">
@@ -121,6 +124,7 @@ namespace DdpNet.Annotations
   /// </list>
   /// </example>
   [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class NotifyPropertyChangedInvocatorAttribute : Attribute
   {
     public NotifyPropertyChangedInvocatorAttribute() { }
@@ -175,6 +179,7 @@ namespace DdpNet.Annotations
   /// </code></item>
   /// </list></examples>
   [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class ContractAnnotationAttribute : Attribute
   {
     public ContractAnnotationAttribute([NotNull] string contract)
@@ -200,6 +205,7 @@ namespace DdpNet.Annotations
   /// }
   /// </code></example>
   [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class LocalizationRequiredAttribute : Attribute
   {
     public LocalizationRequiredAttribute() : this(true) { }
@@ -247,6 +253,7 @@ namespace DdpNet.Annotations
   /// </code></example>
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
   [BaseTypeRequired(typeof(Attribute))]
+  [ExcludeFromCodeCoverage]
   public sealed class BaseTypeRequiredAttribute : Attribute
   {
     public BaseTypeRequiredAttribute([NotNull] Type baseType)
@@ -263,6 +270,7 @@ namespace DdpNet.Annotations
   /// will not be marked as unused (as well as by other usage inspections)
   /// </summary>
   [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class UsedImplicitlyAttribute : Attribute
   {
     public UsedImplicitlyAttribute()
@@ -291,6 +299,7 @@ namespace DdpNet.Annotations
   /// (as well as by other usage inspections)
   /// </summary>
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class MeansImplicitUseAttribute : Attribute
   {
     public MeansImplicitUseAttribute() 
@@ -351,6 +360,7 @@ namespace DdpNet.Annotations
   /// which should not be removed and so is treated as used
   /// </summary>
   [MeansImplicitUse]
+  [ExcludeFromCodeCoverage]
   public sealed class PublicAPIAttribute : Attribute
   {
     public PublicAPIAttribute() { }
@@ -392,6 +402,7 @@ namespace DdpNet.Annotations
   /// starting from web root (~)
   /// </summary>
   [AttributeUsage(AttributeTargets.Parameter)]
+  [ExcludeFromCodeCoverage]
   public class PathReferenceAttribute : Attribute
   {
     public PathReferenceAttribute() { }
@@ -406,36 +417,42 @@ namespace DdpNet.Annotations
   // ASP.NET MVC attributes
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcAreaMasterLocationFormatAttribute : Attribute
   {
     public AspMvcAreaMasterLocationFormatAttribute(string format) { }
   }
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcAreaPartialViewLocationFormatAttribute : Attribute
   {
     public AspMvcAreaPartialViewLocationFormatAttribute(string format) { }
   }
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcAreaViewLocationFormatAttribute : Attribute
   {
     public AspMvcAreaViewLocationFormatAttribute(string format) { }
   }
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcMasterLocationFormatAttribute : Attribute
   {
     public AspMvcMasterLocationFormatAttribute(string format) { }
   }
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcPartialViewLocationFormatAttribute : Attribute
   {
     public AspMvcPartialViewLocationFormatAttribute(string format) { }
   }
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcViewLocationFormatAttribute : Attribute
   {
     public AspMvcViewLocationFormatAttribute(string format) { }
@@ -448,6 +465,7 @@ namespace DdpNet.Annotations
   /// <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>
   /// </summary>
   [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcActionAttribute : Attribute
   {
     public AspMvcActionAttribute() { }
@@ -465,6 +483,7 @@ namespace DdpNet.Annotations
   /// <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>
   /// </summary>
   [AttributeUsage(AttributeTargets.Parameter)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcAreaAttribute : PathReferenceAttribute
   {
     public AspMvcAreaAttribute() { }
@@ -484,6 +503,7 @@ namespace DdpNet.Annotations
   /// <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String, String)</c>
   /// </summary>
   [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+  [ExcludeFromCodeCoverage]
   public sealed class AspMvcControllerAttribute : Attribute
   {
     public AspMvcControllerAttribute() { }
@@ -578,6 +598,7 @@ namespace DdpNet.Annotations
   [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Property |
     AttributeTargets.Field, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class HtmlElementAttributesAttribute : Attribute
   {
     public HtmlElementAttributesAttribute() { }
@@ -592,6 +613,7 @@ namespace DdpNet.Annotations
   [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Field |
     AttributeTargets.Property, Inherited = true)]
+  [ExcludeFromCodeCoverage]
   public sealed class HtmlAttributeValueAttribute : Attribute
   {
     public HtmlAttributeValueAttribute([NotNull] string name)

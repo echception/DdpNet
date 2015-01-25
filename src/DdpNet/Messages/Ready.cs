@@ -6,7 +6,7 @@
     {
         [JsonProperty(PropertyName = "subs")]
         public string[] SubscriptionsReady { get; set; }
-        protected Ready() : base("ready")
+        internal Ready() : base("ready")
         {
         }
     }

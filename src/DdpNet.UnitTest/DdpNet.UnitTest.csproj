@@ -71,6 +71,9 @@
     <Compile Include="InMemoryConnection.cs" />
     <Compile Include="MessageHandlers\AddedHandlerTests.cs" />
     <Compile Include="MessageHandlers\ChangedHandlerTests.cs" />
+    <Compile Include="MessageHandlers\PingHandlerTests.cs" />
+    <Compile Include="MessageHandlers\RemovedHandlerTests.cs" />
+    <Compile Include="MessageHandlers\ReplyMessageHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultHandlerTests.cs" />
   </ItemGroup>

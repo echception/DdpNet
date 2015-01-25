@@ -6,7 +6,7 @@
     {
         [JsonProperty(PropertyName = "methods")]
         public string[] Methods { get; set; }
-        protected Updated() : base("updated")
+        internal Updated() : base("updated")
         {
         }
     }
