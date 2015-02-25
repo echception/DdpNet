@@ -66,19 +66,14 @@
         /// <returns>Task that completes when the result of a function call is returned</returns>
         public Task<ReturnedObject> WaitForResult(WaitHandle waitHandle)
         {
+            RegisteredResultWait wait;
+            if (!this.waits.TryGetValue(waitHandle, out wait))
+            {
+                throw new InvalidOperationException("Specified WaitHandle does not exist");
+            }
+
             return Task.Factory.StartNew(() =>
             {
-                if (waitHandle.Triggered)
-                {
-                    throw new InvalidOperationException("WaitHandle has already completed");
-                }
-
-                RegisteredResultWait wait;
-                if (!this.waits.TryGetValue(waitHandle, out wait))
-                {
-                    throw new InvalidOperationException("Specified WaitHandle does not exist");
-                }
-
                 if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(50)))
                 {
                     throw new TimeoutException("Response was never received");
@@ -111,6 +106,7 @@
                 if (wait.Value.Filter.IsCompleted())
                 {
                     wait.Value.WaitEvent.Set();
+                    wait.Key.SetTriggered();
                 }
             }
 
