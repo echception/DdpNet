@@ -22,15 +22,18 @@
         public event PropertyChangedEventHandler PropertyChanged;
 
         internal string CollectionName { get; private set; }
-        private DdpClient client;
+        private IDdpRemoteMethodCall client;
 
         private SynchronizationContext synchronizationContext;
         private ObjectChanger changer = new ObjectChanger();
 
         private List<T> internalList; 
 
-        internal DdpCollection(DdpClient client, string collectionName)
+        internal DdpCollection(IDdpRemoteMethodCall client, string collectionName)
         {
+            Exceptions.ThrowIfNull(client, "client");
+            Exceptions.ThrowIfNullOrWhitespace(collectionName, "collectionName");
+
             this.CollectionName = collectionName;
             this.client = client;
             this.synchronizationContext = SynchronizationContext.Current;
@@ -39,18 +42,24 @@
 
         public Task AddAsync(T item)
         {
+            Exceptions.ThrowIfNull(item, "item");
+
             var methodName = string.Format(@"/{0}/insert", this.CollectionName);
             return this.client.Call(methodName, new List<object>() {item});
         }
 
         public Task RemoveAsync(T item)
         {
+            Exceptions.ThrowIfNull(item, "item");
+
             var methodName = string.Format(@"/{0}/remove", this.CollectionName);
             return this.client.Call(methodName, new List<object>() {new IdParameter(item.ID)});
         }
 
         public Task UpdateAsync(T item)
         {
+            Exceptions.ThrowIfNull(item, "item");
+
             var methodName = string.Format(@"/{0}/update", this.CollectionName);
             var selector = new IdParameter(item.ID);
             var set = new Set(item);

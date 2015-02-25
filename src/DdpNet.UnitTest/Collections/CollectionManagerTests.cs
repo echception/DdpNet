@@ -3,10 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Runtime.Remoting;
     using DdpNet.Collections;
     using Messages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
     using Newtonsoft.Json.Linq;
     using TestObjects;
 
@@ -16,7 +18,9 @@
         [TestMethod]
         public void CollectionManager_Added_PresentInTypedCollection()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var objectToAdd = new TestDdpObject {integerField = 101, StringProperty = "addedTest"};
 
@@ -33,7 +37,9 @@
         [TestMethod]
         public void CollectionManager_Removed_AddedRemovedFromUntypedCollection()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
 
@@ -48,7 +54,9 @@
         [TestMethod]
         public void CollectionManager_Changed_ChangeUntypedObject()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
 
@@ -76,7 +84,9 @@
         [TestMethod]
         public void CollectionManager_Added_MultipleCollections()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var objectToAdd1 = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
             var objectToAdd2 = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
@@ -107,7 +117,9 @@
         [ExpectedException(typeof(InvalidCollectionTypeException))]
         public void CollectionManager_GetCollection_RetypeCollection()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection1 = collectionManager.GetCollection<TestDdpObject>("Test");
             var collection2 = collectionManager.GetCollection<SimpleDdpObject>("Test");
@@ -116,7 +128,9 @@
         [TestMethod]
         public void CollectionManager_Added_ToTypedCollection()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection = collectionManager.GetCollection<TestDdpObject>("Test");
 
@@ -135,7 +149,9 @@
         [TestMethod]
         public void CollectionManager_Removed_AddedRemovedFromTypedCollection()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection = collectionManager.GetCollection<TestDdpObject>("Test");
 
@@ -153,7 +169,9 @@
         [TestMethod]
         public void CollectionManager_Changed_ChangeTypedObject()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection = collectionManager.GetCollection<TestDdpObject>("Test");
 
@@ -183,8 +201,9 @@
         [TestMethod]
         public void CollectionManager_Added_MultipleTypedCollections()
         {
-            var collectionManager = new CollectionManager(null);
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
 
+            var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection1 = collectionManager.GetCollection<TestDdpObject>("Test1");
             var collection2 = collectionManager.GetCollection<TestDdpObject>("Test2");

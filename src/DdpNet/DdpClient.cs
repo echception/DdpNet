@@ -12,7 +12,7 @@
     using Newtonsoft.Json;
     using Results;
 
-    public class DdpClient : IDdpConnectionSender
+    public class DdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
     {
         private readonly IWebSocketConnection webSocketConnection;
 

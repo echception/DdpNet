@@ -31,7 +31,7 @@
         /// <summary>
         /// The DdpClient used to communicate with the server
         /// </summary>
-        private DdpClient client;
+        private IDdpRemoteMethodCall client;
 
         /// <summary>
         /// Sync object to lock around critical sections
@@ -42,7 +42,7 @@
         /// Creates a new CollectionManager
         /// </summary>
         /// <param name="client">The DdpClient to use</param>
-        public CollectionManager(DdpClient client)
+        public CollectionManager(IDdpRemoteMethodCall client)
         {
             this.typedCollections = new Dictionary<string, IDdpCollection>();
             this.untypedCollections = new Dictionary<string, UntypedCollection>();

@@ -67,6 +67,7 @@
     <Compile Include="Collections\UntypedCollectionTests.cs" />
     <Compile Include="Collections\UntypedObjectChangerTests.cs" />
     <Compile Include="ConnectionTests.cs" />
+    <Compile Include="DdpCollectionTests.cs" />
     <Compile Include="HeartbeatsTest.cs" />
     <Compile Include="InMemoryConnection.cs" />
     <Compile Include="MessageHandlers\AddedHandlerTests.cs" />
