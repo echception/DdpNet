@@ -239,9 +239,6 @@
 
             var testObject = new TestDdpObject() { ID = "11", integerField = 101, StringProperty = "FooBar" };
 
-            var collectionChangedCalled = false;
-            var propertyChangedCalled = false;
-
             ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
             ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
 

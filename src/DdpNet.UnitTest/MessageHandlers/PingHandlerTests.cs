@@ -5,6 +5,7 @@
     using Connection;
     using DdpNet.Collections;
     using DdpNet.MessageHandlers;
+    using DdpNet.Results;
     using Messages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;

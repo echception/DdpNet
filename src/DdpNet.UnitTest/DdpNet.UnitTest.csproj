@@ -67,6 +67,7 @@
     <Compile Include="Collections\UntypedCollectionTests.cs" />
     <Compile Include="Collections\UntypedObjectChangerTests.cs" />
     <Compile Include="ConnectionTests.cs" />
+    <Compile Include="DdpClientTests.cs" />
     <Compile Include="DdpCollectionTests.cs" />
     <Compile Include="HeartbeatsTest.cs" />
     <Compile Include="InMemoryConnection.cs" />
@@ -77,6 +78,11 @@
     <Compile Include="MessageHandlers\ReplyMessageHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultHandlerTests.cs" />
+    <Compile Include="Results\ConnectedResultFilterTests.cs" />
+    <Compile Include="Results\MethodCallResultFilterTests.cs" />
+    <Compile Include="Results\RegisteredResultCallbackTests.cs" />
+    <Compile Include="Results\ResultFilterFactoryTests.cs" />
+    <Compile Include="Results\SubscribeResultFilterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DdpNet\DdpNet.csproj">
