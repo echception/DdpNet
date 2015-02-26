@@ -188,7 +188,7 @@
             var resultWaitHandler =
                 this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));
 
-            var method = new Method(methodName, parameters, id);
+            var method = new Method() {MethodName = methodName, Parameters = parameters, ID = id};
             await this.SendObject(method);
 
             var result = await this.ResultHandler.WaitForResult(resultWaitHandler);

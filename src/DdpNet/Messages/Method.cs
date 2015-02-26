@@ -14,11 +14,9 @@
         [JsonProperty(PropertyName = "id")]
         public string ID { get; set; }
 
-        internal Method(string methodName, List<object> parameters, string id) : base("method")
+        internal Method() : base("method")
         {
-            this.MethodName = methodName;
-            this.Parameters = parameters;
-            this.ID = id;
+
         }
     }
 }

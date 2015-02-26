@@ -12,7 +12,7 @@
     /// 
     /// Some notes about the class:
     /// The typed DdpCollection is only ever created on the user thread, when they call GetCollection
-    /// The UntypedCollection can be created on either the user or the receive thread though, so there is a potential for conflicts
+    /// The UntypedCollection can be modified on either the user or the receive thread though, so there is a potential for conflicts
     /// All modifications to the UntypedCollection utilize double checked locking to ensure only one thread can update it at a time.
     /// This also ensures that when the collection is converted to a typed collection, the write operations will be going to the correct collection
     /// </summary>
