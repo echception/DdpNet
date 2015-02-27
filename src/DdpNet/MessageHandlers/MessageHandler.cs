@@ -43,6 +43,7 @@
             this.handlers.Add(new ReplyMessageHandler());
             this.handlers.Add(new AddedHandler());
             this.handlers.Add(new ChangedHandler());
+            this.handlers.Add(new RemovedHandler());
         }
     }
 }

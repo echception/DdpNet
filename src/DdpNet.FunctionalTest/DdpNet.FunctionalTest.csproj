@@ -50,7 +50,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AssemblyInit.cs" />
+    <Compile Include="DataObjects\Entry.cs" />
+    <Compile Include="TestEnvironment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubscriptionTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DdpNet\DdpNet.csproj">
+      <Project>{21168f58-994b-4018-a702-ae47c719770e}</Project>
+      <Name>DdpNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

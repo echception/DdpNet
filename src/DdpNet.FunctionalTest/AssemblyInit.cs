@@ -1,0 +1,14 @@
+﻿namespace DdpNet.FunctionalTest
+{
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    [TestClass]
+    public class AssemblyInit
+    {
+        [AssemblyInitialize]
+        public static void AssemblyInitialize(TestContext context)
+        {
+            TestEnvironment.Cleanup();
+        }
+    }
+}
