@@ -15,30 +15,35 @@ namespace DdpNet.Test.Console
     {
         static void Main(string[] args)
         {
-            var client = new MeteorClient(new ConsoleLoggingConnection(new WebSocketConnection(new Uri("ws://localhost:3000/websocket"))));
-            client.ConnectAsync().Wait();
+            Run().Wait();
+        }
 
-            client.LoginPassword("chris", "password").Wait();
+        static async Task Run()
+        {
+            var meteorClient = new MeteorClient(new ConsoleLoggingConnection(new WebSocketConnection(new Uri("ws://localhost:3000/websocket"))));
+            await meteorClient.ConnectAsync();
 
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
 
-            client.Subscribe("posts").Wait();
-            var posts = client.GetCollection<Post>("posts");
-
-            posts.CollectionChanged += (sender, eventArgs) =>
+            var inserts = 100;
+            var currentCount = entryCollection.Count;
+            List<Task> tasks = new List<Task>();
+            for (int i = 0; i < inserts; i++)
             {
-                Console.WriteLine(posts.Count);
-                foreach (var post in posts)
+                var entry = new Entry()
                 {
-                    Console.WriteLine(post.title);
-                }
-            };
+                    Count = i,
+                    IsActive = true,
+                    Name = "Item " + i.ToString()
+                };
 
-            //posts.InsertAsync(new Post {author = "testadd", title = "testadd", url = "testadd"});
-            var task = client.Call<string>("testMethod");
-            task.Wait();
-            Console.WriteLine(task.Result);
+                tasks.Add(entryCollection.AddAsync(entry));
+            }
 
-            Console.ReadKey();
+            Task.WaitAll(tasks.ToArray());
+
+            var newCount = entryCollection.Count;
         }
     }
 }

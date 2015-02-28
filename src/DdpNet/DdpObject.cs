@@ -9,14 +9,27 @@
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [JsonIgnore]
+        [JsonProperty(PropertyName = "_id")]
         public string ID { get; internal set; }
+
+        [JsonIgnore] 
+        internal bool SerializeId { get; set; }
+
+        protected DdpObject()
+        {
+            this.SerializeId = true;
+        }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool ShouldSerializeID()
+        {
+            return this.SerializeId;
         }
     }
 }

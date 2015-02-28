@@ -98,7 +98,19 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            collection.UpdateAsync(null);
+            collection.UpdateAsync("ID", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void DdpCollection_UpdateAsync_NullID()
+        {
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+            var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
+
+            var testObject = new TestDdpObject() { ID = "11", integerField = 10, StringProperty = "FooBar" };
+
+            collection.UpdateAsync(string.Empty, testObject);
         }
 
         [TestMethod]
@@ -112,7 +124,7 @@
             remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<List<Object>>()))
                 .Returns(Task.FromResult(true));
 
-            collection.UpdateAsync(testObject);
+            collection.UpdateAsync(testObject.ID, testObject);
 
             remoteMethodCall.Verify(
                 x =>

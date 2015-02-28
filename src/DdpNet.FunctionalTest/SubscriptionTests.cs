@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.FunctionalTest
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using DataObjects;
@@ -27,7 +28,7 @@
 
             Assert.AreEqual(startingCount + 1, entryCollection.Count);
 
-            var entry = entryCollection.First();
+            var entry = entryCollection.Single(x => x.ID == firstEntry.ID);
 
             Entry.AssertAreEqual(firstEntry, entry);
         }
@@ -50,9 +51,89 @@
 
             Assert.AreEqual(startingCount + 1, entryCollection.Count);
 
-            await entryCollection.RemoveAsync(entryCollection.First());
+            await entryCollection.RemoveAsync(firstEntry);
 
             Assert.AreEqual(startingCount, entryCollection.Count);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Update()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
+
+            var entry = new Entry() {Count = 101, IsActive = true, Name = "Entry Name"};
+
+            await entryCollection.AddAsync(entry);
+
+            var update = new Entry() {Count = 102, IsActive = false, Name = "New Name"};
+
+            await entryCollection.UpdateAsync(entry.ID, update);
+
+            var updatedEntry = entryCollection.Single(x => x.ID == entry.ID);
+
+            Entry.AssertAreEqual(update, updatedEntry);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Added_RaisesCollectionChangedEvent()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
+
+            var entry = new Entry() { Count = 101, IsActive = true, Name = "Entry Name" };
+
+            bool collectionChangedCalled = false;
+            bool propertyChanged = false;
+            entryCollection.CollectionChanged += (sender, args) => collectionChangedCalled = true;
+            entryCollection.PropertyChanged += (sender, args) =>
+            {
+                Assert.AreEqual("Count", args.PropertyName);
+                propertyChanged = true;
+            };
+
+            await entryCollection.AddAsync(entry);
+
+            Assert.IsTrue(collectionChangedCalled);
+            Assert.IsTrue(propertyChanged);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_AddedLargeNumberOfObjects()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
+
+            var inserts = 1000;
+            var currentCount = entryCollection.Count;
+
+            for (int i = 0; i < inserts; i++)
+            {
+                var entry = new Entry()
+                {
+                    Count = i,
+                    IsActive = true,
+                    Name = "Item " + i.ToString()
+                };
+
+                await entryCollection.AddAsync(entry);
+            }
+
+            var newCount = entryCollection.Count;
+
+            Assert.AreEqual(currentCount + inserts, newCount);
         }
     }
 }

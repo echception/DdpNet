@@ -44,6 +44,11 @@
         {
             Exceptions.ThrowIfNull(item, "item");
 
+            if (string.IsNullOrWhiteSpace(item.ID))
+            {
+                item.ID = Utilities.GenerateID();
+            }
+
             var methodName = string.Format(@"/{0}/insert", this.CollectionName);
             return this.client.Call(methodName, new List<object>() {item});
         }
@@ -56,13 +61,15 @@
             return this.client.Call(methodName, new List<object>() {new IdParameter(item.ID)});
         }
 
-        public Task UpdateAsync(T item)
+        public Task UpdateAsync(string id, T item)
         {
             Exceptions.ThrowIfNull(item, "item");
+            Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
             var methodName = string.Format(@"/{0}/update", this.CollectionName);
-            var selector = new IdParameter(item.ID);
+            var selector = new IdParameter(id);
             var set = new Set(item);
+            item.SerializeId = false;
             return this.client.Call(methodName, new List<object>() {selector, set});
         }
 
