@@ -125,10 +125,19 @@
         {
             var result = await this.webSocketConnection.ReceiveAsync();
 
-            if (!String.IsNullOrWhiteSpace(result))
+            try
             {
-                await this.handler.HandleMessage(this, this.CollectionManager, this.ResultHandler, result);
+                if (!String.IsNullOrWhiteSpace(result))
+                {
+                    await this.handler.HandleMessage(this, this.CollectionManager, this.ResultHandler, result);
+                }
             }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.ToString());
+                System.Diagnostics.Debug.WriteLine(result);
+            }
+           
         }
 
         public Task Call(string methodName)

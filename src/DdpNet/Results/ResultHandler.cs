@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.Results
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -16,20 +17,20 @@
         /// <summary>
         /// List of callbacks registered
         /// </summary>
-        private List<RegisteredResultCallback> callbacks;
+        private ConcurrentDictionary<RegisteredResultCallback, int> callbacks;
 
         /// <summary>
         /// List of WaitHandles registered
         /// </summary>
-        private Dictionary<WaitHandle, RegisteredResultWait> waits;
+        private ConcurrentDictionary<WaitHandle, RegisteredResultWait> waits;
 
         /// <summary>
         /// Creates a new ResultHandler
         /// </summary>
         internal ResultHandler()
         {
-            this.callbacks = new List<RegisteredResultCallback>();
-            this.waits = new Dictionary<WaitHandle, RegisteredResultWait>();
+            this.callbacks = new ConcurrentDictionary<RegisteredResultCallback, int>();
+            this.waits = new ConcurrentDictionary<WaitHandle, RegisteredResultWait>();
         }
  
         /// <summary>
@@ -43,7 +44,10 @@
             var waitEvent = new ManualResetEvent(false);
             var registeredWait = new RegisteredResultWait(filter, waitEvent);
             var handle = new WaitHandle();
-            this.waits.Add(handle, registeredWait);
+            if (!this.waits.TryAdd(handle, registeredWait))
+            {
+                throw new InvalidOperationException("Wait is already registered");
+            }
 
             return handle;
         }
@@ -55,7 +59,10 @@
         /// <param name="callback">The function to call when the result is received</param>
         public void RegisterResultCallback(ResultFilter filter, ResultCallback callback)
         {
-            this.callbacks.Add(new RegisteredResultCallback(filter, callback));
+            if (!this.callbacks.TryAdd(new RegisteredResultCallback(filter, callback), 0))
+            {
+                throw new InvalidOperationException("Could not register callback");
+            }
         }
 
         /// <summary>
@@ -74,13 +81,14 @@
 
             return Task.Factory.StartNew(() =>
             {
-                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(50)))
+                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(5)))
                 {
                     throw new TimeoutException("Response was never received");
                 }
 
                 waitHandle.SetTriggered();
-                this.waits.Remove(waitHandle);
+                RegisteredResultWait outResult;
+                this.waits.TryRemove(waitHandle, out outResult);
 
                 return wait.Filter.GetReturnedObject();
             });
@@ -96,8 +104,8 @@
         {
             var callbacksToRemove = new List<RegisteredResultCallback>();
 
-            var waitsToIterate = this.waits.ToList();
-            var callbacksToIterate = this.callbacks.ToList();
+            var waitsToIterate = this.waits.ToArray();
+            var callbacksToIterate = this.callbacks.ToArray();
 
             foreach (var wait in waitsToIterate)
             {
@@ -112,17 +120,18 @@
 
             foreach (var callback in callbacksToIterate)
             {
-                callback.Filter.HandleReturnObject(newReturnedObject);
-                if (callback.Filter.IsCompleted())
+                callback.Key.Filter.HandleReturnObject(newReturnedObject);
+                if (callback.Key.Filter.IsCompleted())
                 {
-                    callback.Callback(newReturnedObject);
-                    callbacksToRemove.Add(callback);
+                    callback.Key.Callback(newReturnedObject);
+                    callbacksToRemove.Add(callback.Key);
                 }
             }
 
             foreach (var removedCallback in callbacksToRemove)
             {
-                this.callbacks.Remove(removedCallback);
+                int outInt;
+                this.callbacks.TryRemove(removedCallback, out outInt);
             }
         }
     }

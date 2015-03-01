@@ -116,8 +116,10 @@
             var entryCollection = meteorClient.GetCollection<Entry>("entries");
             await meteorClient.Subscribe("entries");
 
-            var inserts = 1000;
+            var inserts = 100;
             var currentCount = entryCollection.Count;
+
+            List<Task> startedTasks = new List<Task>();
 
             for (int i = 0; i < inserts; i++)
             {
@@ -128,8 +130,10 @@
                     Name = "Item " + i.ToString()
                 };
 
-                await entryCollection.AddAsync(entry);
+                startedTasks.Add(entryCollection.AddAsync(entry));
             }
+
+            Task.WaitAll(startedTasks.ToArray());
 
             var newCount = entryCollection.Count;
 
