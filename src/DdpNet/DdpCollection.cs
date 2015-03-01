@@ -50,18 +50,18 @@
             }
 
             var methodName = string.Format(@"/{0}/insert", this.CollectionName);
-            return this.client.Call(methodName, new List<object>() {item});
+            return this.client.Call(methodName, item);
         }
 
-        public Task RemoveAsync(T item)
+        public Task<bool> RemoveAsync(string id)
         {
-            Exceptions.ThrowIfNull(item, "item");
+            Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
             var methodName = string.Format(@"/{0}/remove", this.CollectionName);
-            return this.client.Call(methodName, new List<object>() {new IdParameter(item.ID)});
+            return this.CallConvertNumberToBool(methodName, new IdParameter(id));
         }
 
-        public Task UpdateAsync(string id, T item)
+        public Task<bool> UpdateAsync(string id, T item)
         {
             Exceptions.ThrowIfNull(item, "item");
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
@@ -70,7 +70,7 @@
             var selector = new IdParameter(id);
             var set = new Set(item);
             item.SerializeId = false;
-            return this.client.Call(methodName, new List<object>() {selector, set});
+            return this.CallConvertNumberToBool(methodName, selector, set);
         }
 
         void IDdpCollection.Added(string id, JObject jObject)
@@ -141,6 +141,22 @@
                 // Raises the PropertyChanged event on the creator thread
                 this.synchronizationContext.Send(RaisePropertyChanged, e);
             }
+        }
+
+        private async Task<bool> CallConvertNumberToBool(string methodName, params object[] parameters)
+        {
+            int numberUpdated = await this.client.Call<int>(methodName, parameters);
+
+            if (numberUpdated == 0)
+            {
+                return false;
+            }
+            else if (numberUpdated == 1)
+            {
+                return true;
+            }
+
+            throw new InvalidOperationException("Unexpected number of documents were updated");
         }
 
         private void RaisePropertyChanged(object param)

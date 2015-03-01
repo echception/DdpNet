@@ -9,7 +9,7 @@
         public string MethodName { get; set; }
 
         [JsonProperty(PropertyName = "params")]
-        public List<object> Parameters { get; set; }
+        public object[] Parameters { get; set; }
 
         [JsonProperty(PropertyName = "id")]
         public string ID { get; set; }

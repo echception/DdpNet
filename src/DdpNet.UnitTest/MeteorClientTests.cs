@@ -62,8 +62,8 @@
             loginTask.Wait();
 
             Assert.AreEqual("login", method.MethodName);
-            Assert.AreEqual(1, method.Parameters.Count);
-            var loginParameters = ((JObject)method.Parameters[0]).ToObject<LoginPasswordParameters>();
+            Assert.AreEqual(1, method.Parameters.Length);
+            var loginParameters = JsonConvert.DeserializeObject<LoginPasswordParameters>(method.Parameters[0].ToString());
 
             Assert.AreEqual("Username", loginParameters.User.UserName);
             Assert.IsTrue(!string.IsNullOrWhiteSpace(loginParameters.Password.Digest));

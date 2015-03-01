@@ -51,7 +51,7 @@
 
             var testObject = new TestDdpObject() {ID = "1", integerField = 10, StringProperty = "FooBar"};
 
-            remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<List<object>>()))
+            remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<object[]>()))
                 .Returns(Task.FromResult(true));
 
             collection.AddAsync(testObject).Wait();
@@ -59,7 +59,7 @@
             remoteMethodCall.Verify(
                 x =>
                     x.Call(It.Is<string>(s => s.Equals(@"/TestCollection/insert")),
-                        It.Is<List<object>>(c => c.Count == 1 && c.First() == testObject)));
+                        It.Is<object[]>(c => c.Length == 1 && c.First() == testObject)));
         }
 
         [TestMethod]
@@ -80,15 +80,15 @@
 
             var testObject = new TestDdpObject() {ID = "1", integerField = 10, StringProperty = "FooBar"};
 
-            remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<List<Object>>()))
-                .Returns(Task.FromResult(true));
+            remoteMethodCall.Setup(x => x.Call<int>(It.IsAny<string>(), It.IsAny<object[]>()))
+                .Returns(Task.FromResult(1));
 
-            collection.RemoveAsync(testObject).Wait();
+            collection.RemoveAsync(testObject.ID).Wait();
 
             remoteMethodCall.Verify(
                 x =>
-                    x.Call(It.Is<string>(s => s.Equals(@"/TestCollection/remove")),
-                        It.Is<List<object>>(c => c.Count == 1 && ((IdParameter) c.First()).ID == "1")));
+                    x.Call<int>(It.Is<string>(s => s.Equals(@"/TestCollection/remove")),
+                        It.Is<object[]>(c => c.Length == 1 && ((IdParameter) c.First()).ID == "1")));
         }
 
         [TestMethod]
@@ -121,17 +121,17 @@
 
             var testObject = new TestDdpObject() { ID = "11", integerField = 10, StringProperty = "FooBar" };
 
-            remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<List<Object>>()))
-                .Returns(Task.FromResult(true));
+            remoteMethodCall.Setup(x => x.Call<int>(It.IsAny<string>(), It.IsAny<object[]>()))
+                .Returns(Task.FromResult(1));
 
             collection.UpdateAsync(testObject.ID, testObject);
 
             remoteMethodCall.Verify(
                 x =>
-                    x.Call(It.Is<string>(s => s.Equals(@"/TestCollection/update")),
-                        It.Is<List<object>>(
+                    x.Call<int>(It.Is<string>(s => s.Equals(@"/TestCollection/update")),
+                        It.Is<object[]>(
                             c =>
-                                c.Count == 2 && ((IdParameter) c[0]).ID == "11" && ((Set) c[1]).ObjectToSet == testObject)));
+                                c.Length == 2 && ((IdParameter) c[0]).ID == "11" && ((Set) c[1]).ObjectToSet == testObject)));
         }
 
         [TestMethod]

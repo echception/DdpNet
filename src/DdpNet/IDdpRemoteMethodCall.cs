@@ -5,7 +5,7 @@
 
     internal interface IDdpRemoteMethodCall
     {
-        Task Call(string methodName, List<object> parameters);
-        Task<T> Call<T>(string methodName, List<object> parameters);
+        Task Call(string methodName, params object[] parameters);
+        Task<T> Call<T>(string methodName, params object[] parameters);
     }
 }

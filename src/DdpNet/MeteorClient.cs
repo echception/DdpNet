@@ -27,7 +27,7 @@ namespace DdpNet
 
             var loginParameters = new LoginPasswordParameters(userParameter, passwordParameter);
 
-            return this.Call("login", new List<object> {loginParameters});
+            return this.Call("login", loginParameters);
         }
 
         private Password GetPassword(string password)

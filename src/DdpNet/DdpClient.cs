@@ -124,42 +124,21 @@
            
         }
 
-        public Task Call(string methodName)
-        {
-            this.VerifyConnected();
-
-            return this.Call(methodName, new List<object>());
-        }
-
-        public Task<T> Call<T>(string methodName)
-        {
-            this.VerifyConnected();
-
-            return this.Call<T>(methodName, new List<object>());
-        }
-
-        public Task Call(string methodName, List<object> parameters)
+        public Task Call(string methodName, params object[] parameters)
         {
             this.VerifyConnected();
 
             return this.CallGetResult(methodName, parameters);
         }
 
-        public Task<T> Call<T>(string methodName, List<object> parameters)
+        public Task<T> Call<T>(string methodName, params object[] parameters)
         {
             this.VerifyConnected();
 
             return this.CallParseResult<T>(methodName, parameters);
         }
 
-        public Task Subscribe(string subscriptionName)
-        {
-            this.VerifyConnected();
-
-            return this.SubscribeWithParameters(subscriptionName, new List<object>());
-        }
-
-        public Task Subscribe(string subscriptionName, List<object> parameters)
+        public Task Subscribe(string subscriptionName, params object[] parameters)
         {
             this.VerifyConnected();
 
@@ -179,20 +158,27 @@
             }
         }
 
-        private async Task SubscribeWithParameters(string subscriptionName, List<object> parameters)
+        private async Task SubscribeWithParameters(string subscriptionName, object[] parameters)
         {
             var id = Utilities.GenerateID();
             this.subscriptions.Add(subscriptionName, id);
-            var sub = new Subscribe(id, subscriptionName, parameters.ToArray());
+            var sub = new Subscribe(id, subscriptionName, parameters);
 
             var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateSubscribeResultFilter(id));
 
             await this.SendObject(sub);
 
-            await this.ResultHandler.WaitForResult(readyWaitHandler);
+            var returnedObject = await this.ResultHandler.WaitForResult(readyWaitHandler);
+
+            if (returnedObject.MessageType == "nosub")
+            {
+                var noSub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+
+                throw new InvalidOperationException(string.Format("Subscribe for {0} returned an error {1}. Details: {2}. Reason: {3}", subscriptionName, noSub.Error.ErrorMessage, noSub.Error.Details, noSub.Error.Reason));
+            }
         }
 
-        private async Task<T> CallParseResult<T>(string methodName, List<object> parameters)
+        private async Task<T> CallParseResult<T>(string methodName, object[] parameters)
         {
             var resultObject = await this.CallGetResult(methodName, parameters);
 
@@ -204,7 +190,7 @@
             return resultObject.ResultObject.ToObject<T>();
         }
 
-        private async Task<Result> CallGetResult(string methodName, List<object> parameters)
+        private async Task<Result> CallGetResult(string methodName, object[] parameters)
         {
             var id = Utilities.GenerateID();
 

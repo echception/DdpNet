@@ -8,7 +8,6 @@ Entries.allow({
         return true;
     },
     remove: function(userId, doc) {
-        console.log('remove');
         return true;
     }
 });

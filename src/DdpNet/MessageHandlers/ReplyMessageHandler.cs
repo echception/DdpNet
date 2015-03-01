@@ -16,7 +16,7 @@
         /// <summary>
         /// All the messages to handle
         /// </summary>
-        private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result", "ready", "updated"};
+        private static readonly string[] resultMessageTypes = new[] {"connected", "failed", "result", "ready", "updated", "nosub"};
 
         /// <summary>
         /// Processes the reply message

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Remoting;
     using System.Threading.Tasks;
     using DataObjects;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,7 +13,7 @@
     {
         [TestMethod]
         [TestCategory("Functional")]
-        public async Task SubscriptionTests_CreateReadDelete()
+        public async Task SubscriptionTests_Add_ObjectReadable()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
@@ -35,7 +36,7 @@
 
         [TestMethod]
         [TestCategory("Functional")]
-        public async Task SubscriptionTests_Remove()
+        public async Task SubscriptionTests_Remove_ValidObject()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
@@ -51,14 +52,16 @@
 
             Assert.AreEqual(startingCount + 1, entryCollection.Count);
 
-            await entryCollection.RemoveAsync(firstEntry);
+            var removed = await entryCollection.RemoveAsync(firstEntry.ID);
+
+            Assert.IsTrue(removed);
 
             Assert.AreEqual(startingCount, entryCollection.Count);
         }
 
         [TestMethod]
         [TestCategory("Functional")]
-        public async Task SubscriptionTests_Update()
+        public async Task SubscriptionTests_Update_ValidObject()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
@@ -72,7 +75,9 @@
 
             var update = new Entry() {Count = 102, IsActive = false, Name = "New Name"};
 
-            await entryCollection.UpdateAsync(entry.ID, update);
+            bool wasUpdated = await entryCollection.UpdateAsync(entry.ID, update);
+
+            Assert.IsTrue(wasUpdated);
 
             var updatedEntry = entryCollection.Single(x => x.ID == entry.ID);
 
@@ -108,7 +113,7 @@
 
         [TestMethod]
         [TestCategory("Functional")]
-        public async Task SubscriptionTests_AddedRemoveLargeNumberOfObjects()
+        public async Task SubscriptionTests_AddRemove_LargeNumberOfObjects()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
@@ -116,7 +121,7 @@
             var entryCollection = meteorClient.GetCollection<Entry>("entries");
             await meteorClient.Subscribe("entries");
 
-            var inserts = 1000;
+            var inserts = 10;
             var currentCount = entryCollection.Count;
 
             List<Task> startedTasks = new List<Task>();
@@ -142,12 +147,82 @@
 
             foreach (var entry in entryCollection)
             {
-                startedTasks.Add(entryCollection.RemoveAsync(entry));
+                startedTasks.Add(entryCollection.RemoveAsync(entry.ID));
             }
 
             Task.WaitAll(startedTasks.ToArray());
 
             Assert.AreEqual(0, entryCollection.Count);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task SubscriptionTests_Subscribe_SubscriptionNotExist()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            await meteorClient.Subscribe("foobar");
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Update_ItemNotExist()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("entries");
+
+            await meteorClient.Subscribe("entries");
+
+            bool wasUpdated = await collection.UpdateAsync("NOT_EXIST", new Entry() {Count = 10});
+
+            Assert.IsFalse(wasUpdated);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Remove_ItemNotExist()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("entries");
+
+            await meteorClient.Subscribe("entries");
+
+            bool wasRemoved = await collection.RemoveAsync("ID_NOT_EXIST");
+
+            Assert.IsFalse(wasRemoved);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_SubscribeWithParameters_LimitedCollection()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("entries");
+
+            for (int i = 0; i < 10; i++)
+            {
+                await collection.AddAsync(new Entry() {Count = 5, IsActive = true, Name = "TestName"});
+            }
+
+            var entryToFilter = new Entry() {Count = 10001, IsActive = false, Name = "FILTER_ON_NAME_ITEM"};
+
+            await collection.AddAsync(entryToFilter);
+
+            await meteorClient.Subscribe("entriesByName", entryToFilter.Name);
+
+            Assert.AreEqual(1, collection.Count);
+
+            var entry = collection.First();
+
+            Entry.AssertAreEqual(entryToFilter, entry);
         }
     }
 }

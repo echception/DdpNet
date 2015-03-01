@@ -6,7 +6,7 @@
     internal class SubscribeResultFilter : ResultFilter
     {
         private bool readyCalled;
-        private bool unsubCalled;
+        private bool nosubCalled;
 
         private ReturnedObject returnedObject;
 
@@ -14,7 +14,7 @@
         internal SubscribeResultFilter(string subscriptionId)
         {
             this.readyCalled = false;
-            this.unsubCalled = false;
+            this.nosubCalled = false;
 
             this.subscriptionId = subscriptionId;
         }
@@ -31,11 +31,21 @@
                     this.returnedObject = returnedObject;
                 }
             }
+            if (returnedObject.MessageType == "nosub")
+            {
+                var noSubObject = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+
+                if (noSubObject.ID == this.subscriptionId)
+                {
+                    this.nosubCalled = true;
+                    this.returnedObject = returnedObject;
+                }
+            }
         }
 
         internal override bool IsCompleted()
         {
-            return this.readyCalled || this.unsubCalled;
+            return this.readyCalled || this.nosubCalled;
         }
 
         internal override ReturnedObject GetReturnedObject()

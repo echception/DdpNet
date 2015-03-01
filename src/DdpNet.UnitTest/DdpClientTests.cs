@@ -63,7 +63,7 @@
             task.Wait();
 
             Assert.AreEqual("TestMethod", method.MethodName);
-            Assert.AreEqual(0, method.Parameters.Count);
+            Assert.AreEqual(0, method.Parameters.Length);
         }
 
         [TestMethod]
@@ -94,7 +94,7 @@
             task.Wait();
 
             Assert.AreEqual("TestMethod", method.MethodName);
-            Assert.AreEqual(0, method.Parameters.Count);
+            Assert.AreEqual(0, method.Parameters.Length);
 
             var result = task.Result;
 
@@ -131,7 +131,7 @@
             ExceptionAssert.ExpectAggregateException(() => task.Wait(), typeof(InvalidOperationException));
 
             Assert.AreEqual("TestMethod", method.MethodName);
-            Assert.AreEqual(0, method.Parameters.Count);
+            Assert.AreEqual(0, method.Parameters.Length);
 
             Assert.IsNotNull(task.Exception);
             Assert.IsTrue(task.IsFaulted);
@@ -202,7 +202,7 @@
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call("Test", new List<object>() {1});
+            client.Call("Test", 1);
         }
 
         [TestMethod]
@@ -212,7 +212,7 @@
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call<string>("Test", new List<object>() { 1 });
+            client.Call<string>("Test", 1 );
         }
 
         [TestMethod]
@@ -232,7 +232,7 @@
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Subscribe("TestSub", new List<object>() { "Test" });
+            client.Subscribe("TestSub", "Test" );
         }
 
         private void Connect(DdpClient client, InMemoryConnection connection)

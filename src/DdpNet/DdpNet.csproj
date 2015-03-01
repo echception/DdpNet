@@ -79,6 +79,7 @@
     <Compile Include="Messages\Connected.cs" />
     <Compile Include="Messages\Error.cs" />
     <Compile Include="Messages\Failed.cs" />
+    <Compile Include="Messages\NoSubscribe.cs" />
     <Compile Include="ParameterObjects\IdParameter.cs" />
     <Compile Include="Messages\Method.cs" />
     <Compile Include="Messages\Ping.cs" />
