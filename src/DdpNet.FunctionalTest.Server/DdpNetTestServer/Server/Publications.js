@@ -7,3 +7,7 @@ Meteor.publish('entriesByName', function(entryName) {
         Name: entryName
     })
 });
+
+Meteor.publish('denyAll', function() {
+    return DenyAll.find();
+});

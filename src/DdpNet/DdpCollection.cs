@@ -69,8 +69,10 @@
             var methodName = string.Format(@"/{0}/update", this.CollectionName);
             var selector = new IdParameter(id);
             var set = new Set(item);
-            item.SerializeId = false;
-            return this.CallConvertNumberToBool(methodName, selector, set);
+            using (new ForceSerializeDdpObjectId(item, false))
+            {
+                return this.CallConvertNumberToBool(methodName, selector, set);
+            }
         }
 
         void IDdpCollection.Added(string id, JObject jObject)

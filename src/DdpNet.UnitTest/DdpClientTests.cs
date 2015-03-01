@@ -128,7 +128,7 @@
                 }));
             connection.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new[] { method.ID } }));
 
-            ExceptionAssert.ExpectAggregateException(() => task.Wait(), typeof(InvalidOperationException));
+            ExceptionAssert.ExpectAggregateException(() => task.Wait(), typeof(DdpServerException));
 
             Assert.AreEqual("TestMethod", method.MethodName);
             Assert.AreEqual(0, method.Parameters.Length);

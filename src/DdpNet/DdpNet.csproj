@@ -62,7 +62,9 @@
     <Compile Include="DdpObject.cs" />
     <Compile Include="DdpCollection.cs" />
     <Compile Include="Connection\IWebSocketConnection.cs" />
+    <Compile Include="DdpServerException.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="ForceSerializeDdpObjectId.cs" />
     <Compile Include="IDdpRemoteMethodCall.cs" />
     <Compile Include="MessageHandlers\ChangedHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />

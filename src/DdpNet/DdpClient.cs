@@ -174,7 +174,7 @@
             {
                 var noSub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
 
-                throw new InvalidOperationException(string.Format("Subscribe for {0} returned an error {1}. Details: {2}. Reason: {3}", subscriptionName, noSub.Error.ErrorMessage, noSub.Error.Details, noSub.Error.Reason));
+                throw new DdpServerException(noSub.Error);
             }
         }
 
@@ -206,7 +206,7 @@
 
             if (resultObject.Error != null)
             {
-                throw new InvalidOperationException(string.Format("Server returned an error {0}. Details: {1}. Reason: {2}", resultObject.Error.ErrorMessage, resultObject.Error.Details, resultObject.Error.Reason));
+                throw new DdpServerException(resultObject.Error);
             }
 
             return resultObject;

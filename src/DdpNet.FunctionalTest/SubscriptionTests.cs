@@ -157,13 +157,13 @@
 
         [TestMethod]
         [TestCategory("Functional")]
-        [ExpectedException(typeof(InvalidOperationException))]
         public async Task SubscriptionTests_Subscribe_SubscriptionNotExist()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
 
-            await meteorClient.Subscribe("foobar");
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async 
+                () => await meteorClient.Subscribe("foobar"), "404", "Subscription not found");
         }
 
         [TestMethod]
@@ -223,6 +223,62 @@
             var entry = collection.First();
 
             Entry.AssertAreEqual(entryToFilter, entry);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Add_NoPermission()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("denyAll");
+
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.AddAsync(Entry.Random()), "403", "Access denied");
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Update_NoPermission()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entry = Entry.Random();
+
+            await TestEnvironment.AddDenyAllEntry(meteorClient, entry);
+
+            var collection = meteorClient.GetCollection<Entry>("denyAll");
+
+            await meteorClient.Subscribe("denyAll");
+
+            Assert.IsTrue(collection.Count > 0);
+
+            var entryToUpdate = collection.First();
+
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.UpdateAsync(entryToUpdate.ID, Entry.Random()), "403", "Access denied");
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Remove_NoPermission()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entry = Entry.Random();
+
+            await TestEnvironment.AddDenyAllEntry(meteorClient, entry);
+
+            var collection = meteorClient.GetCollection<Entry>("denyAll");
+
+            await meteorClient.Subscribe("denyAll");
+
+            Assert.IsTrue(collection.Count > 0);
+
+            var entryToRemove = collection.First();
+
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.RemoveAsync(entryToRemove.ID), "403", "Access denied");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace DdpNet
 {
+    using System;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using Annotations;
@@ -29,7 +30,12 @@
 
         public bool ShouldSerializeID()
         {
-            return this.SerializeId;
+            if (this.SerializeId == false)
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(this.ID);
         }
     }
 }

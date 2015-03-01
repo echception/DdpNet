@@ -1,6 +1,8 @@
 ﻿namespace DdpNet.FunctionalTest
 {
     using System;
+    using System.Threading.Tasks;
+    using DataObjects;
 
     public class TestEnvironment
     {
@@ -14,6 +16,11 @@
             var client = GetClient();
             client.ConnectAsync().Wait();
             client.Call("cleanup");
+        }
+
+        public static async Task AddDenyAllEntry(MeteorClient client, Entry entry)
+        {
+            await client.Call("addDenyAll", entry);
         }
     }
 }
