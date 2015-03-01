@@ -108,7 +108,7 @@
 
         [TestMethod]
         [TestCategory("Functional")]
-        public async Task SubscriptionTests_AddedLargeNumberOfObjects()
+        public async Task SubscriptionTests_AddedRemoveLargeNumberOfObjects()
         {
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
@@ -138,6 +138,16 @@
             var newCount = entryCollection.Count;
 
             Assert.AreEqual(currentCount + inserts, newCount);
+            startedTasks.Clear();
+
+            foreach (var entry in entryCollection)
+            {
+                startedTasks.Add(entryCollection.RemoveAsync(entry));
+            }
+
+            Task.WaitAll(startedTasks.ToArray());
+
+            Assert.AreEqual(0, entryCollection.Count);
         }
     }
 }

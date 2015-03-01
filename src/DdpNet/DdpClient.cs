@@ -49,7 +49,7 @@
             this.subscriptions = new Dictionary<string, string>();
         }
 
-        internal async Task ConnectAsync(bool startBackgroundThread)
+        public async Task ConnectAsync()
         {
             if (this.state != DdpClientState.NotConnected)
             {
@@ -68,12 +68,9 @@
 
             await this.SendObject(connectMessage);
 
-            if (startBackgroundThread)
-            {
-                this.receiveThread = new Thread(this.BackgroundReceive);
-                this.receiveThread.IsBackground = true;
-                this.receiveThread.Start();
-            }
+            this.receiveThread = new Thread(this.BackgroundReceive);
+            this.receiveThread.IsBackground = true;
+            this.receiveThread.Start();
 
             var resultMessage = await this.ResultHandler.WaitForResult(waitHandle);
 
@@ -86,11 +83,6 @@
             this.SetSession(connected.Session);
 
             this.state = DdpClientState.Connected;
-        }
-
-        public Task ConnectAsync()
-        {
-            return this.ConnectAsync(true);
         }
 
         private Task SendObject(object objectToSend)
@@ -134,37 +126,60 @@
 
         public Task Call(string methodName)
         {
+            this.VerifyConnected();
+
             return this.Call(methodName, new List<object>());
         }
 
         public Task<T> Call<T>(string methodName)
         {
+            this.VerifyConnected();
+
             return this.Call<T>(methodName, new List<object>());
         }
 
         public Task Call(string methodName, List<object> parameters)
         {
+            this.VerifyConnected();
+
             return this.CallGetResult(methodName, parameters);
         }
 
-        public async Task<T> Call<T>(string methodName, List<object> parameters)
+        public Task<T> Call<T>(string methodName, List<object> parameters)
         {
-            var resultObject = await this.CallGetResult(methodName, parameters);
+            this.VerifyConnected();
 
-            if (resultObject.ResultObject == null)
-            {
-                throw new InvalidOperationException("Server did not return an object when a return value was expected");
-            }
-
-            return resultObject.ResultObject.ToObject<T>();
+            return this.CallParseResult<T>(methodName, parameters);
         }
 
         public Task Subscribe(string subscriptionName)
         {
-            return this.Subscribe(subscriptionName, new List<object>());
+            this.VerifyConnected();
+
+            return this.SubscribeWithParameters(subscriptionName, new List<object>());
         }
 
-        public async Task Subscribe(string subscriptionName, List<object> parameters)
+        public Task Subscribe(string subscriptionName, List<object> parameters)
+        {
+            this.VerifyConnected();
+
+            return this.SubscribeWithParameters(subscriptionName, parameters);
+        }
+
+        public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
+        {
+            return this.CollectionManager.GetCollection<T>(collectionName);
+        }
+
+        private void VerifyConnected()
+        {
+            if (this.state != DdpClientState.Connected)
+            {
+                throw new InvalidOperationException("DdpClient.ConnectAsync must be called before any client methods can be called");
+            }
+        }
+
+        private async Task SubscribeWithParameters(string subscriptionName, List<object> parameters)
         {
             var id = Utilities.GenerateID();
             this.subscriptions.Add(subscriptionName, id);
@@ -177,9 +192,16 @@
             await this.ResultHandler.WaitForResult(readyWaitHandler);
         }
 
-        public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
+        private async Task<T> CallParseResult<T>(string methodName, List<object> parameters)
         {
-            return this.CollectionManager.GetCollection<T>(collectionName);
+            var resultObject = await this.CallGetResult(methodName, parameters);
+
+            if (resultObject.ResultObject == null)
+            {
+                throw new InvalidOperationException("Server did not return an object when a return value was expected");
+            }
+
+            return resultObject.ResultObject.ToObject<T>();
         }
 
         private async Task<Result> CallGetResult(string methodName, List<object> parameters)

@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.UnitTest
 {
     using System;
+    using System.Collections.Generic;
     using Collections.TestObjects;
     using Connection;
     using Messages;
@@ -22,13 +23,13 @@
             connection.Reply(
                 JsonConvert.SerializeObject(new Connected() {Session = "TestSession"}));
 
-            client.ConnectAsync(true).Wait();
+            client.ConnectAsync().Wait();
 
             bool exceptionCaught = false;
 
             try
             {
-                client.ConnectAsync(true).Wait();
+                client.ConnectAsync().Wait();
             }
             catch (AggregateException e)
             {
@@ -174,12 +175,72 @@
             Assert.IsNotNull(collection);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DdpClient_Call_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Call("Test");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof (InvalidOperationException))]
+        public void DdpClient_CallResult_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Call<string>("Test");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof (InvalidOperationException))]
+        public void DdpClient_CallParameters_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Call("Test", new List<object>() {1});
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DdpClient_CallParametersResult_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Call<string>("Test", new List<object>() { 1 });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof (InvalidOperationException))]
+        public void DdpClient_Subscribe_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Subscribe("TestSub");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DdpClient_SubscribeParameters_BeforeConnectThrows()
+        {
+            var connection = new InMemoryConnection();
+            var client = new DdpClient(connection);
+
+            client.Subscribe("TestSub", new List<object>() { "Test" });
+        }
+
         private void Connect(DdpClient client, InMemoryConnection connection)
         {
             connection.Reply(
                 JsonConvert.SerializeObject(new Connected() { Session = "TestSession" }));
 
-            client.ConnectAsync(true).Wait();
+            client.ConnectAsync().Wait();
         }
 
         private void ClearSentMessages(InMemoryConnection connection)
