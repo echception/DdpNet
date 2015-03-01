@@ -18,6 +18,7 @@
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
+        private ArraySegment<byte> buffer; 
 
         public WebSocketConnection(Uri serverUri)
         {
@@ -25,6 +26,7 @@
             this.client = new ClientWebSocket();
 
             this.sendQueue = new BlockingCollection<string>();
+            this.buffer = new ArraySegment<byte>(new byte[1024]);
         }
 
         public async Task ConnectAsync()
@@ -49,19 +51,21 @@
 
         public async Task<string> ReceiveAsync()
         {
-            var buffer = new ArraySegment<byte>(new byte[2048]);
-            var receiveTask = this.client.ReceiveAsync(buffer, CancellationToken.None);
-            receiveTask.Wait();
-            if (receiveTask.Exception != null)
+            String fullMessage = string.Empty;
+            bool completed = false;
+            do
             {
-                System.Diagnostics.Debug.WriteLine(receiveTask.Exception.ToString());
-            }
-            var result = receiveTask.Result;
-            var message = Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
+                var result = await this.client.ReceiveAsync(this.buffer, CancellationToken.None);
+                var message = Encoding.UTF8.GetString(this.buffer.Array, 0, result.Count);
 
-            logger.Trace(string.Format("Recv: {0}", message));
+                fullMessage += message;
+                completed = result.EndOfMessage;
+            } while (!completed);
 
-            return message;
+
+            logger.Trace(string.Format("Recv: {0}", fullMessage));
+
+            return fullMessage;
         }
 
         private async void BackgroundSend()
@@ -73,13 +77,7 @@
                 logger.Trace("Send: {0}", stringToSend);
 
                 var bytesToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(stringToSend));
-                var sendTask = this.client.SendAsync(bytesToSend, WebSocketMessageType.Text, true, CancellationToken.None);
-                sendTask.Wait();
-
-                if (sendTask.Exception != null)
-                {
-                    System.Diagnostics.Debug.WriteLine(sendTask.Exception.ToString());
-                }
+                await this.client.SendAsync(bytesToSend, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
     }

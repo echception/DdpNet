@@ -125,17 +125,9 @@
         {
             var result = await this.webSocketConnection.ReceiveAsync();
 
-            try
+            if (!String.IsNullOrWhiteSpace(result))
             {
-                if (!String.IsNullOrWhiteSpace(result))
-                {
-                    await this.handler.HandleMessage(this, this.CollectionManager, this.ResultHandler, result);
-                }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e.ToString());
-                System.Diagnostics.Debug.WriteLine(result);
+                await this.handler.HandleMessage(this, this.CollectionManager, this.ResultHandler, result);
             }
            
         }
