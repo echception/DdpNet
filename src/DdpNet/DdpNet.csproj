@@ -82,6 +82,7 @@
     <Compile Include="Messages\Error.cs" />
     <Compile Include="Messages\Failed.cs" />
     <Compile Include="Messages\NoSubscribe.cs" />
+    <Compile Include="Messages\Unsubscribe.cs" />
     <Compile Include="ParameterObjects\IdParameter.cs" />
     <Compile Include="Messages\Method.cs" />
     <Compile Include="Messages\Ping.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Results\ReturnedObject.cs" />
     <Compile Include="Results\ResultHandler.cs" />
     <Compile Include="Results\SubscribeResultFilter.cs" />
+    <Compile Include="Results\UnsubscribeResultFilter.cs" />
     <Compile Include="Results\WaitHandle.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Connection\WebSocketConnection.cs" />

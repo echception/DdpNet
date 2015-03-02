@@ -18,5 +18,10 @@
         {
             return new MethodCallResultFilter(methodId);
         }
+
+        internal static ResultFilter CreateUnsubscribeResultFilter(string id)
+        {
+            return new UnsubscribeResultFilter(id);
+        }
     }
 }

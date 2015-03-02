@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Runtime.Remoting;
     using System.Threading.Tasks;
     using DataObjects;
@@ -279,6 +280,56 @@
             var entryToRemove = collection.First();
 
             await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.RemoveAsync(entryToRemove.ID), "403", "Access denied");
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Subscribe_MultipleSubscriptionsSameCollection()
+        {
+            var allEntriesClient = TestEnvironment.GetClient();
+            await allEntriesClient.ConnectAsync();
+
+            var multipleSubscriptionsClient = TestEnvironment.GetClient();
+            await multipleSubscriptionsClient.ConnectAsync();
+
+            var allEntriesCollection = allEntriesClient.GetCollection<Entry>("entries");
+            var multipleSubscriptionsCollection = multipleSubscriptionsClient.GetCollection<Entry>("entries");
+
+            await allEntriesClient.Subscribe("entries");
+
+            for (int i = 0; i < 10; i++)
+            {
+                await allEntriesCollection.AddAsync(Entry.Random());
+            }
+
+            int numberActive = allEntriesCollection.Count(x => x.IsActive);
+
+            await multipleSubscriptionsClient.Subscribe("activeEntries");
+
+            Assert.AreEqual(numberActive, multipleSubscriptionsCollection.Count);
+
+            await multipleSubscriptionsClient.Subscribe("inactiveEntries");
+
+            Assert.AreEqual(allEntriesCollection.Count, multipleSubscriptionsCollection.Count);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task SubscriptionTests_Unsubscribe_ValidSubscription()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("entries");
+
+            await collection.AddAsync(Entry.Random());
+
+            await meteorClient.Subscribe("entries");
+
+            Assert.IsTrue(collection.Count > 0);
+            await meteorClient.Unsubscribe("entries");
+
+            Assert.IsTrue(collection.Count == 0);
         }
     }
 }

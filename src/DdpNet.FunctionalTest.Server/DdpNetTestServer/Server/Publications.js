@@ -8,6 +8,18 @@ Meteor.publish('entriesByName', function(entryName) {
     })
 });
 
+Meteor.publish('activeEntries', function() {
+    return Entries.find({
+        IsActive: true
+    })
+});
+
+Meteor.publish('inactiveEntries', function() {
+    return Entries.find({
+        IsActive: false
+    })
+});
+
 Meteor.publish('denyAll', function() {
     return DenyAll.find();
 });

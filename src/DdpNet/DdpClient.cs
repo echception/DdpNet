@@ -32,7 +32,7 @@
 
         internal CollectionManager CollectionManager { get; private set; }
 
-        private Dictionary<string, string> subscriptions; 
+        private readonly Dictionary<string, string> subscriptions; 
 
         public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
         {
@@ -145,6 +145,11 @@
             return this.SubscribeWithParameters(subscriptionName, parameters);
         }
 
+        public Task Unsubscribe(string subscriptionName)
+        {
+            return this.UnsubscribeInternal(subscriptionName);
+        }
+
         public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
         {
             return this.CollectionManager.GetCollection<T>(collectionName);
@@ -161,7 +166,6 @@
         private async Task SubscribeWithParameters(string subscriptionName, object[] parameters)
         {
             var id = Utilities.GenerateID();
-            this.subscriptions.Add(subscriptionName, id);
             var sub = new Subscribe(id, subscriptionName, parameters);
 
             var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateSubscribeResultFilter(id));
@@ -175,6 +179,33 @@
                 var noSub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
 
                 throw new DdpServerException(noSub.Error);
+            }
+
+            this.subscriptions.Add(subscriptionName, id);
+        }
+
+        private async Task UnsubscribeInternal(string subscriptionName)
+        {
+            string subscriptionId;
+
+            if (this.subscriptions.TryGetValue(subscriptionName, out subscriptionId))
+            {
+                var unsubscribe = new Unsubscribe(subscriptionId);
+
+                var unsubscribeWaitHandler =
+                    this.ResultHandler.RegisterWaitHandler(
+                        ResultFilterFactory.CreateUnsubscribeResultFilter(subscriptionId));
+
+                await this.SendObject(unsubscribe);
+
+                var returnedObject = await this.ResultHandler.WaitForResult(unsubscribeWaitHandler);
+
+                var nosub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+
+                if (nosub.Error != null)
+                {
+                    throw new DdpServerException(nosub.Error);
+                }
             }
         }
 
