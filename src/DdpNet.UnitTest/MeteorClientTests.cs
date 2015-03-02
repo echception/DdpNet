@@ -17,6 +17,8 @@
             var websocket = new InMemoryConnection();
 
             var client = new MeteorClient(websocket);
+            websocket.Reply(JsonConvert.SerializeObject(new Connected() { Session = "TestSession" }));
+            client.ConnectAsync().Wait();
 
             client.LoginPassword(string.Empty, "Password");
         }
@@ -28,6 +30,8 @@
             var websocket = new InMemoryConnection();
 
             var client = new MeteorClient(websocket);
+            websocket.Reply(JsonConvert.SerializeObject(new Connected() { Session = "TestSession" }));
+            client.ConnectAsync().Wait();
 
             client.LoginPassword("Username", String.Empty);
         }

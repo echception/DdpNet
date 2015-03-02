@@ -22,6 +22,9 @@ namespace DdpNet
 
         public Task LoginPassword(string userName, string password)
         {
+            Exceptions.ThrowIfNullOrWhitespace(userName, "userName");
+            Exceptions.ThrowIfNullOrWhitespace(password, "password");
+
             var passwordParameter = this.GetPassword(password);
             var userParameter = new User(userName);
 
