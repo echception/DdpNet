@@ -27,5 +27,23 @@
 
             Assert.IsTrue(thrown);
         }
+
+        public static async Task AssertDdpServerExceptionThrown(Func<Task> action, string expectedError)
+        {
+            bool thrown = false;
+
+            try
+            {
+                await action();
+            }
+            catch (DdpServerException e)
+            {
+                thrown = true;
+
+                Assert.AreEqual(expectedError, e.Error);
+            }
+
+            Assert.IsTrue(thrown);
+        }
     }
 }

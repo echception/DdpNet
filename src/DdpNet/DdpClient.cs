@@ -165,23 +165,27 @@
 
         private async Task SubscribeWithParameters(string subscriptionName, object[] parameters)
         {
-            var id = Utilities.GenerateID();
-            var sub = new Subscribe(id, subscriptionName, parameters);
-
-            var readyWaitHandler = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateSubscribeResultFilter(id));
-
-            await this.SendObject(sub);
-
-            var returnedObject = await this.ResultHandler.WaitForResult(readyWaitHandler);
-
-            if (returnedObject.MessageType == "nosub")
+            if (!this.subscriptions.ContainsKey(subscriptionName))
             {
-                var noSub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+                var id = Utilities.GenerateID();
+                var sub = new Subscribe(id, subscriptionName, parameters);
 
-                throw new DdpServerException(noSub.Error);
+                var readyWaitHandler =
+                    this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateSubscribeResultFilter(id));
+
+                await this.SendObject(sub);
+
+                var returnedObject = await this.ResultHandler.WaitForResult(readyWaitHandler);
+
+                if (returnedObject.MessageType == "nosub")
+                {
+                    var noSub = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+
+                    throw new DdpServerException(noSub.Error);
+                }
+
+                this.subscriptions.Add(subscriptionName, id);
             }
-
-            this.subscriptions.Add(subscriptionName, id);
         }
 
         private async Task UnsubscribeInternal(string subscriptionName)
