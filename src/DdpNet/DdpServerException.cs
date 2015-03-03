@@ -2,6 +2,7 @@
 {
     using System;
     using Messages;
+    using ReturnedObjects;
 
     public class DdpServerException : Exception
     {

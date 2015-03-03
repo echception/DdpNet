@@ -9,6 +9,7 @@
     using Moq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using ReturnedObjects;
 
     [TestClass]
     public class DdpClientTests

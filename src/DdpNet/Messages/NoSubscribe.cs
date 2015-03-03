@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.Messages
 {
     using Newtonsoft.Json;
+    using ReturnedObjects;
 
     internal class NoSubscribe : BaseMessage
     {

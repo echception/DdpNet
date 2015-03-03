@@ -5,12 +5,12 @@
     internal class LoginPasswordParameters
     {
         [JsonProperty(PropertyName = "user")]
-        public User User { get; set; }
+        public UserLogin User { get; set; }
 
         [JsonProperty(PropertyName = "password")]
         public Password Password { get; set; }
 
-        public LoginPasswordParameters(User user, Password password)
+        public LoginPasswordParameters(UserLogin user, Password password)
         {
             this.User = user;
             this.Password = password;

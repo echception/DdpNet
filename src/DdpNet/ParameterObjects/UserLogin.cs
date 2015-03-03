@@ -2,12 +2,12 @@
 {
     using Newtonsoft.Json;
 
-    internal class User
+    internal class UserLogin
     {
         [JsonProperty(PropertyName = "username")]
         public string UserName { get; set; }
 
-        public User(string userName)
+        public UserLogin(string userName)
         {
             this.UserName = userName;
         }

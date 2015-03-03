@@ -6,18 +6,67 @@ using System.Threading.Tasks;
 
 namespace DdpNet
 {
-    using System.Security.Cryptography;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using Annotations;
     using Connection;
     using ParameterObjects;
 
-    public class MeteorClient : DdpClient
+    public class MeteorClient : DdpClient, INotifyPropertyChanged
     {
+        private UserSession userSession;
+        private MeteorUser user;
+
+        private DdpCollection<MeteorUser> users; 
+
+        public UserSession UserSession
+        {
+            get
+            {
+                return this.userSession;
+            }
+            private set
+            {
+                if (value != this.userSession)
+                {
+                    this.userSession = value;
+                    this.OnPropertyChanged();
+
+                    if (this.userSession != null && !string.IsNullOrWhiteSpace(this.userSession.UserId))
+                    {
+                        var userObject = this.users.Single(x => x.ID == this.userSession.UserId);
+
+                        this.User = userObject;
+                    }
+                    else
+                    {
+                        this.User = null;
+                    }
+                }
+            }
+        }
+
+        public MeteorUser User
+        {
+            get { return this.user; }
+            private set
+            {
+                if (this.user != value)
+                {
+                    this.user = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         public MeteorClient(Uri serverUri) : base(serverUri)
         {
+            this.Initialize();
         }
 
         internal MeteorClient(IWebSocketConnection webSocketConnection) : base(webSocketConnection)
         {
+            this.Initialize();
         }
 
         public Task LoginPassword(string userName, string password)
@@ -25,27 +74,45 @@ namespace DdpNet
             Exceptions.ThrowIfNullOrWhitespace(userName, "userName");
             Exceptions.ThrowIfNullOrWhitespace(password, "password");
 
-            var passwordParameter = this.GetPassword(password);
-            var userParameter = new User(userName);
+            var passwordParameter = Utilities.GetPassword(password);
+            var userParameter = new UserLogin(userName);
 
             var loginParameters = new LoginPasswordParameters(userParameter, passwordParameter);
 
-            return this.Call("login", loginParameters);
+            return this.CallLoginMethod("login", loginParameters);
         }
 
-        private Password GetPassword(string password)
+        public Task Logout()
         {
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hashString = new SHA256Managed();
-            var hashedPassword = hashString.ComputeHash(bytes);
-            var hashedString = string.Empty;
+            return this.CallLogoutMethod();
+        }
 
-            foreach (var x in hashedPassword)
-            {
-                hashedString += string.Format("{0:x2}", x);
-            }
+        internal async Task CallLoginMethod(string methodName, params object[] parameters)
+        {
+            var loginResult = await this.Call<UserSession>(methodName, parameters);
 
-            return new Password(hashedString, "sha-256");
+            this.UserSession = loginResult;
+        }
+
+        internal async Task CallLogoutMethod()
+        {
+            await this.Call("logout");
+
+            this.UserSession = null;
+        }
+
+        private void Initialize()
+        {
+            this.users = this.GetCollection<MeteorUser>("users");
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChangedEventHandler handler1 = PropertyChanged;
+            if (handler1 != null) handler1(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

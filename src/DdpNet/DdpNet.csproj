@@ -79,10 +79,14 @@
     <Compile Include="Messages\Changed.cs" />
     <Compile Include="Messages\Connect.cs" />
     <Compile Include="Messages\Connected.cs" />
-    <Compile Include="Messages\Error.cs" />
+    <Compile Include="MeteorUser.cs" />
+    <Compile Include="ReturnedObjects\Date.cs" />
+    <Compile Include="ReturnedObjects\Error.cs" />
     <Compile Include="Messages\Failed.cs" />
     <Compile Include="Messages\NoSubscribe.cs" />
     <Compile Include="Messages\Unsubscribe.cs" />
+    <Compile Include="Packages\Accounts\AccountsExtensionMethods.cs" />
+    <Compile Include="Packages\Accounts\CreateUserUserNameParameters.cs" />
     <Compile Include="ParameterObjects\IdParameter.cs" />
     <Compile Include="Messages\Method.cs" />
     <Compile Include="Messages\Ping.cs" />
@@ -96,7 +100,7 @@
     <Compile Include="ParameterObjects\LoginPasswordParameters.cs" />
     <Compile Include="ParameterObjects\Password.cs" />
     <Compile Include="ParameterObjects\Set.cs" />
-    <Compile Include="ParameterObjects\User.cs" />
+    <Compile Include="ParameterObjects\UserLogin.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\ConnectedResultFilter.cs" />
@@ -111,6 +115,8 @@
     <Compile Include="Results\SubscribeResultFilter.cs" />
     <Compile Include="Results\UnsubscribeResultFilter.cs" />
     <Compile Include="Results\WaitHandle.cs" />
+    <Compile Include="UserEmailAddress.cs" />
+    <Compile Include="UserSession.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Connection\WebSocketConnection.cs" />
   </ItemGroup>

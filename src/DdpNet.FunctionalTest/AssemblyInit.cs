@@ -9,6 +9,7 @@
         public static void AssemblyInitialize(TestContext context)
         {
             TestEnvironment.Cleanup();
+            TestEnvironment.InitializeTestUser().Wait();
         }
     }
 }
