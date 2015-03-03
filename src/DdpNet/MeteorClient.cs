@@ -82,6 +82,15 @@ namespace DdpNet
             return this.CallLoginMethod("login", loginParameters);
         }
 
+        public Task LoginResumeSession(string token)
+        {
+            Exceptions.ThrowIfNullOrWhitespace(token, "token");
+
+            var loginResume = new LoginResume(token);
+
+            return this.CallLoginMethod("login", loginResume);
+        }
+
         public Task Logout()
         {
             return this.CallLogoutMethod();

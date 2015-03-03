@@ -83,5 +83,40 @@
             Assert.IsNull(client.User);
             Assert.IsNull(client.UserSession);
         }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task MeteorClient_LoginResumeSession_StartingAnotherSession()
+        {
+            var client = TestEnvironment.GetClient();
+            await client.ConnectAsync();
+
+            await client.LoginPassword(TestEnvironment.TestUserName, TestEnvironment.TestUserPassword);
+
+            var token = client.UserSession.Token;
+
+            var client2 = TestEnvironment.GetClient();
+            await client2.ConnectAsync();
+
+            await client2.LoginResumeSession(token);
+
+            Assert.AreEqual(client.User.ID, client2.User.ID);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
+        public async Task MeteorClient_LoginResumeSession_SessionLoggedOut()
+        {
+            var client = TestEnvironment.GetClient();
+            await client.ConnectAsync();
+
+            await client.LoginPassword(TestEnvironment.TestUserName, TestEnvironment.TestUserPassword);
+
+            var token = client.UserSession.Token;
+
+            await client.Logout();
+
+            await ExceptionAssert.AssertDdpServerExceptionThrown(async () => await client.LoginResumeSession(token), "403");
+        }
     }
 }
