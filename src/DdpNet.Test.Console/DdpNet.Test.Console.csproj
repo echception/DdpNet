@@ -56,10 +56,6 @@
       <Project>{f6809443-fbfd-4d6d-ae3f-a5b5600e1e98}</Project>
       <Name>DdpNet.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DdpNet\DdpNet.csproj">
-      <Project>{21168f58-994b-4018-a702-ae47c719770e}</Project>
-      <Name>DdpNet</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DdpNet
+﻿namespace DdpNet
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using Connection;
     using ParameterObjects;
 
-    public abstract class BaseMeteorClient : BaseDdpClient, INotifyPropertyChanged
+    public class MeteorClient : DdpClient, INotifyPropertyChanged
     {
         private UserSession userSession;
         private MeteorUser user;
@@ -58,7 +58,12 @@ namespace DdpNet
             }
         }
 
-        protected BaseMeteorClient(IWebSocketConnection webSocketConnection)
+        public MeteorClient(Uri serverUri) : base(serverUri)
+        {
+            this.Initialize();
+        }
+
+        internal MeteorClient(IWebSocketConnection webSocketConnection)
             : base(webSocketConnection)
         {
             this.Initialize();

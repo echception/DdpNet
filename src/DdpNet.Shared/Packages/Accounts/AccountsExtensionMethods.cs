@@ -5,7 +5,7 @@
 
     public static class AccountsExtensionMethods
     {
-        public static Task CreateUserWithUserName(this BaseMeteorClient client, string userName, string password)
+        public static Task CreateUserWithUserName(this MeteorClient client, string userName, string password)
         {
             Exceptions.ThrowIfNullOrWhitespace(userName, "userName");
             Exceptions.ThrowIfNullOrWhitespace(password, "password");

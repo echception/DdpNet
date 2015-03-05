@@ -108,10 +108,6 @@
       <Project>{f6809443-fbfd-4d6d-ae3f-a5b5600e1e98}</Project>
       <Name>DdpNet.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DdpNet\DdpNet.csproj">
-      <Project>{21168f58-994b-4018-a702-ae47c719770e}</Project>
-      <Name>DdpNet</Name>
-    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

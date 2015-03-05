@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DdpNet
+﻿namespace DdpNet
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Net.WebSockets;
+    using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
     using Connection;
 
-    internal class ClientWebSocketConnection : IWebSocketConnection
+    internal class WebSocketConnection : IWebSocketConnection
     {
         private readonly Uri serverUri;
 
@@ -21,7 +18,7 @@ namespace DdpNet
 
         private ArraySegment<byte> buffer;
 
-        public ClientWebSocketConnection(Uri serverUri)
+        public WebSocketConnection(Uri serverUri)
         {
             this.serverUri = serverUri;
             this.client = new ClientWebSocket();

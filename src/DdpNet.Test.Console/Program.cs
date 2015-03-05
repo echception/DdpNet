@@ -20,7 +20,7 @@ namespace DdpNet.Test.Console
 
         static async Task Run()
         {
-            var meteorClient = new MeteorClient(new ConsoleLoggingConnection(new ClientWebSocketConnection(new Uri("ws://localhost:3000/websocket"))));
+            var meteorClient = new MeteorClient(new ConsoleLoggingConnection(new WebSocketConnection(new Uri("ws://localhost:3000/websocket"))));
             await meteorClient.ConnectAsync();
 
             var entryCollection = meteorClient.GetCollection<Entry>("entries");

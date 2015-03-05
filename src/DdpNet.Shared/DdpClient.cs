@@ -12,7 +12,7 @@
     using Newtonsoft.Json;
     using Results;
 
-    public abstract class BaseDdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
+    public class DdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
     {
         private readonly IWebSocketConnection webSocketConnection;
 
@@ -34,7 +34,12 @@
 
         private readonly Dictionary<string, string> subscriptions;
 
-        protected BaseDdpClient(IWebSocketConnection webSocketConnection)
+        public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
+        {
+            
+        }
+
+        internal DdpClient(IWebSocketConnection webSocketConnection)
         {
             this.webSocketConnection = webSocketConnection;
             this.state = DdpClientState.NotConnected;

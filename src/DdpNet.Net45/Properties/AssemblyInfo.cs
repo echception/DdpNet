@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a10381bf-ad57-4ee0-86f6-01c2821cb669")]
+[assembly: Guid("8fdb2031-8af6-4cf8-b672-97fa4b199b3b")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -37,3 +37,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("DdpNet.Test.Console")]
 [assembly: InternalsVisibleTo("DdpNet.UnitTest")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

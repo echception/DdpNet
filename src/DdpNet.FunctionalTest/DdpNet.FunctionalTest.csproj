@@ -79,10 +79,6 @@
       <Project>{f6809443-fbfd-4d6d-ae3f-a5b5600e1e98}</Project>
       <Name>DdpNet.Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DdpNet\DdpNet.csproj">
-      <Project>{21168F58-994B-4018-A702-AE47C719770E}</Project>
-      <Name>DdpNet</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

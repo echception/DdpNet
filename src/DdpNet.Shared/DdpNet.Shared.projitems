@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f1d12e2d-8646-41dd-a329-86be9bd0d840</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DdpNet</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\CollectionManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\ICollectionManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\IDdpCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\InactiveCollectionException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\ObjectChanger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\InvalidCollectionTypeException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedObjectChanger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Connection\IDdpConnectionSender.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpClientState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Connection\IWebSocketConnection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpServerException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ForceSerializeDdpObjectId.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDdpRemoteMethodCall.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoginResume.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ChangedHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\MessageHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\AddedHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\BaseMessageHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\IMessageHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\PingHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\RemovedHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ReplyMessageHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Added.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\BaseMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Changed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Connect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Connected.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MeteorUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Date.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Error.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Failed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\NoSubscribe.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Unsubscribe.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packages\Accounts\AccountsExtensionMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packages\Accounts\CreateUserUserNameParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterObjects\IdParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Method.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Ping.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Pong.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Ready.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Removed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Result.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Subscribe.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages\Updated.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MeteorClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterObjects\LoginPasswordParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterObjects\Password.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterObjects\Set.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterObjects\UserLogin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ConnectedResultFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\IResultHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\MethodCallResultFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\RegisteredResultCallback.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\RegisteredResultWait.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ResultFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ResultFilterFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ReturnedObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ResultHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\SubscribeResultFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\UnsubscribeResultFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\WaitHandle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserEmailAddress.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserSession.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Properties\" />
+  </ItemGroup>
+</Project>
