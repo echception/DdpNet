@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -40,7 +41,7 @@
 
                     var property = this.FindProperty(changedField.Key, objectToChange);
 
-                    if (property != null && property.GetSetMethod(true) != null)
+                    if (property != null && property.SetMethod != null)
                     {
                         property.SetValue(objectToChange, changedField.Value.ToObject(property.PropertyType));
                     }
@@ -80,7 +81,10 @@
         {
             Type changeType = change.GetType();
 
-            var fields = changeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            TypeInfo info = changeType.GetTypeInfo();
+
+            //var fields = changeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var fields = info.DeclaredFields.Where(x => !x.IsStatic);
 
             foreach (var field in fields)
             {
@@ -116,7 +120,9 @@
         {
             Type changeType = change.GetType();
 
-            var properties = changeType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var info = changeType.GetTypeInfo();
+
+            var properties = info.DeclaredProperties;
 
             foreach (var property in properties)
             {

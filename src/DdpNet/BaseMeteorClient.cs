@@ -8,11 +8,10 @@ namespace DdpNet
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-    using Annotations;
     using Connection;
     using ParameterObjects;
 
-    public class MeteorClient : DdpClient, INotifyPropertyChanged
+    public abstract class BaseMeteorClient : BaseDdpClient, INotifyPropertyChanged
     {
         private UserSession userSession;
         private MeteorUser user;
@@ -59,12 +58,8 @@ namespace DdpNet
             }
         }
 
-        public MeteorClient(Uri serverUri) : base(serverUri)
-        {
-            this.Initialize();
-        }
-
-        internal MeteorClient(IWebSocketConnection webSocketConnection) : base(webSocketConnection)
+        protected BaseMeteorClient(IWebSocketConnection webSocketConnection)
+            : base(webSocketConnection)
         {
             this.Initialize();
         }
@@ -117,7 +112,6 @@ namespace DdpNet
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler1 = PropertyChanged;

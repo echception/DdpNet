@@ -1,0 +1,10 @@
+﻿<Application
+    x:Class="Microscope.Net.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Microscope.Net">
+
+    <Application.Resources>
+        <x:String x:Key="AppName">Microscope.Net</x:String>
+    </Application.Resources>
+</Application>

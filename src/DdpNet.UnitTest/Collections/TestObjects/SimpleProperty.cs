@@ -2,7 +2,6 @@
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-    using Annotations;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -38,7 +37,6 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler = PropertyChanged;

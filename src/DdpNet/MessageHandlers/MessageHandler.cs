@@ -18,18 +18,21 @@
 
         public async Task HandleMessage(IDdpConnectionSender client, ICollectionManager collectionManager, IResultHandler resultHandler, string messageText)
         {
-            dynamic message = JObject.Parse(messageText);
+            JObject message = JObject.Parse(messageText);
 
-            var msg = message.msg;
-
-            if (msg != null)
+            if (message["msg"] != null)
             {
-                var messageType = (string) msg;
-                foreach (var handler in this.handlers)
+                var msg = message["msg"];
+
+                if (msg != null)
                 {
-                    if (handler.CanHandle(messageType))
+                    var messageType = (string)msg;
+                    foreach (var handler in this.handlers)
                     {
-                        await handler.HandleMessage(client, collectionManager, resultHandler, messageText);
+                        if (handler.CanHandle(messageType))
+                        {
+                            await handler.HandleMessage(client, collectionManager, resultHandler, messageText);
+                        }
                     }
                 }
             }

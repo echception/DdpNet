@@ -12,7 +12,7 @@
     using Newtonsoft.Json;
     using Results;
 
-    public class DdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
+    public abstract class BaseDdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
     {
         private readonly IWebSocketConnection webSocketConnection;
 
@@ -20,7 +20,7 @@
 
         private readonly string preferredVersion = "1";
 
-        private Thread receiveThread;
+        private Task receiveThread;
 
         internal string SessionId { get; private set; }
 
@@ -32,14 +32,9 @@
 
         internal CollectionManager CollectionManager { get; private set; }
 
-        private readonly Dictionary<string, string> subscriptions; 
+        private readonly Dictionary<string, string> subscriptions;
 
-        public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
-        {
-            
-        }
-
-        internal DdpClient(IWebSocketConnection webSocketConnection)
+        protected BaseDdpClient(IWebSocketConnection webSocketConnection)
         {
             this.webSocketConnection = webSocketConnection;
             this.state = DdpClientState.NotConnected;
@@ -68,8 +63,7 @@
 
             await this.SendObject(connectMessage);
 
-            this.receiveThread = new Thread(this.BackgroundReceive);
-            this.receiveThread.IsBackground = true;
+            this.receiveThread = new Task(this.BackgroundReceive, TaskCreationOptions.LongRunning);
             this.receiveThread.Start();
 
             var resultMessage = await this.ResultHandler.WaitForResult(waitHandle);

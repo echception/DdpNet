@@ -1,26 +1,27 @@
-﻿namespace DdpNet.Connection
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DdpNet
 {
-    using System;
     using System.Collections.Concurrent;
     using System.Net.WebSockets;
-    using System.Text;
     using System.Threading;
-    using System.Threading.Tasks;
-    using NLog;
+    using Connection;
 
-    internal class WebSocketConnection : IWebSocketConnection
+    internal class ClientWebSocketConnection : IWebSocketConnection
     {
         private readonly Uri serverUri;
 
         private readonly ClientWebSocket client;
         private BlockingCollection<string> sendQueue;
-        private Thread sendingThread;
+        private Task sendingThread;
 
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private ArraySegment<byte> buffer;
 
-        private ArraySegment<byte> buffer; 
-
-        public WebSocketConnection(Uri serverUri)
+        public ClientWebSocketConnection(Uri serverUri)
         {
             this.serverUri = serverUri;
             this.client = new ClientWebSocket();
@@ -32,8 +33,7 @@
         public async Task ConnectAsync()
         {
             await this.client.ConnectAsync(this.serverUri, CancellationToken.None);
-            this.sendingThread = new Thread(BackgroundSend);
-            this.sendingThread.IsBackground = true;
+            this.sendingThread = new Task(this.BackgroundSend, TaskCreationOptions.LongRunning);
             this.sendingThread.Start();
         }
 
@@ -62,9 +62,6 @@
                 completed = result.EndOfMessage;
             } while (!completed);
 
-
-            logger.Trace(string.Format("Recv: {0}", fullMessage));
-
             return fullMessage;
         }
 
@@ -73,8 +70,6 @@
             while (!this.sendQueue.IsCompleted)
             {
                 var stringToSend = this.sendQueue.Take();
-
-                logger.Trace("Send: {0}", stringToSend);
 
                 var bytesToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(stringToSend));
                 await this.client.SendAsync(bytesToSend, WebSocketMessageType.Text, true, CancellationToken.None);

@@ -2,7 +2,7 @@
 {
     using System.Threading.Tasks;
 
-    internal interface IWebSocketConnection
+    public interface IWebSocketConnection
     {
         Task ConnectAsync();
 

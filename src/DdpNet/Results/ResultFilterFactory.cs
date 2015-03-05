@@ -1,7 +1,5 @@
 ﻿namespace DdpNet.Results
 {
-    using Microsoft.SqlServer.Server;
-
     internal static class ResultFilterFactory
     {
         internal static ResultFilter CreateSubscribeResultFilter(string subscriptionId)

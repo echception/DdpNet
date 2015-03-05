@@ -3,7 +3,6 @@
     using System;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-    using Annotations;
     using Newtonsoft.Json;
 
     public abstract class DdpObject : INotifyPropertyChanged
@@ -21,7 +20,6 @@
             this.SerializeId = true;
         }
 
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler = PropertyChanged;

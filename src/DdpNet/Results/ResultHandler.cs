@@ -81,7 +81,7 @@
 
             return Task.Factory.StartNew(() =>
             {
-                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(5)))
+                if (!wait.WaitEvent.WaitOne(TimeSpan.FromSeconds(30)))
                 {
                     throw new TimeoutException("Response was never received");
                 }
