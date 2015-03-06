@@ -47,7 +47,7 @@
             var meteorClient = TestEnvironment.GetClient();
             await meteorClient.ConnectAsync();
 
-            await ExceptionAssert.AssertDdpServerExceptionThrown(async () => await meteorClient.Call("throwException"), "500");
+            await ExceptionAssert.AssertDdpServerExceptionThrown(async () => await meteorClient.Call("throwException"), "ERROR");
         }
 
         [TestMethod]

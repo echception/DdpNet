@@ -3,7 +3,7 @@ Meteor.methods({
         return 10;
     },
     'throwException': function() {
-        throw "ERROR";
+        throw new Meteor.Error("ERROR");
     },
     'increment': function(value) {
         return value + 1;
