@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using DataObjects;
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

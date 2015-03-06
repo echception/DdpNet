@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>139fb543-edb5-4b67-9879-56c5112ed524</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DdpNet.FunctionalTest.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AccountsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataObjects\Entry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpCollectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionAssert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpClientMethodCallTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MeteorClientTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestEnvironment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpClientSubscribeTests.cs" />
+  </ItemGroup>
+</Project>

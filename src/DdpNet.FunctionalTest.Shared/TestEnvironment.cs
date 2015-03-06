@@ -12,7 +12,7 @@
 
         public static MeteorClient GetClient()
         {
-            return new MeteorClient(new Uri("ws://localhost:3000/websocket"));
+            return new MeteorClient(new Uri("ws://localhost:3000/websocket", UriKind.Absolute));
         }
 
         public static void Cleanup()

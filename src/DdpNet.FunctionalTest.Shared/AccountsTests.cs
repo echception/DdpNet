@@ -2,6 +2,7 @@
 {
     using DdpNet.Packages.Accounts;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

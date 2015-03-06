@@ -18,6 +18,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Microscope.Net
 {
+    using System.Threading.Tasks;
+    using DdpNet;
+
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
@@ -52,6 +55,13 @@ namespace Microscope.Net
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
+
+        private async Task Connect()
+        {
+            var client = new DdpClient(new Uri("ws://localhost:3000/websocket"));
+            await client.ConnectAsync();
+        }
+
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -91,9 +101,10 @@ namespace Microscope.Net
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+            await this.Connect();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

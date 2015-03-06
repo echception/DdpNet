@@ -1,6 +1,7 @@
 ﻿namespace DdpNet.FunctionalTest
 {
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using DataObjects;
+    using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -119,7 +120,7 @@
             var entryCollection = meteorClient.GetCollection<Entry>("entries");
             await meteorClient.Subscribe("entries");
 
-            var inserts = 10;
+            var inserts = 100;
             var currentCount = entryCollection.Count;
 
             List<Task> startedTasks = new List<Task>();

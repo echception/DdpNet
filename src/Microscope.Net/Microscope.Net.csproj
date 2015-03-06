@@ -142,6 +142,12 @@
   <ItemGroup>
     <Folder Include="DataModel\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DdpNet.WinRT\DdpNet.WinRT.csproj">
+      <Project>{2ebf3873-401d-4503-bf91-8720013b3c59}</Project>
+      <Name>DdpNet.WinRT</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

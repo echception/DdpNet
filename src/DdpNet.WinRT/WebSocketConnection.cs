@@ -30,9 +30,11 @@
 
         public async Task ConnectAsync()
         {
-            await this.messageWebSocket.ConnectAsync(this.serverUri);
             this.messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
             this.messageWebSocket.MessageReceived += MessageWebSocketOnMessageReceived;
+
+            await this.messageWebSocket.ConnectAsync(this.serverUri);
+            
             this.sendingThread = new Task(this.BackgroundSend, TaskCreationOptions.LongRunning);
             this.sendingThread.Start();
         }
