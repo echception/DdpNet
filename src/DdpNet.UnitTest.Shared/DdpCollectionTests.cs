@@ -19,28 +19,28 @@
     public class DdpCollectionTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DdpCollection_Constructor_NullClientThrows()
         {
-            var collection = new DdpCollection<TestDdpObject>(null, "collectionName");
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(
+                () => { var collection = new DdpCollection<TestDdpObject>(null, "collectionName"); });
         }
 
         [TestMethod]
-        [ExpectedException(typeof (ArgumentNullException))]
         public void DdpCollection_Constructor_NullCollectionNameThrows()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
-            var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, string.Empty);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() =>
+            {
+                var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, string.Empty); });
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DdpCollection_AddAsync_NullItem()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            collection.AddAsync(null);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.AddAsync(null));
         }
 
         [TestMethod]
@@ -63,13 +63,12 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DdpCollection_RemoveAsync_NullItem()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            collection.RemoveAsync(null);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.RemoveAsync(null));
         }
 
         [TestMethod]
@@ -92,17 +91,15 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DdpCollection_UpdateAsync_NullItem()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            collection.UpdateAsync("ID", null);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.UpdateAsync("ID", null));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DdpCollection_UpdateAsync_NullID()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
@@ -110,7 +107,7 @@
 
             var testObject = new TestDdpObject() { ID = "11", integerField = 10, StringProperty = "FooBar" };
 
-            collection.UpdateAsync(string.Empty, testObject);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.UpdateAsync(string.Empty, testObject));
         }
 
         [TestMethod]

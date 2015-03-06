@@ -53,7 +53,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void ResultHandler_WaitForResult_ReactivateWaitHandle()
         {
             var resultHandler = new ResultHandler();
@@ -71,7 +70,7 @@
 
             Assert.AreEqual(returnedObject, waitTask.Result);
 
-            resultHandler.WaitForResult(waitHandle);
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => resultHandler.WaitForResult(waitHandle));
         }
 
         [TestMethod]

@@ -178,63 +178,57 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void DdpClient_Call_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call("Test");
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Call("Test"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof (InvalidOperationException))]
         public void DdpClient_CallResult_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call<string>("Test");
+             PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Call<string>("Test"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof (InvalidOperationException))]
         public void DdpClient_CallParameters_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call("Test", 1);
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Call("Test", 1));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void DdpClient_CallParametersResult_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Call<string>("Test", 1 );
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Call<string>("Test", 1 ));
         }
 
         [TestMethod]
-        [ExpectedException(typeof (InvalidOperationException))]
         public void DdpClient_Subscribe_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Subscribe("TestSub");
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Subscribe("TestSub"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void DdpClient_SubscribeParameters_BeforeConnectThrows()
         {
             var connection = new InMemoryConnection();
             var client = new DdpClient(connection);
 
-            client.Subscribe("TestSub", "Test" );
+            PCLTesting.ExceptionAssert.Throws<InvalidOperationException>(() => client.Subscribe("TestSub", "Test" ));
         }
 
         private void Connect(DdpClient client, InMemoryConnection connection)

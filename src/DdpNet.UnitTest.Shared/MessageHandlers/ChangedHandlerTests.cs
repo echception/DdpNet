@@ -31,7 +31,7 @@
             handler.HandleMessage(connectionMock.Object, collectionMock.Object, resultHandlerMock.Object,
                 JsonConvert.SerializeObject(added));
 
-            collectionMock.Verify(collection => collection.Changed(It.IsAny<Changed>()), Times.Once);
+            collectionMock.Verify(collection => collection.Changed(It.IsAny<Changed>()), Times.Once());
         }
 
         [TestMethod]

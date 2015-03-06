@@ -115,7 +115,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidCollectionTypeException))]
         public void CollectionManager_GetCollection_RetypeCollection()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
@@ -123,7 +122,9 @@
             var collectionManager = new CollectionManager(remoteMethodCall.Object);
 
             var collection1 = collectionManager.GetCollection<TestDdpObject>("Test");
-            var collection2 = collectionManager.GetCollection<SimpleDdpObject>("Test");
+
+            ExceptionAssert.Throws<InvalidCollectionTypeException>(
+                () => { var collection2 = collectionManager.GetCollection<SimpleDdpObject>("Test"); });
         }
 
         [TestMethod]
@@ -232,7 +233,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void CollectionManager_Changed_NotExist()
         {
             var collectionManager = new CollectionManager(null);
@@ -245,16 +245,15 @@
                 ID = "1"
             };
 
-            collectionManager.Changed(changed);
+            ExceptionAssert.Throws<InvalidOperationException>(() => collectionManager.Changed(changed));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void CollectionManager_Removed_NotExist()
         {
             var collectionManager = new CollectionManager(null);
 
-            collectionManager.Removed(new Removed() { Collection = "Test", ID = "1" });
+            ExceptionAssert.Throws<InvalidOperationException>(() => collectionManager.Removed(new Removed() { Collection = "Test", ID = "1" }));
         }
 
         private void AssertDdpObjectsEqual(TestDdpObject expected, TestDdpObject actual)

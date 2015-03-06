@@ -12,7 +12,6 @@
     public class MeteorClientTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void MeteorClient_LoginPassword_NullUsername()
         {
             var websocket = new InMemoryConnection();
@@ -21,11 +20,10 @@
             websocket.Reply(JsonConvert.SerializeObject(new Connected() { Session = "TestSession" }));
             client.ConnectAsync().Wait();
 
-            client.LoginPassword(string.Empty, "Password");
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => client.LoginPassword(string.Empty, "Password"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof (ArgumentNullException))]
         public void MeteorClient_LoginPassword_NullPassword()
         {
             var websocket = new InMemoryConnection();
@@ -34,7 +32,7 @@
             websocket.Reply(JsonConvert.SerializeObject(new Connected() { Session = "TestSession" }));
             client.ConnectAsync().Wait();
 
-            client.LoginPassword("Username", String.Empty);
+            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => client.LoginPassword("Username", String.Empty));
         }
 
         [TestMethod]

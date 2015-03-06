@@ -30,7 +30,7 @@
             handler.HandleMessage(connectionMock.Object, collectionMock.Object, resultHandlerMock.Object,
                 JsonConvert.SerializeObject(added));
 
-            collectionMock.Verify(collection => collection.Removed(It.IsAny<Removed>()), Times.Once);
+            collectionMock.Verify(collection => collection.Removed(It.IsAny<Removed>()), Times.Once());
         }
 
         [TestMethod]
