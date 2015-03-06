@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>cf26a705-492e-4f01-97a1-6be04b69961d</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DdpNet.UnitTest.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\CollectionManagerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\TestObjects\ComplexObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\TestObjects\SimpleDdpObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\TestObjects\TestDdpObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\TestObjects\SimpleField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\TestObjects\SimpleProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\ObjectChangerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedCollectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedObjectChangerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConnectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpClientTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpCollectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionAssert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HeartbeatsTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InMemoryConnection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\AddedHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ChangedHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\PingHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\RemovedHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ReplyMessageHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MeteorClientTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ResultHandlerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ConnectedResultFilterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\MethodCallResultFilterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\RegisteredResultCallbackTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\ResultFilterFactoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Results\SubscribeResultFilterTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Properties\" />
+  </ItemGroup>
+</Project>

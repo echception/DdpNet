@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DdpNet.Net45")]
+[assembly: AssemblyTitle("DdpNet.UnitTest.Net45")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DdpNet.Net45")]
+[assembly: AssemblyProduct("DdpNet.UnitTest.Net45")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8fdb2031-8af6-4cf8-b672-97fa4b199b3b")]
+[assembly: Guid("86d3e22b-04af-4701-8f68-532ae86a4d74")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,7 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: InternalsVisibleTo("DdpNet.Test.Console")]
-[assembly: InternalsVisibleTo("DdpNet.UnitTest.Net45")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
