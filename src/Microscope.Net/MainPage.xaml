@@ -37,10 +37,14 @@
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
         </Grid>
         
-        <ListView Grid.Row="1">
+        <ListView Grid.Row="1" ItemsSource="{Binding Posts}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Title}"></TextBlock>
+                        </StackPanel>
+                    </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.ComponentModel;
     using System.Linq;
     using System.Security;
     using System.Threading.Tasks;
@@ -143,7 +144,7 @@
             var collectionChangedCalled = false;
             var propertyChangedCalled = false;
 
-            collection.CollectionChanged += (sender, args) =>
+            ((INotifyCollectionChanged)collection).CollectionChanged += (sender, args) =>
             {
                 Assert.AreEqual(NotifyCollectionChangedAction.Add, args.Action);
                 Assert.AreEqual(1, args.NewItems.Count);
@@ -159,9 +160,8 @@
                 collectionChangedCalled = true;
             };
 
-            collection.PropertyChanged += (sender, args) =>
+            ((INotifyPropertyChanged)collection).PropertyChanged += (sender, args) =>
             {
-                Assert.AreEqual("Count", args.PropertyName);
                 propertyChangedCalled = true;
             };
 
@@ -209,7 +209,7 @@
 
             Assert.AreEqual(1, collection.Count);
 
-            collection.CollectionChanged += (sender, args) =>
+            ((INotifyCollectionChanged)collection).CollectionChanged += (sender, args) =>
             {
                 Assert.AreEqual(NotifyCollectionChangedAction.Remove, args.Action);
                 Assert.AreEqual(1, args.OldItems.Count);
@@ -225,9 +225,8 @@
                 collectionChangedCalled = true;
             };
 
-            collection.PropertyChanged += (sender, args) =>
+            ((INotifyPropertyChanged)collection).PropertyChanged += (sender, args) =>
             {
-                Assert.AreEqual("Count", args.PropertyName);
                 propertyChangedCalled = true;
             };
 

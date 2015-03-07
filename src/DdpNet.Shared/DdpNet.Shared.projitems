@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedObjectChanger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Connection\IDdpConnectionSender.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Date.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpClientState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpObject.cs" />
@@ -42,7 +43,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connected.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MeteorUser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Date.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Error.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Failed.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\NoSubscribe.cs" />

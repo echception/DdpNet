@@ -1,9 +1,9 @@
-﻿namespace DdpNet.ReturnedObjects
+﻿namespace DdpNet
 {
     using System;
     using Newtonsoft.Json;
 
-    internal class Date
+    public class Date
     {
         [JsonProperty(PropertyName = "$date")]
         public long MillisecondsSinceEposh { get; set; }

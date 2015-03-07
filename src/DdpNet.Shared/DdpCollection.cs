@@ -14,22 +14,17 @@
     using Newtonsoft.Json.Linq;
     using ParameterObjects;
 
-    public class DdpCollection<T> : IEnumerable<T>, INotifyCollectionChanged, INotifyPropertyChanged, IDdpCollection where T: DdpObject
+    public class DdpCollection<T> : ReadOnlyObservableCollection<T>, IDdpCollection where T: DdpObject
     {
-        public int Count { get { return this.internalList.Count; } }
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
-
         internal string CollectionName { get; private set; }
         private IDdpRemoteMethodCall client;
 
         private SynchronizationContext synchronizationContext;
         private ObjectChanger changer = new ObjectChanger();
 
-        private List<T> internalList; 
+        private ObservableCollection<T> internalList; 
 
-        internal DdpCollection(IDdpRemoteMethodCall client, string collectionName)
+        internal DdpCollection(IDdpRemoteMethodCall client, string collectionName) : this(new ObservableCollection<T>())
         {
             Exceptions.ThrowIfNull(client, "client");
             Exceptions.ThrowIfNullOrWhitespace(collectionName, "collectionName");
@@ -37,7 +32,11 @@
             this.CollectionName = collectionName;
             this.client = client;
             this.synchronizationContext = SynchronizationContext.Current;
-            this.internalList = new List<T>();
+        }
+
+        internal DdpCollection(ObservableCollection<T> internalList) : base(internalList)
+        {
+            this.internalList = internalList;
         }
 
         public Task AddAsync(T item)
@@ -81,8 +80,6 @@
             deserializedObject.ID = id;
 
             this.internalList.Add(deserializedObject);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, deserializedObject));
-            this.OnPropertyChanged(new PropertyChangedEventArgs("Count"));
         }
 
         void IDdpCollection.Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
@@ -104,12 +101,10 @@
             if (objectToRemove != null)
             {
                 this.internalList.Remove(objectToRemove);
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, objectToRemove));
-                this.OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             }
         }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
@@ -119,19 +114,16 @@
             else
             {
                 // Raises the CollectionChanged event on the creator thread
-                this.synchronizationContext.Send(RaiseCollectionChanged, e);
+                this.synchronizationContext.Post(RaiseCollectionChanged, e);
             }
         }
 
         private void RaiseCollectionChanged(object param)
         {
-            if (this.CollectionChanged != null)
-            {
-                this.CollectionChanged(this, (NotifyCollectionChangedEventArgs) param);
-            }
+            base.OnCollectionChanged((NotifyCollectionChangedEventArgs) param);
         }
 
-        protected void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
@@ -141,7 +133,7 @@
             else
             {
                 // Raises the PropertyChanged event on the creator thread
-                this.synchronizationContext.Send(RaisePropertyChanged, e);
+                this.synchronizationContext.Post(RaisePropertyChanged, e);
             }
         }
 
@@ -163,24 +155,7 @@
 
         private void RaisePropertyChanged(object param)
         {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, (PropertyChangedEventArgs)param);
-            }
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            var snapShot = this.internalList.ToList();
-
-            return snapShot.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            var snapShot = this.internalList.ToList();
-
-            return snapShot.GetEnumerator();
+            base.OnPropertyChanged((PropertyChangedEventArgs)param);
         }
     }
 }

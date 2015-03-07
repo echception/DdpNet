@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 namespace Microscope.Net
 {
     using System.Threading.Tasks;
+    using DataModel;
     using DdpNet;
 
     /// <summary>
@@ -26,7 +27,7 @@ namespace Microscope.Net
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
+        private MainPageViewModel viewModel;
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
@@ -54,12 +55,16 @@ namespace Microscope.Net
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
+
+            this.Load();
         }
 
-        private async Task Connect()
+        private async void Load()
         {
-            var client = new DdpClient(new Uri("ws://localhost:3000/websocket"));
-            await client.ConnectAsync();
+            this.viewModel = new MainPageViewModel(App.Current.Client.GetCollection<Post>("posts"));
+            await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = 50, Sort = new Sort() { ID = -1, Submitted = -1 } });
+
+            this.DataContext = this.viewModel;
         }
 
 
@@ -104,7 +109,6 @@ namespace Microscope.Net
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-            await this.Connect();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

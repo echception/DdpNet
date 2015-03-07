@@ -19,11 +19,20 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Microscope.Net
 {
+    using DdpNet;
+
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     sealed partial class App : Application
     {
+        public new static App Current
+        {
+            get { return (App) Application.Current; }
+        }
+
+        public DdpClient Client { get; private set; }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -39,7 +48,7 @@ namespace Microscope.Net
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
 
 #if DEBUG
@@ -48,6 +57,9 @@ namespace Microscope.Net
                 this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
+
+            this.Client = new DdpClient(new Uri("ws://localhost:3000/websocket"));
+            await this.Client.ConnectAsync();
 
             Frame rootFrame = Window.Current.Content as Frame;
 

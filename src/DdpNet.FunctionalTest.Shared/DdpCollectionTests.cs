@@ -1,6 +1,8 @@
 ﻿namespace DdpNet.FunctionalTest
 {
     using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
     using DataObjects;
@@ -97,8 +99,8 @@
 
             bool collectionChangedCalled = false;
             bool propertyChanged = false;
-            entryCollection.CollectionChanged += (sender, args) => collectionChangedCalled = true;
-            entryCollection.PropertyChanged += (sender, args) =>
+            ((INotifyCollectionChanged)entryCollection).CollectionChanged += (sender, args) => collectionChangedCalled = true;
+            ((INotifyPropertyChanged)entryCollection).PropertyChanged += (sender, args) =>
             {
                 Assert.AreEqual("Count", args.PropertyName);
                 propertyChanged = true;
