@@ -31,19 +31,19 @@
             {
                 foreach (var changedField in fields)
                 {
+                    var property = this.FindProperty(changedField.Key, objectToChange);
+
+                    if (property != null && property.SetMethod != null)
+                    {
+                        property.SetValue(objectToChange, changedField.Value.ToObject(property.PropertyType));
+                    }
+
                     var field = this.FindField(changedField.Key, objectToChange);
 
                     if (field != null)
                     {
                         field.SetValue(objectToChange, changedField.Value.ToObject(field.FieldType));
                         continue;
-                    }
-
-                    var property = this.FindProperty(changedField.Key, objectToChange);
-
-                    if (property != null && property.SetMethod != null)
-                    {
-                        property.SetValue(objectToChange, changedField.Value.ToObject(property.PropertyType));
                     }
                 }
             }

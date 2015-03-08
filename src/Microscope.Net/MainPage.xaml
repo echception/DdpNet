@@ -9,7 +9,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
+    
     <!--
         This grid acts as a root panel for the page that defines two rows:
         * Row 0 contains the back button and page title
@@ -41,8 +41,17 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
+                        <Button Content="Upvote"></Button>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Title}"></TextBlock>
+                            <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
+                            <TextBlock>
+                                <Run Text="{Binding Votes}"></Run>
+                                <Run Text=" votes, submitted by"></Run>
+                                <Run Text="{Binding Author}"></Run>
+                                <Run Text=", "></Run>
+                                <Run Text="{Binding CommentsCount}"></Run>
+                                <Run Text=" comments"></Run>
+                            </TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </DataTemplate>

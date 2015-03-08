@@ -77,7 +77,7 @@
         void IDdpCollection.Added(string id, JObject jObject)
         {
             var deserializedObject = jObject.ToObject<T>();
-            deserializedObject.ID = id;
+            deserializedObject.OnAdded(id, this.synchronizationContext);
 
             this.internalList.Add(deserializedObject);
         }
