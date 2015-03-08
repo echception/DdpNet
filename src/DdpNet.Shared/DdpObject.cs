@@ -26,7 +26,6 @@
         internal void OnAdded(string id, SynchronizationContext synchronizationContext)
         {
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
-            Exceptions.ThrowIfNull(synchronizationContext, "synchronizationContext");
 
             this.ID = id;
             this.SynchronizationContext = synchronizationContext;
@@ -35,7 +34,7 @@
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var args = new PropertyChangedEventArgs(propertyName);
-            if (SynchronizationContext.Current == this.SynchronizationContext)
+            if (this.SynchronizationContext == null || SynchronizationContext.Current == this.SynchronizationContext)
             {
                 RaisePropertyChanged(args);
             }

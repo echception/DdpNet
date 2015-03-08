@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedObjectChangerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConnectionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpClientTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpCollectionSortTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpCollectionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HeartbeatsTest.cs" />

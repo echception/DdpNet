@@ -22,7 +22,11 @@
         private SynchronizationContext synchronizationContext;
         private ObjectChanger changer = new ObjectChanger();
 
-        private ObservableCollection<T> internalList; 
+        private ObservableCollection<T> internalList;
+
+        private Comparison<T> sortComparer; 
+
+        private object lockObject = new object();
 
         internal DdpCollection(IDdpRemoteMethodCall client, string collectionName) : this(new ObservableCollection<T>())
         {
@@ -32,9 +36,10 @@
             this.CollectionName = collectionName;
             this.client = client;
             this.synchronizationContext = SynchronizationContext.Current;
+            this.sortComparer = null;
         }
 
-        internal DdpCollection(ObservableCollection<T> internalList) : base(internalList)
+        private DdpCollection(ObservableCollection<T> internalList) : base(internalList)
         {
             this.internalList = internalList;
         }
@@ -74,33 +79,78 @@
             }
         }
 
+        public void Sort(Comparison<T> comparer)
+        {
+            lock (this.lockObject)
+            {
+                var sortedList = this.internalList.ToList();
+                sortedList.Sort(comparer);
+
+                for (int i = 0; i < sortedList.Count; i++)
+                {
+                    this.internalList.Move(this.internalList.IndexOf(sortedList[i]), i);
+                }
+
+                this.sortComparer = comparer;
+            }
+        }
+
         void IDdpCollection.Added(string id, JObject jObject)
         {
-            var deserializedObject = jObject.ToObject<T>();
-            deserializedObject.OnAdded(id, this.synchronizationContext);
+            lock (this.lockObject)
+            {
+                var deserializedObject = jObject.ToObject<T>();
+                deserializedObject.OnAdded(id, this.synchronizationContext);
 
-            this.internalList.Add(deserializedObject);
+                if (this.sortComparer == null)
+                {
+                    this.internalList.Add(deserializedObject);
+                }
+                else
+                {
+                    var insertIndex = this.FindIndexForItem(deserializedObject);
+                    this.internalList.Insert(insertIndex, deserializedObject);
+                }
+            }
         }
 
         void IDdpCollection.Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
         {
-            var objectToChange = this.SingleOrDefault(x => x.ID == id);
-
-            if (objectToChange == null)
+            lock (this.lockObject)
             {
-                return;
-            }
+                var objectToChange = this.internalList.SingleOrDefault(x => x.ID == id);
 
-            this.changer.ChangeObject(objectToChange, fields, cleared);
+                if (objectToChange == null)
+                {
+                    return;
+                }
+
+                this.changer.ChangeObject(objectToChange, fields, cleared);
+
+                if (this.sortComparer != null)
+                {
+                    var newIndex = this.FindIndexForItem(objectToChange);
+
+                    if (this.internalList.IndexOf(objectToChange) < newIndex)
+                    {
+                        newIndex--;
+                    }
+
+                    this.internalList.Move(this.internalList.IndexOf(objectToChange), newIndex);
+                }
+            }
         }
 
         void IDdpCollection.Removed(string id)
         {
-            var objectToRemove = this.SingleOrDefault(x => x.ID == id);
-
-            if (objectToRemove != null)
+            lock (this.lockObject)
             {
-                this.internalList.Remove(objectToRemove);
+                var objectToRemove = this.SingleOrDefault(x => x.ID == id);
+
+                if (objectToRemove != null)
+                {
+                    this.internalList.Remove(objectToRemove);
+                }
             }
         }
 
@@ -156,6 +206,64 @@
         private void RaisePropertyChanged(object param)
         {
             base.OnPropertyChanged((PropertyChangedEventArgs)param);
+        }
+
+        private int FindIndexForItem(T item)
+        {
+            var index = BinarySearch(item);
+            while (index < this.internalList.Count && this.sortComparer(this.internalList[index], item) == 0)
+            {
+                index++;
+            }
+
+            return index;
+        }
+
+        private int BinarySearch(T item)
+        {
+            int min = 0;
+            int max = this.internalList.Count - 1;
+
+            while (min <= max)
+            {
+                int mid = (min + max)/2;
+                T midItem = this.internalList[mid];
+
+                if (midItem == item)
+                {
+                    if (mid + 1 <= max)
+                    {
+                        mid = mid + 1;
+                        midItem = this.internalList[mid];
+                    }
+                    else if(mid - 1 >= min)
+                    {
+                        mid = mid - 1;
+                        midItem = this.internalList[mid];
+                    }
+                    else
+                    {
+                        return mid;
+                    }
+                }
+
+                int result = this.sortComparer(midItem, item);
+
+                if (result == 0)
+                {
+                    return mid;
+                }
+                if (result < 0)
+                {
+                    min = mid + 1;
+                }
+                else
+                {
+                    max = mid - 1;
+                }
+            }
+
+            return min;
         }
     }
 }
