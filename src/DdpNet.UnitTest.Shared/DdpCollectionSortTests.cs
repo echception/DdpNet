@@ -11,80 +11,88 @@
     [TestClass]
     public class DdpCollectionSortTests
     {
+        private const int Iterations = 1000;
         [TestMethod]
         public void DdpCollection_Sort_ManyInsertsSmallRange()
         {
-            var collection = this.GetSortedCollection();
+            var collection = this.GetCollection();
+            var sortedCollection = this.GetSortedCollection(collection);
 
-            this.RunAddTests(collection, 10000, 0, 100);
+            this.RunAddTests(collection, sortedCollection, Iterations, 0, 100);
 
-            Assert.AreEqual(10000, collection.Count);
-            this.AssertCollectionSorted(collection);
+            Assert.AreEqual(Iterations, collection.Count);
+            Assert.AreEqual(Iterations, sortedCollection.Count);
+            this.AssertCollectionSorted(sortedCollection);
         }
 
         [TestMethod]
         public void DdpCollection_Sort_ManyInsertsLargeRangeRange()
         {
-            var collection = this.GetSortedCollection();
+            var collection = this.GetCollection();
+            var sortedCollection = this.GetSortedCollection(collection);
 
-            this.RunAddTests(collection, 10000, 0, 1000000);
+            this.RunAddTests(collection, sortedCollection, Iterations, 0, 1000000);
 
-            Assert.AreEqual(10000, collection.Count);
-            this.AssertCollectionSorted(collection);
+            Assert.AreEqual(Iterations, collection.Count);
+            Assert.AreEqual(Iterations, sortedCollection.Count);
+            this.AssertCollectionSorted(sortedCollection);
         }
 
         [TestMethod]
         public void DdpCollection_Sort_ManyChangesSmallRange()
         {
-            var collection = this.GetSortedCollection();
+            var collection = this.GetCollection();
+            var sortedCollection = this.GetSortedCollection(collection);
 
-            this.RunAddTests(collection, 10000, 0, 100);
-            this.RunChangeTests(collection, 10000, 0, 100);
+            this.RunAddTests(collection, sortedCollection, Iterations, 0, 100);
+            this.RunChangeTests(collection, sortedCollection, Iterations, 0, 100);
 
-            Assert.AreEqual(10000, collection.Count);
-            this.AssertCollectionSorted(collection);
+            Assert.AreEqual(Iterations, collection.Count);
+            Assert.AreEqual(Iterations, sortedCollection.Count);
+            this.AssertCollectionSorted(sortedCollection);
         }
 
         [TestMethod]
         public void DdpCollection_Sort_ManyChangesLargeRange()
         {
-            var collection = this.GetSortedCollection();
+            var collection = this.GetCollection();
+            var sortedCollection = this.GetSortedCollection(collection);
 
-            this.RunAddTests(collection, 10000, 0, 100000);
-            this.RunChangeTests(collection, 10000, 0, 100000);
+            this.RunAddTests(collection, sortedCollection, Iterations, 0, 100000);
+            this.RunChangeTests(collection, sortedCollection, Iterations, 0, 100000);
 
-            Assert.AreEqual(10000, collection.Count);
-            this.AssertCollectionSorted(collection);
+            Assert.AreEqual(Iterations, collection.Count);
+            Assert.AreEqual(Iterations, sortedCollection.Count);
+            this.AssertCollectionSorted(sortedCollection);
         }
 
         [TestMethod]
         public void DdpCollection_Sort_ManyChangesSmallCollection()
         {
-            var collection = this.GetSortedCollection();
+            var collection = this.GetCollection();
+            var sortedCollection = this.GetSortedCollection(collection);
 
-            this.RunAddTests(collection, 5, 0, 10);
-            this.RunChangeTests(collection, 10000, 0, 10);
+            this.RunAddTests(collection, sortedCollection, 5, 0, 10);
+            this.RunChangeTests(collection, sortedCollection, Iterations, 0, 10);
 
             Assert.AreEqual(5, collection.Count);
-            this.AssertCollectionSorted(collection);
+            Assert.AreEqual(5, sortedCollection.Count);
+            this.AssertCollectionSorted(sortedCollection);
         }
 
-        private DdpCollection<TestDdpObject> GetSortedCollection()
+        private DdpCollection<TestDdpObject> GetCollection()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
 
-            var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
-            this.SortCollectionByIntegerField(collection);
-
-            return collection;
+            return new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
         }
 
-        private void SortCollectionByIntegerField(DdpCollection<TestDdpObject> collection)
+        private DdpFilteredCollection<TestDdpObject> GetSortedCollection(DdpCollection<TestDdpObject> collection)
         {
-            collection.Sort((x, y) => x.integerField - y.integerField);
+            return collection.Filter(sortFilter: (x, y) => x.integerField - y.integerField);
         }
 
-        private void RunAddTests(DdpCollection<TestDdpObject> collection, int numberOfAdds, int minRange, int maxRange)
+        private void RunAddTests(DdpCollection<TestDdpObject> collection, DdpFilteredCollection<TestDdpObject> sortedCollection, int numberOfAdds, int minRange, int maxRange)
         {
             Random random = new Random();
             for (int i = 0; i < numberOfAdds; i++)
@@ -93,11 +101,11 @@
 
                 this.AddObject(collection, newValue);
 
-                this.AssertCollectionSorted(collection);
+                this.AssertCollectionSorted(sortedCollection);
             }
         }
 
-        private void RunChangeTests(DdpCollection<TestDdpObject> collection, int numberOfChanges, int minRange,
+        private void RunChangeTests(DdpCollection<TestDdpObject> collection, DdpFilteredCollection<TestDdpObject> sortedCollection, int numberOfChanges, int minRange,
             int maxRange)
         {
             Random random = new Random();
@@ -108,7 +116,7 @@
 
                 this.ChangeObject(collection, collection[indexToChange].ID, newValue);
 
-                this.AssertCollectionSorted(collection);
+                this.AssertCollectionSorted(sortedCollection);
             }
         }
 
@@ -124,7 +132,7 @@
             ((IDdpCollection)collection).Changed(id, new Dictionary<string, JToken>() { { "integerField", newValue } }, new string[0]);
         }
 
-        private void AssertCollectionSorted(DdpCollection<TestDdpObject> collection)
+        private void AssertCollectionSorted(DdpFilteredCollection<TestDdpObject> collection)
         {
             for (int i = 0; i < collection.Count - 1; i++)
             {

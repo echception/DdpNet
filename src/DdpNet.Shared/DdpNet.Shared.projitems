@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Date.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpClientState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DdpFilteredCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Connection\IWebSocketConnection.cs" />

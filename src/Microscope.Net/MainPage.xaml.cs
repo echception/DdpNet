@@ -62,7 +62,7 @@ namespace Microscope.Net
         private async void Load()
         {
             this.viewModel = new MainPageViewModel(App.Current.Client.GetCollection<Post>("posts"));
-            await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = 50, Sort = new Sort() { ID = -1, Submitted = -1 } });
+            await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = 5, Sort = new Sort() { ID = -1, Submitted = -1 } });
 
             this.DataContext = this.viewModel;
         }

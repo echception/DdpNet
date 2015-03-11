@@ -16,17 +16,18 @@
 
     public class DdpCollection<T> : ReadOnlyObservableCollection<T>, IDdpCollection where T: DdpObject
     {
-        internal string CollectionName { get; private set; }
-        private IDdpRemoteMethodCall client;
+        public string CollectionName { get; private set; }
 
-        private SynchronizationContext synchronizationContext;
-        private ObjectChanger changer = new ObjectChanger();
+        private readonly IDdpRemoteMethodCall client;
 
-        private ObservableCollection<T> internalList;
+        private readonly SynchronizationContext synchronizationContext;
+        private readonly ObjectChanger changer = new ObjectChanger();
 
-        private Comparison<T> sortComparer; 
+        private readonly ObservableCollection<T> internalList;
 
-        private object lockObject = new object();
+        private readonly List<DdpFilteredCollection<T>> filteredCollections;
+
+        private readonly object filterLock = new object();
 
         internal DdpCollection(IDdpRemoteMethodCall client, string collectionName) : this(new ObservableCollection<T>())
         {
@@ -36,7 +37,7 @@
             this.CollectionName = collectionName;
             this.client = client;
             this.synchronizationContext = SynchronizationContext.Current;
-            this.sortComparer = null;
+            this.filteredCollections = new List<DdpFilteredCollection<T>>();
         }
 
         private DdpCollection(ObservableCollection<T> internalList) : base(internalList)
@@ -79,44 +80,48 @@
             }
         }
 
-        public void Sort(Comparison<T> comparer)
+        public DdpFilteredCollection<T> Filter(Func<T, bool> whereFilter = null, Comparison<T> sortFilter = null)
         {
-            lock (this.lockObject)
+            if (whereFilter == null && sortFilter == null)
             {
-                var sortedList = this.internalList.ToList();
-                sortedList.Sort(comparer);
+                throw new ArgumentException("whereFilter and sortFilter cannot both be null");
+            }
 
-                for (int i = 0; i < sortedList.Count; i++)
+            lock (this.filterLock)
+            {
+                var filteredCollection = new DdpFilteredCollection<T>(this.CollectionName, this.synchronizationContext,
+                    whereFilter, sortFilter);
+
+                this.filteredCollections.Add(filteredCollection);
+
+                foreach (var item in this.internalList)
                 {
-                    this.internalList.Move(this.internalList.IndexOf(sortedList[i]), i);
+                    filteredCollection.OnAdded(item);
                 }
 
-                this.sortComparer = comparer;
+                return filteredCollection;
             }
         }
 
         void IDdpCollection.Added(string id, JObject jObject)
         {
-            lock (this.lockObject)
+            lock (this.filterLock)
             {
                 var deserializedObject = jObject.ToObject<T>();
                 deserializedObject.OnAdded(id, this.synchronizationContext);
 
-                if (this.sortComparer == null)
+                this.internalList.Add(deserializedObject);
+
+                foreach (var filteredCollection in this.filteredCollections)
                 {
-                    this.internalList.Add(deserializedObject);
-                }
-                else
-                {
-                    var insertIndex = this.FindIndexForItem(deserializedObject);
-                    this.internalList.Insert(insertIndex, deserializedObject);
+                    filteredCollection.OnAdded(deserializedObject);
                 }
             }
         }
 
         void IDdpCollection.Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
         {
-            lock (this.lockObject)
+            lock (this.filterLock)
             {
                 var objectToChange = this.internalList.SingleOrDefault(x => x.ID == id);
 
@@ -127,29 +132,27 @@
 
                 this.changer.ChangeObject(objectToChange, fields, cleared);
 
-                if (this.sortComparer != null)
+                foreach (var filteredCollection in this.filteredCollections)
                 {
-                    var newIndex = this.FindIndexForItem(objectToChange);
-
-                    if (this.internalList.IndexOf(objectToChange) < newIndex)
-                    {
-                        newIndex--;
-                    }
-
-                    this.internalList.Move(this.internalList.IndexOf(objectToChange), newIndex);
+                    filteredCollection.OnChanged(objectToChange);
                 }
             }
         }
 
         void IDdpCollection.Removed(string id)
         {
-            lock (this.lockObject)
+            lock (this.filterLock)
             {
                 var objectToRemove = this.SingleOrDefault(x => x.ID == id);
 
                 if (objectToRemove != null)
                 {
                     this.internalList.Remove(objectToRemove);
+                }
+
+                foreach (var filteredCollection in this.filteredCollections)
+                {
+                    filteredCollection.OnRemoved(objectToRemove);
                 }
             }
         }
@@ -187,6 +190,11 @@
             }
         }
 
+        private void RaisePropertyChanged(object param)
+        {
+            base.OnPropertyChanged((PropertyChangedEventArgs)param);
+        }
+
         private async Task<bool> CallConvertNumberToBool(string methodName, params object[] parameters)
         {
             int numberUpdated = await this.client.Call<int>(methodName, parameters);
@@ -201,69 +209,6 @@
             }
 
             throw new InvalidOperationException("Unexpected number of documents were updated");
-        }
-
-        private void RaisePropertyChanged(object param)
-        {
-            base.OnPropertyChanged((PropertyChangedEventArgs)param);
-        }
-
-        private int FindIndexForItem(T item)
-        {
-            var index = BinarySearch(item);
-            while (index < this.internalList.Count && this.sortComparer(this.internalList[index], item) == 0)
-            {
-                index++;
-            }
-
-            return index;
-        }
-
-        private int BinarySearch(T item)
-        {
-            int min = 0;
-            int max = this.internalList.Count - 1;
-
-            while (min <= max)
-            {
-                int mid = (min + max)/2;
-                T midItem = this.internalList[mid];
-
-                if (midItem == item)
-                {
-                    if (mid + 1 <= max)
-                    {
-                        mid = mid + 1;
-                        midItem = this.internalList[mid];
-                    }
-                    else if(mid - 1 >= min)
-                    {
-                        mid = mid - 1;
-                        midItem = this.internalList[mid];
-                    }
-                    else
-                    {
-                        return mid;
-                    }
-                }
-
-                int result = this.sortComparer(midItem, item);
-
-                if (result == 0)
-                {
-                    return mid;
-                }
-                if (result < 0)
-                {
-                    min = mid + 1;
-                }
-                else
-                {
-                    max = mid - 1;
-                }
-            }
-
-            return min;
         }
     }
 }

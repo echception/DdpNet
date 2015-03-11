@@ -102,7 +102,6 @@
             ((INotifyCollectionChanged)entryCollection).CollectionChanged += (sender, args) => collectionChangedCalled = true;
             ((INotifyPropertyChanged)entryCollection).PropertyChanged += (sender, args) =>
             {
-                Assert.AreEqual("Count", args.PropertyName);
                 propertyChanged = true;
             };
 
