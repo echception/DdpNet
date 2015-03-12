@@ -568,5 +568,27 @@
 
             Assert.AreEqual(0, filteredCollection.Count);
         }
+
+        [TestMethod]
+        public void DdpCollection_Filter_SortedAndWhere()
+        {
+            var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
+            var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
+
+            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { ID = "1", integerField = 2 };
+            var testObject2 = new TestDdpObject() { ID = "2", integerField = 1 };
+
+            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+
+            var filteredCollection = collection.Filter(whereFilter: x => x.integerField < 4, sortFilter: (x,y) => x.integerField - y.integerField);
+
+            Assert.AreEqual(2, filteredCollection.Count);
+
+            Assert.AreEqual(1, filteredCollection[0].integerField);
+            Assert.AreEqual(2, filteredCollection[1].integerField);
+        }
     }
 }
