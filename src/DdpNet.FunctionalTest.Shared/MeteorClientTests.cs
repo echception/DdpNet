@@ -7,6 +7,13 @@
     [TestClass]
     public class MeteorClientTests
     {
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            TestEnvironment.Cleanup();
+            TestEnvironment.InitializeTestUser().Wait();
+        }
+
         [TestMethod]
         [TestCategory("Functional")]
         public async Task MeteorClient_LoginPassword_ValidInformation()

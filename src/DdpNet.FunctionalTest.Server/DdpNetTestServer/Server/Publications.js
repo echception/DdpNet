@@ -20,6 +20,10 @@ Meteor.publish('inactiveEntries', function() {
     })
 });
 
+Meteor.publish('entiresWithFilterActive', function(includeActive) {
+    return Entries.find({IsActive: includeActive});
+})
+
 Meteor.publish('denyAll', function() {
     return DenyAll.find();
 });

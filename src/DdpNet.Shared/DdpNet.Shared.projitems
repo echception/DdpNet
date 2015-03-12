@@ -76,6 +76,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Results\SubscribeResultFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Results\UnsubscribeResultFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Results\WaitHandle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Subscription.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserEmailAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserSession.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities.cs" />

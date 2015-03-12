@@ -109,6 +109,42 @@
 
         [TestMethod]
         [TestCategory("Functional")]
+        public async Task DdpClient_SubscribeWithParameters_SameSubscriptionDifferentParameters()
+        {
+            TestEnvironment.Cleanup();
+
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var collection = meteorClient.GetCollection<Entry>("entries");
+
+            for (int i = 0; i < 10; i++)
+            {
+                await collection.AddAsync(new Entry() { Count = 5, IsActive = true, Name = "TestName" });
+                await collection.AddAsync(new Entry() { Count = 5, IsActive = false, Name = "TestName" });
+            }
+
+            await meteorClient.Subscribe("entiresWithFilterActive", true);
+
+            Assert.AreEqual(10, collection.Count);
+
+            foreach (var entry in collection)
+            {
+                Assert.AreEqual(true, entry.IsActive);
+            }
+
+            await meteorClient.Subscribe("entiresWithFilterActive", false);
+
+            Assert.AreEqual(20, collection.Count);
+
+            for (int i = 10; i < 20; i++)
+            {
+                Assert.AreEqual(false, collection[i].IsActive);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
         public async Task DdpClient_Unsubscribe_ValidSubscription()
         {
             var meteorClient = TestEnvironment.GetClient();
@@ -118,25 +154,12 @@
 
             await collection.AddAsync(Entry.Random());
 
-            await meteorClient.Subscribe("entries");
+            var subscription = await meteorClient.Subscribe("entries");
 
             Assert.IsTrue(collection.Count > 0);
-            await meteorClient.Unsubscribe("entries");
+            await meteorClient.Unsubscribe(subscription);
 
             Assert.IsTrue(collection.Count == 0);
-        }
-
-        [TestMethod]
-        [TestCategory("Functional")]
-        public async Task DdpClient_Unsubscribe_NotSubscribed()
-        {
-            var meteorClient = TestEnvironment.GetClient();
-            await meteorClient.ConnectAsync();
-
-            var collection = meteorClient.GetCollection<Entry>("entries");
-
-            // No exception thrown
-            await meteorClient.Unsubscribe("entries");
         }
 
         [TestMethod]
@@ -150,11 +173,11 @@
 
             await collection.AddAsync(Entry.Random());
 
-            await meteorClient.Subscribe("entries");
+            var subscription = await meteorClient.Subscribe("entries");
 
             Assert.IsTrue(collection.Count > 0);
-            await meteorClient.Unsubscribe("entries");
-            await meteorClient.Unsubscribe("entries");
+            await meteorClient.Unsubscribe(subscription);
+            await meteorClient.Unsubscribe(subscription);
 
             Assert.IsTrue(collection.Count == 0);
         }
