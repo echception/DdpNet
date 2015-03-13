@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Microscope.Net.DataModel
@@ -24,6 +25,7 @@ namespace Microscope.Net.DataModel
         public MainPageViewModel(DdpCollection<Post> posts, bool showLoadMore)
         {
             this.Posts = posts.Filter(sortFilter: (post1, post2) => post2.Submitted.DateTime.CompareTo(post1.Submitted.DateTime));
+
             this.ShowLoadMore = showLoadMore;
         }
 

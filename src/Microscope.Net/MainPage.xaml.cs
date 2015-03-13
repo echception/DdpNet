@@ -1,6 +1,7 @@
 ﻿using Microscope.Net.Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -72,6 +73,9 @@ namespace Microscope.Net
             this.sort = new Sort() {ID = -1, Submitted = -1};
 
             this.viewModel = new MainPageViewModel(collection, false);
+
+            ((INotifyCollectionChanged)collection).CollectionChanged +=
+    (sender, args) => this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
 
             this.DataContext = this.viewModel;
 
