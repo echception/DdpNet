@@ -31,6 +31,12 @@ namespace Microscope.Net
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
+        private int limit;
+        private Sort sort;
+        private const int Increment = 5;
+
+        private Subscription currentSubscription;
+
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
@@ -61,10 +67,28 @@ namespace Microscope.Net
 
         private async void Load()
         {
-            this.viewModel = new MainPageViewModel(App.Current.Client.GetCollection<Post>("posts"));
-            await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = 5, Sort = new Sort() { ID = -1, Submitted = -1 } });
+            var collection = App.Current.Client.GetCollection<Post>("posts");
+            this.limit = Increment;
+            this.sort = new Sort() {ID = -1, Submitted = -1};
+
+            this.viewModel = new MainPageViewModel(collection, false);
 
             this.DataContext = this.viewModel;
+
+            await this.LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            var newSubscription = await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = this.limit, Sort = this.sort });
+
+            if (this.currentSubscription != null)
+            {
+                await App.Current.Client.Unsubscribe(this.currentSubscription);
+            }
+
+            this.currentSubscription = newSubscription;
+            this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
         }
 
 
@@ -117,5 +141,14 @@ namespace Microscope.Net
         }
 
         #endregion
+
+        private async void LoadMoreButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (this.viewModel.ShowLoadMore)
+            {
+                this.limit += Increment;
+                await this.LoadData();
+            }
+        }
     }
 }
