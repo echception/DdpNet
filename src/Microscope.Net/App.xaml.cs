@@ -31,7 +31,7 @@ namespace Microscope.Net
             get { return (App) Application.Current; }
         }
 
-        public DdpClient Client { get; private set; }
+        public MeteorClient Client { get; private set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -58,7 +58,7 @@ namespace Microscope.Net
             }
 #endif
 
-            this.Client = new DdpClient(new Uri("ws://localhost:3000/websocket"));
+            this.Client = new MeteorClient(new Uri("ws://localhost:3000/websocket"));
             await this.Client.ConnectAsync();
 
             Frame rootFrame = Window.Current.Content as Frame;

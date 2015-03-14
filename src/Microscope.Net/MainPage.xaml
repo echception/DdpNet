@@ -12,6 +12,8 @@
     
     <Page.Resources>
         <local:BooleanToVisibilityConverter x:Key="TrueToVisibleConverter"></local:BooleanToVisibilityConverter>
+        <local:NullToVisibilityConverter x:Key="NullToVisibleConverter"></local:NullToVisibilityConverter>
+        <local:NullToVisibilityConverter x:Key="NotNullToVisibleConverter" IsReversed="true"></local:NullToVisibilityConverter>
     </Page.Resources>
     
     <!--
@@ -29,16 +31,22 @@
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
 
         <!-- Back button and page title -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Name="PageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+            <Button Grid.Column="2" Content="Login" x:Name="LoginButton" HorizontalAlignment="Right" Click="LoginButton_OnClick" Visibility="{Binding Path=Client.User, Converter={StaticResource NullToVisibleConverter}}"></Button>
+            <TextBlock Grid.Column="2" Text="{Binding Path=Client.User.UserName}" Style="{StaticResource SubheaderTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
         </Grid>
         
         <ScrollViewer Grid.Row ="1" VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled">
@@ -66,5 +74,6 @@
                 <Button Content="Load More" Name="LoadMoreButton" Click="LoadMoreButton_OnClick" Visibility="{Binding ShowLoadMore, Converter={StaticResource TrueToVisibleConverter}}"></Button>
             </StackPanel>
         </ScrollViewer>
+
     </Grid>
 </Page>

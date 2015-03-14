@@ -12,6 +12,8 @@ namespace Microscope.Net.DataModel
 
         public DdpFilteredCollection<Post> Posts { get; private set; }
 
+        public MeteorClient Client { get; private set; }
+
         public bool ShowLoadMore
         {
             get { return this.showLoadMore; }
@@ -22,11 +24,13 @@ namespace Microscope.Net.DataModel
             }
         }
 
-        public MainPageViewModel(DdpCollection<Post> posts, bool showLoadMore)
+        public MainPageViewModel(MeteorClient meteorClient, DdpCollection<Post> posts, bool showLoadMore)
         {
             this.Posts = posts.Filter(sortFilter: (post1, post2) => post2.Submitted.DateTime.CompareTo(post1.Submitted.DateTime));
 
             this.ShowLoadMore = showLoadMore;
+
+            this.Client = meteorClient;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

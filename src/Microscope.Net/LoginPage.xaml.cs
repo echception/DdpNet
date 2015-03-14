@@ -1,7 +1,6 @@
 ﻿using Microscope.Net.Common;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,37 +13,23 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using DdpNet;
+using DdpNet.Packages.Accounts;
+using Microscope.Net.DataModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
 namespace Microscope.Net
 {
-    using System.Threading.Tasks;
-    using DataModel;
-    using DdpNet;
-
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class LoginPage : Page
     {
-        private MainPageViewModel viewModel;
+
         private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        private int limit;
-        private Sort sort;
-        private const int Increment = 5;
-
-        private Subscription currentSubscription;
-
-        /// <summary>
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
-        public ObservableDictionary DefaultViewModel
-        {
-            get { return this.defaultViewModel; }
-        }
+        private LoginPageViewModel viewModel;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -56,43 +41,13 @@ namespace Microscope.Net
         }
 
 
-        public MainPage()
+        public LoginPage()
         {
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
-
-        private async void Load()
-        {
-            var collection = App.Current.Client.GetCollection<Post>("posts");
-            this.limit = Increment;
-            this.sort = new Sort() {ID = -1, Submitted = -1};
-
-            this.viewModel = new MainPageViewModel(App.Current.Client, collection, false);
-
-            ((INotifyCollectionChanged)collection).CollectionChanged +=
-    (sender, args) => this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-
-            this.DataContext = this.viewModel;
-
-            await this.LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            var newSubscription = await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = this.limit, Sort = this.sort });
-
-            if (this.currentSubscription != null)
-            {
-                await App.Current.Client.Unsubscribe(this.currentSubscription);
-            }
-
-            this.currentSubscription = newSubscription;
-            this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-        }
-
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -107,7 +62,8 @@ namespace Microscope.Net
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.Load();
+            this.viewModel = new LoginPageViewModel();
+            this.DataContext = this.viewModel;
         }
 
         /// <summary>
@@ -133,7 +89,7 @@ namespace Microscope.Net
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
         }
@@ -145,18 +101,72 @@ namespace Microscope.Net
 
         #endregion
 
-        private async void LoadMoreButton_OnClick(object sender, RoutedEventArgs e)
+        private void CreateAccount_OnClick(object sender, RoutedEventArgs e)
         {
-            if (this.viewModel.ShowLoadMore)
+            this.viewModel.CreateUser = true;
+            this.viewModel.ErrorText = string.Empty;
+        }
+
+        private async void LoginButton_OnClick(object sender, RoutedEventArgs args)
+        {
+            var client = App.Current.Client;
+            if (string.IsNullOrWhiteSpace(this.viewModel.UserName))
             {
-                this.limit += Increment;
-                await this.LoadData();
+                this.viewModel.ErrorText = "UserName required";
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(this.viewModel.Password))
+            {
+                this.viewModel.ErrorText = "Password required";
+                return;
+            }
+
+            try
+            {
+                await client.LoginPassword(this.viewModel.UserName, this.viewModel.Password);
+                NavigationHelper.GoBack();
+            }
+            catch (DdpServerException e)
+            {
+
+                this.viewModel.ErrorText = e.Reason;
             }
         }
 
-        private void LoginButton_OnClick(object sender, RoutedEventArgs e)
+        private async void CreateUserButton_OnClick(object sender, RoutedEventArgs args)
         {
-            this.Frame.Navigate(typeof (LoginPage));
+            var client = App.Current.Client;
+            if (string.IsNullOrWhiteSpace(this.viewModel.UserName))
+            {
+                this.viewModel.ErrorText = "UserName required";
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(this.viewModel.Password))
+            {
+                this.viewModel.ErrorText = "Password required";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(this.viewModel.PasswordAgain))
+            {
+                this.viewModel.ErrorText = "Enter password again";
+            }
+            else if (this.viewModel.Password != this.viewModel.PasswordAgain)
+            {
+                this.viewModel.ErrorText = "Passwords do not match";
+            }
+            else
+            {
+                try
+                {
+                    await client.CreateUserWithUserName(this.viewModel.UserName, this.viewModel.Password);
+                    NavigationHelper.GoBack();
+                }
+                catch (DdpServerException e)
+                {
+                    this.viewModel.ErrorText = e.Reason;
+                }
+            }
         }
     }
 }
