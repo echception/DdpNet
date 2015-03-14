@@ -1,7 +1,6 @@
 ﻿using Microscope.Net.Common;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,37 +13,24 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using DdpNet;
+using Microscope.Net.DataModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
 namespace Microscope.Net
 {
-    using System.Threading.Tasks;
-    using DataModel;
-    using DdpNet;
-
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class PostPage : Page
     {
-        private MainPageViewModel viewModel;
+
         private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        private int limit;
-        private Sort sort;
-        private const int Increment = 5;
+        private List<Subscription> subscriptions;
 
-        private Subscription currentSubscription;
-
-        /// <summary>
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
-        public ObservableDictionary DefaultViewModel
-        {
-            get { return this.defaultViewModel; }
-        }
+        private PostPageViewModel viewModel;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -56,43 +42,14 @@ namespace Microscope.Net
         }
 
 
-        public MainPage()
+        public PostPage()
         {
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
+            this.subscriptions = new List<Subscription>();
         }
-
-        private async void Load()
-        {
-            var collection = App.Current.Client.GetCollection<Post>("posts");
-            this.limit = Increment;
-            this.sort = new Sort() {ID = -1, Submitted = -1};
-
-            this.viewModel = new MainPageViewModel(App.Current.Client, collection, false);
-
-            ((INotifyCollectionChanged)collection).CollectionChanged +=
-    (sender, args) => this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-
-            this.DataContext = this.viewModel;
-
-            await this.LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            var newSubscription = await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = this.limit, Sort = this.sort });
-
-            if (this.currentSubscription != null)
-            {
-                await App.Current.Client.Unsubscribe(this.currentSubscription);
-            }
-
-            this.currentSubscription = newSubscription;
-            this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-        }
-
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -105,9 +62,20 @@ namespace Microscope.Net
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session. The state will be null the first time a page is visited.</param>
-        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.Load();
+            var postId = e.NavigationParameter as String;
+            this.subscriptions.Add(await App.Current.Client.Subscribe("singlePost", postId));
+
+            var commentCollection = App.Current.Client.GetCollection<Comment>("comments");
+
+            this.subscriptions.Add(await App.Current.Client.Subscribe("comments", postId));
+
+            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
+            var comments = commentCollection.Filter(whereFilter: x => x.PostId == postId);
+
+            this.viewModel = new PostPageViewModel() {Comments = comments, Post = post};
+            this.DataContext = this.viewModel;
         }
 
         /// <summary>
@@ -118,8 +86,16 @@ namespace Microscope.Net
         /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
         /// <param name="e">Event data that provides an empty dictionary to be populated with
         /// serializable state.</param>
-        private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
+        private async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
+            if (this.subscriptions != null)
+            {
+                foreach (var subscription in this.subscriptions)
+                {
+                    await App.Current.Client.Unsubscribe(subscription);
+                }
+                this.subscriptions.Clear();
+            }
         }
 
         #region NavigationHelper registration
@@ -128,12 +104,12 @@ namespace Microscope.Net
         /// NavigationHelper to respond to the page's navigation methods.
         /// 
         /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
-        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
+        /// <see cref="Common.NavigationHelper.LoadState"/>
+        /// and <see cref="Common.NavigationHelper.SaveState"/>.
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
         }
@@ -144,25 +120,5 @@ namespace Microscope.Net
         }
 
         #endregion
-
-        private async void LoadMoreButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (this.viewModel.ShowLoadMore)
-            {
-                this.limit += Increment;
-                await this.LoadData();
-            }
-        }
-
-        private void LoginButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(typeof (LoginPage));
-        }
-
-        private void Discuss_OnClick(object sender, RoutedEventArgs e)
-        {
-            var post = (Post) ((Button) e.OriginalSource).DataContext;
-            this.Frame.Navigate(typeof (PostPage), post.ID);
-        }
     }
 }

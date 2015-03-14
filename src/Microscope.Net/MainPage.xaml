@@ -51,22 +51,12 @@
         
         <ScrollViewer Grid.Row ="1" VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled">
             <StackPanel>
-                <ListView ItemsSource="{Binding Posts}" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Disabled">
+                <ListView SelectionMode="None" ItemsSource="{Binding Posts}" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button x:Name="UpvoteButton" Content="Upvote" IsEnabled="{Binding CanUpvote}" Click="UpvoteButton_OnClick"></Button>
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
-                                    <TextBlock>
-                                        <Run Text="{Binding Votes}"></Run>
-                                        <Run Text=" votes, submitted by"></Run>
-                                        <Run Text="{Binding Author}"></Run>
-                                        <Run Text=", "></Run>
-                                        <Run Text="{Binding CommentsCount}"></Run>
-                                        <Run Text=" comments"></Run>
-                                    </TextBlock>
-                                </StackPanel>
+                                <local:PostItem></local:PostItem>
+                                <Button x:Name="Discuss" Content="Discuss" Click="Discuss_OnClick"></Button>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

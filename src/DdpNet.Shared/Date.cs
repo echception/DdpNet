@@ -15,5 +15,10 @@
         {
             get { return Epoch.AddMilliseconds(this.MillisecondsSinceEposh); }
         }
+
+        public override string ToString()
+        {
+            return this.DateTime.ToString("g");
+        }
     }
 }
