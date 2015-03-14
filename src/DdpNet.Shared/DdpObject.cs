@@ -31,6 +31,11 @@
             this.SynchronizationContext = synchronizationContext;
         }
 
+        protected virtual void Initialized()
+        {
+            
+        }
+
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var args = new PropertyChangedEventArgs(propertyName);

@@ -55,7 +55,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Upvote"></Button>
+                                <Button Content="Upvote" IsEnabled="{Binding CanUpvote}"></Button>
                                 <StackPanel Orientation="Vertical">
                                     <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
                                     <TextBlock>

@@ -1,4 +1,6 @@
-﻿namespace Microscope.Net.DataModel
+﻿using System.Linq;
+
+namespace Microscope.Net.DataModel
 {
     using DdpNet;
     using Newtonsoft.Json;
@@ -13,6 +15,17 @@
         private int commentsCount;
         private string[] upvoters;
         private int votes;
+
+        protected override void Initialized()
+        {
+            App.Current.Client.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == "User")
+                {
+                    this.OnPropertyChanged("CanUpvote");
+                }
+            };
+        }
 
         [JsonProperty(PropertyName = "title")]
         public string Title
@@ -88,6 +101,7 @@
             {
                 this.upvoters = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged("CanUpvote");
             }
         }
 
@@ -99,6 +113,27 @@
             {
                 this.votes = value;
                 this.OnPropertyChanged();
+            }
+        }
+
+        [JsonIgnore]
+        public bool CanUpvote
+        {
+            get
+            {
+                if (App.Current.Client.User == null)
+                {
+                    return false;
+                }
+
+                var userId = App.Current.Client.User.ID;
+
+                if (this.upvoters.Contains(userId))
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
     }
