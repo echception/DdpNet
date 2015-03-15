@@ -111,6 +111,7 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="DataModel\Comment.cs" />
+    <Compile Include="DataModel\CommentSubmit.cs" />
     <Compile Include="DataModel\LoginPageViewModel.cs" />
     <Compile Include="DataModel\MainPageViewModel.cs" />
     <Compile Include="DataModel\Post.cs" />

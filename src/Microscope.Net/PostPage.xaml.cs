@@ -74,7 +74,7 @@ namespace Microscope.Net
             var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
             var comments = commentCollection.Filter(whereFilter: x => x.PostId == postId);
 
-            this.viewModel = new PostPageViewModel() {Comments = comments, Post = post};
+            this.viewModel = new PostPageViewModel() {Comments = comments, Post = post, Client = App.Current.Client};
             this.DataContext = this.viewModel;
         }
 
@@ -120,5 +120,17 @@ namespace Microscope.Net
         }
 
         #endregion
+
+        private async void AddCommentButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var text = this.CommentTextBox.Text;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                var comment = new CommentSubmit(text, this.viewModel.Post.ID);
+
+                await App.Current.Client.Call("commentInsert", comment);
+                this.CommentTextBox.Text = string.Empty;
+            }
+        }
     }
 }

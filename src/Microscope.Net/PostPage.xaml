@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-
+        <local:NullToVisibilityConverter x:Key="NotNullToVisibleConverter" IsReversed="true"></local:NullToVisibilityConverter>
     </Page.Resources>
 
     <!--
@@ -49,6 +49,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <local:PostItem Grid.Row="0" DataContext="{Binding Post}"/>
@@ -66,6 +67,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            <StackPanel Grid.Row="2" Orientation="Vertical" Margin="20" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}">
+                <TextBlock Text="Leave a comment" Style="{StaticResource SubheaderTextBlockStyle}" Margin="5"></TextBlock>
+                <TextBox x:Name="CommentTextBox" TextWrapping="Wrap" AcceptsReturn="True" Height="100"></TextBox>
+                <Button Content="Add Comment" Margin="5" x:Name="AddCommentButton" Click="AddCommentButton_OnClick"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>
