@@ -51,7 +51,7 @@ namespace Microscope.Net
                     return timeComparison;
                 }
 
-                return post2.ID.CompareTo(post1.ID);
+                return post2.Id.CompareTo(post1.Id);
             });
         }
 

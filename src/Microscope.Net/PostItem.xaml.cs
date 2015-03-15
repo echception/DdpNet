@@ -28,7 +28,7 @@ namespace Microscope.Net
         private void UpvoteButton_OnClick(object sender, RoutedEventArgs e)
         {
             Post post = (Post)((Button)e.OriginalSource).DataContext;
-            App.Current.Client.Call("upvote", post.ID);
+            App.Current.Client.Call("upvote", post.Id);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Microscope.Net
             var postId = e.NavigationParameter as String;
             this.subscription = await App.Current.Client.Subscribe("singlePost", postId);
 
-            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
+            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.Id == postId);
 
             this.viewModel = new PostViewModel() {Title = post.Title, Url = post.Url};
             this.DataContext = this.viewModel;
@@ -86,15 +86,15 @@ namespace Microscope.Net
             PostEdit post = new PostEdit(this.viewModel.Url, this.viewModel.Title);
 
             var posts = App.Current.Client.GetCollection<Post>("posts");
-            await posts.UpdateAsync(this.postToEdit.ID, post);
+            await posts.UpdateAsync(this.postToEdit.Id, post);
 
-            this.Frame.Navigate(typeof (PostPage), this.postToEdit.ID);
+            this.Frame.Navigate(typeof (PostPage), this.postToEdit.Id);
         }
 
         private async void DeletePostButton_OnClick(object sender, RoutedEventArgs e)
         {
             var posts = App.Current.Client.GetCollection<Post>("posts");
-            await posts.RemoveAsync(this.postToEdit.ID);
+            await posts.RemoveAsync(this.postToEdit.Id);
 
             this.Frame.Navigate(typeof (MainPage));
         }

@@ -31,7 +31,7 @@
 
             Assert.AreEqual(1, collection.Count);
 
-            objectToAdd.ID = "1";
+            objectToAdd.Id = "1";
             AssertDdpObjectsEqual(objectToAdd, collection.First());
         }
 
@@ -78,7 +78,7 @@
             Assert.AreEqual(1, collection.Count);
 
             objectToAdd.StringProperty = "changed!";
-            objectToAdd.ID = "1";
+            objectToAdd.Id = "1";
             AssertDdpObjectsEqual(objectToAdd, collection.First());
         }
 
@@ -105,9 +105,9 @@
             Assert.AreEqual(1, collection2.Count);
             Assert.AreEqual(1, collection3.Count);
 
-            objectToAdd1.ID = "1";
-            objectToAdd2.ID = "2";
-            objectToAdd3.ID = "3";
+            objectToAdd1.Id = "1";
+            objectToAdd2.Id = "2";
+            objectToAdd3.Id = "3";
 
             AssertDdpObjectsEqual(objectToAdd1, collection1.First());
             AssertDdpObjectsEqual(objectToAdd2, collection2.First());
@@ -144,7 +144,7 @@
 
             Assert.AreEqual(1, collection.Count);
 
-            objectToAdd.ID = "1";
+            objectToAdd.Id = "1";
             AssertDdpObjectsEqual(objectToAdd, collection.First());
         }
 
@@ -196,7 +196,7 @@
             Assert.AreEqual(1, collection.Count);
 
             objectToAdd.StringProperty = "changed!";
-            objectToAdd.ID = "1";
+            objectToAdd.Id = "1";
             AssertDdpObjectsEqual(objectToAdd, collection.First());
         }
 
@@ -223,9 +223,9 @@
             Assert.AreEqual(1, collection2.Count);
             Assert.AreEqual(1, collection3.Count);
 
-            objectToAdd1.ID = "1";
-            objectToAdd2.ID = "2";
-            objectToAdd3.ID = "3";
+            objectToAdd1.Id = "1";
+            objectToAdd2.Id = "2";
+            objectToAdd3.Id = "3";
 
             AssertDdpObjectsEqual(objectToAdd1, collection1.First());
             AssertDdpObjectsEqual(objectToAdd2, collection2.First());
@@ -259,7 +259,7 @@
         private void AssertDdpObjectsEqual(TestDdpObject expected, TestDdpObject actual)
         {
             Assert.AreNotEqual(expected, actual);
-            Assert.AreEqual(expected.ID, actual.ID);
+            Assert.AreEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.StringProperty, actual.StringProperty);
             Assert.AreEqual(expected.integerField, actual.integerField);
         }

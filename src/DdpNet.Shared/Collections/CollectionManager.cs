@@ -178,26 +178,30 @@
             lock (this.collectionsSyncObject)
             {
                 IDdpCollection collection;
+                DdpCollection<T> typedCollection = null;
                 if (!this.typedCollections.TryGetValue(collectionName, out collection))
                 {
                     UntypedCollection untypedCollection;
                     if (!this.untypedCollections.TryGetValue(collectionName, out untypedCollection))
                     {
-                        collection = new DdpCollection<T>(this.client, collectionName);
+                        typedCollection = new DdpCollection<T>(this.client, collectionName);
                         this.typedCollections.Add(collectionName, collection);
                     }
                     else
                     {
                         var convertedCollection = this.ConvertToTypedCollection<T>(collectionName, untypedCollection);
-                        collection = convertedCollection;
+                        typedCollection = convertedCollection;
                     }
                 }
+                else
+                {
+                    typedCollection = collection as DdpCollection<T>;
+                }
 
-                if (!(collection is DdpCollection<T>))
+                if(typedCollection == null)
                 {
                     throw new InvalidCollectionTypeException(collectionName, collection.GetType(), typeof(DdpCollection<T>));
                 }
-                var typedCollection = (DdpCollection<T>) collection;
 
                 return typedCollection;
             }

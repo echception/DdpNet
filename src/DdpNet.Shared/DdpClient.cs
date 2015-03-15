@@ -151,11 +151,12 @@
             return this.CollectionManager.GetCollection<T>(collectionName);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ConnectAsync")]
         private void VerifyConnected()
         {
             if (this.state != DdpClientState.Connected)
             {
-                throw new InvalidOperationException("DdpClient.ConnectAsync must be called before any client methods can be called");
+                throw new InvalidOperationException("ConnectAsync() must be called before any client methods can be called");
             }
         }
 

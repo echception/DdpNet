@@ -6,6 +6,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -49,12 +50,12 @@
         {
             Exceptions.ThrowIfNull(item, "item");
 
-            if (string.IsNullOrWhiteSpace(item.ID))
+            if (string.IsNullOrWhiteSpace(item.Id))
             {
-                item.ID = Utilities.GenerateID();
+                item.Id = Utilities.GenerateID();
             }
 
-            var methodName = string.Format(@"/{0}/insert", this.CollectionName);
+            var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/insert", this.CollectionName);
             return this.client.Call(methodName, item);
         }
 
@@ -62,7 +63,7 @@
         {
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
-            var methodName = string.Format(@"/{0}/remove", this.CollectionName);
+            var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/remove", this.CollectionName);
             return this.CallConvertNumberToBool(methodName, new IdParameter(id));
         }
 
@@ -71,13 +72,14 @@
             Exceptions.ThrowIfNull(fieldsToUpdate, "fieldsToUpdate");
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
-            var methodName = string.Format(@"/{0}/update", this.CollectionName);
+            var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/update", this.CollectionName);
             var selector = new IdParameter(id);
             var set = new Set(fieldsToUpdate);
 
             return this.CallConvertNumberToBool(methodName, selector, set);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         public DdpFilteredCollection<T> Filter(Func<T, bool> whereFilter = null, Comparison<T> sortFilter = null)
         {
             if (whereFilter == null && sortFilter == null)
@@ -121,7 +123,7 @@
         {
             lock (this.filterLock)
             {
-                var objectToChange = this.internalList.SingleOrDefault(x => x.ID == id);
+                var objectToChange = this.internalList.SingleOrDefault(x => x.Id == id);
 
                 if (objectToChange == null)
                 {
@@ -141,7 +143,7 @@
         {
             lock (this.filterLock)
             {
-                var objectToRemove = this.SingleOrDefault(x => x.ID == id);
+                var objectToRemove = this.SingleOrDefault(x => x.Id == id);
 
                 if (objectToRemove != null)
                 {
@@ -155,17 +157,17 @@
             }
         }
 
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
                 // Execute the CollectionChanged event on the current thread
-                RaiseCollectionChanged(e);
+                RaiseCollectionChanged(args);
             }
             else
             {
                 // Raises the CollectionChanged event on the creator thread
-                this.synchronizationContext.Post(RaiseCollectionChanged, e);
+                this.synchronizationContext.Post(RaiseCollectionChanged, args);
             }
         }
 
@@ -174,17 +176,17 @@
             base.OnCollectionChanged((NotifyCollectionChangedEventArgs) param);
         }
 
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
                 // Execute the PropertyChanged event on the current thread
-                RaisePropertyChanged(e);
+                RaisePropertyChanged(args);
             }
             else
             {
                 // Raises the PropertyChanged event on the creator thread
-                this.synchronizationContext.Post(RaisePropertyChanged, e);
+                this.synchronizationContext.Post(RaisePropertyChanged, args);
             }
         }
 

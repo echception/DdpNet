@@ -12,17 +12,17 @@
             this.connectedCalled = false;
             this.failedCalled = false;
         }
-        internal override void HandleReturnObject(ReturnedObject returnedObject)
+        internal override void HandleReturnObject(ReturnedObject returnObject)
         {
-            if (returnedObject.MessageType == "connected")
+            if (returnObject.MessageType == "connected")
             {
                 this.connectedCalled = true;
-                this.returnedObject = returnedObject;
+                this.returnedObject = returnObject;
             }
-            else if (returnedObject.MessageType == "failed")
+            else if (returnObject.MessageType == "failed")
             {
                 this.failedCalled = true;
-                this.returnedObject = returnedObject;
+                this.returnedObject = returnObject;
             }
         }
 

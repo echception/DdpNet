@@ -44,7 +44,7 @@ namespace Microscope.Net
 
             this.subscriptions.Add(await App.Current.Client.Subscribe("comments", postId));
 
-            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
+            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.Id == postId);
             var comments = commentCollection.Filter(whereFilter: x => x.PostId == postId);
 
             this.viewModel = new PostPageViewModel() { Comments = comments, Post = post };
@@ -68,7 +68,7 @@ namespace Microscope.Net
             var text = this.CommentTextBox.Text;
             if (!string.IsNullOrWhiteSpace(text))
             {
-                var comment = new CommentSubmit(text, this.viewModel.Post.ID);
+                var comment = new CommentSubmit(text, this.viewModel.Post.Id);
 
                 await App.Current.Client.Call("commentInsert", comment);
                 this.CommentTextBox.Text = string.Empty;

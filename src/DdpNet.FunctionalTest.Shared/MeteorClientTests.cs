@@ -24,7 +24,7 @@
             await client.LoginPassword(TestEnvironment.TestUserName, TestEnvironment.TestUserPassword);
 
             Assert.AreEqual(TestEnvironment.TestUserName, client.User.UserName);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(client.User.ID));
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(client.User.Id));
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@
             await client.LoginPassword(TestEnvironment.TestUserName, TestEnvironment.TestUserPassword);
 
             Assert.AreEqual(TestEnvironment.TestUserName, client.User.UserName);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(client.User.ID));
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(client.User.Id));
         }
 
         [TestMethod]
@@ -108,7 +108,7 @@
 
             await client2.LoginResumeSession(token);
 
-            Assert.AreEqual(client.User.ID, client2.User.ID);
+            Assert.AreEqual(client.User.Id, client2.User.Id);
         }
 
         [TestMethod]

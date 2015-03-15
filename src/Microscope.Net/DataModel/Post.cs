@@ -11,7 +11,7 @@ namespace Microscope.Net.DataModel
         private string url;
         private string userId;
         private string author;
-        private Date submitted;
+        private DdpDate submitted;
         private int commentsCount;
         private string[] upvoters;
         private int votes;
@@ -72,7 +72,7 @@ namespace Microscope.Net.DataModel
         }
 
         [JsonProperty(PropertyName = "submitted")]
-        public Date Submitted
+        public DdpDate Submitted
         {
             get { return this.submitted; }
             set
@@ -126,7 +126,7 @@ namespace Microscope.Net.DataModel
                     return false;
                 }
 
-                var userId = App.Current.Client.User.ID;
+                var userId = App.Current.Client.User.Id;
 
                 if (this.upvoters.Contains(userId))
                 {
@@ -144,7 +144,7 @@ namespace Microscope.Net.DataModel
             {
                 if (App.Current.Client.User != null)
                 {
-                    if (App.Current.Client.User.ID == this.userId)
+                    if (App.Current.Client.User.Id == this.userId)
                     {
                         return true;
                     }

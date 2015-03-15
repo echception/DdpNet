@@ -13,7 +13,7 @@
         public string Token { get; private set; }
 
         [JsonProperty(PropertyName = "tokenExpires")]
-        private Date TokenExpires { get; set; }
+        private DdpDate TokenExpires { get; set; }
 
         [JsonIgnore]
         public DateTime TokenExpiration { get { return this.TokenExpires.DateTime; }}

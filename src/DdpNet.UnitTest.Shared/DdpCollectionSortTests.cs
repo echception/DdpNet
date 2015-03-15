@@ -114,7 +114,7 @@
                 var indexToChange = random.Next(0, collection.Count);
                 var newValue = random.Next(minRange, maxRange);
 
-                this.ChangeObject(collection, collection[indexToChange].ID, newValue);
+                this.ChangeObject(collection, collection[indexToChange].Id, newValue);
 
                 this.AssertCollectionSorted(sortedCollection);
             }

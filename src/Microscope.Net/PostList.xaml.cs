@@ -64,7 +64,7 @@
             Frame frame = (Frame)Window.Current.Content;
             var post = (Post)((Button)e.OriginalSource).DataContext;
 
-            frame.Navigate(typeof(PostPage), post.ID);
+            frame.Navigate(typeof(PostPage), post.Id);
         }
 
         private void EditButton_OnClick(object sender, RoutedEventArgs e)
@@ -72,7 +72,7 @@
             Frame frame = (Frame)Window.Current.Content;
 
             var post = (Post)((Button)e.OriginalSource).DataContext;
-            frame.Navigate(typeof(EditPostPage), post.ID);
+            frame.Navigate(typeof(EditPostPage), post.Id);
         }
     }
 }

@@ -13,7 +13,7 @@
         private SynchronizationContext SynchronizationContext { get; set; }
 
         [JsonProperty(PropertyName = "_id")]
-        public string ID { get; internal set; }
+        public string Id { get; internal set; }
 
         [JsonIgnore] 
         internal bool SerializeId { get; set; }
@@ -27,7 +27,7 @@
         {
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
-            this.ID = id;
+            this.Id = id;
             this.SynchronizationContext = synchronizationContext;
         }
 
@@ -36,6 +36,7 @@
             
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var args = new PropertyChangedEventArgs(propertyName);
@@ -55,14 +56,14 @@
             if (handler != null) handler(this, (PropertyChangedEventArgs)param);
         }
 
-        public bool ShouldSerializeID()
+        public bool ShouldSerializeId()
         {
             if (this.SerializeId == false)
             {
                 return false;
             }
 
-            return !string.IsNullOrWhiteSpace(this.ID);
+            return !string.IsNullOrWhiteSpace(this.Id);
         }
     }
 }

@@ -30,7 +30,7 @@
 
             Assert.AreEqual(startingCount + 1, entryCollection.Count);
 
-            var entry = entryCollection.Single(x => x.ID == firstEntry.ID);
+            var entry = entryCollection.Single(x => x.Id == firstEntry.Id);
 
             Entry.AssertAreEqual(firstEntry, entry);
         }
@@ -53,7 +53,7 @@
 
             Assert.AreEqual(startingCount + 1, entryCollection.Count);
 
-            var removed = await entryCollection.RemoveAsync(firstEntry.ID);
+            var removed = await entryCollection.RemoveAsync(firstEntry.Id);
 
             Assert.IsTrue(removed);
 
@@ -76,11 +76,11 @@
 
             var update = new Entry() { Count = 102, IsActive = false, Name = "New Name" };
 
-            bool wasUpdated = await entryCollection.UpdateAsync(entry.ID, update);
+            bool wasUpdated = await entryCollection.UpdateAsync(entry.Id, update);
 
             Assert.IsTrue(wasUpdated);
 
-            var updatedEntry = entryCollection.Single(x => x.ID == entry.ID);
+            var updatedEntry = entryCollection.Single(x => x.Id == entry.Id);
 
             Entry.AssertAreEqual(update, updatedEntry);
         }
@@ -147,7 +147,7 @@
 
             foreach (var entry in entryCollection)
             {
-                startedTasks.Add(entryCollection.RemoveAsync(entry.ID));
+                startedTasks.Add(entryCollection.RemoveAsync(entry.Id));
             }
 
             Task.WaitAll(startedTasks.ToArray());
@@ -218,7 +218,7 @@
 
             var entryToUpdate = collection.First();
 
-            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.UpdateAsync(entryToUpdate.ID, Entry.Random()), "403", "Access denied");
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.UpdateAsync(entryToUpdate.Id, Entry.Random()), "403", "Access denied");
         }
 
         [TestMethod]
@@ -240,7 +240,7 @@
 
             var entryToRemove = collection.First();
 
-            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.RemoveAsync(entryToRemove.ID), "403", "Access denied");
+            await ExceptionAssert.AssertThrowsWithMessage<DdpServerException>(async () => await collection.RemoveAsync(entryToRemove.Id), "403", "Access denied");
         }
     }
 }

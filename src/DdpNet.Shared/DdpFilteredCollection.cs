@@ -80,17 +80,17 @@
             this.internalCollection.Remove(item);
         }
 
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
                 // Execute the CollectionChanged event on the current thread
-                RaiseCollectionChanged(e);
+                RaiseCollectionChanged(args);
             }
             else
             {
                 // Raises the CollectionChanged event on the creator thread
-                this.synchronizationContext.Post(RaiseCollectionChanged, e);
+                this.synchronizationContext.Post(RaiseCollectionChanged, args);
             }
         }
 
@@ -99,17 +99,17 @@
             base.OnCollectionChanged((NotifyCollectionChangedEventArgs)param);
         }
 
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
         {
             if (SynchronizationContext.Current == this.synchronizationContext)
             {
                 // Execute the PropertyChanged event on the current thread
-                RaisePropertyChanged(e);
+                RaisePropertyChanged(args);
             }
             else
             {
                 // Raises the PropertyChanged event on the creator thread
-                this.synchronizationContext.Post(RaisePropertyChanged, e);
+                this.synchronizationContext.Post(RaisePropertyChanged, args);
             }
         }
         private void RaisePropertyChanged(object param)

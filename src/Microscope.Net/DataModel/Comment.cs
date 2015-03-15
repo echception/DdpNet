@@ -9,7 +9,7 @@ namespace Microscope.Net.DataModel
         private string body;
         private string userId;
         private string author;
-        private Date submitted;
+        private DdpDate submitted;
 
         [JsonProperty(PropertyName = "postId")]
         public string PostId
@@ -40,7 +40,7 @@ namespace Microscope.Net.DataModel
         }
 
         [JsonProperty(PropertyName = "submitted")]
-        public Date Submitted
+        public DdpDate Submitted
         {
             get { return this.submitted; }
             set { this.submitted = value; this.OnPropertyChanged(); }

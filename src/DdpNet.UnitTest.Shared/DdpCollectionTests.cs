@@ -50,7 +50,7 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() {ID = "1", integerField = 10, StringProperty = "FooBar"};
+            var testObject = new TestDdpObject() {Id = "1", integerField = 10, StringProperty = "FooBar"};
 
             remoteMethodCall.Setup(x => x.Call(It.IsAny<string>(), It.IsAny<object[]>()))
                 .Returns(Task.FromResult(true));
@@ -78,12 +78,12 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() {ID = "1", integerField = 10, StringProperty = "FooBar"};
+            var testObject = new TestDdpObject() {Id = "1", integerField = 10, StringProperty = "FooBar"};
 
             remoteMethodCall.Setup(x => x.Call<int>(It.IsAny<string>(), It.IsAny<object[]>()))
                 .Returns(Task.FromResult(1));
 
-            collection.RemoveAsync(testObject.ID).Wait();
+            collection.RemoveAsync(testObject.Id).Wait();
 
             remoteMethodCall.Verify(
                 x =>
@@ -106,7 +106,7 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 10, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 10, StringProperty = "FooBar" };
 
             PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.UpdateAsync(string.Empty, testObject));
         }
@@ -117,12 +117,12 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 10, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 10, StringProperty = "FooBar" };
 
             remoteMethodCall.Setup(x => x.Call<int>(It.IsAny<string>(), It.IsAny<object[]>()))
                 .Returns(Task.FromResult(1));
 
-            collection.UpdateAsync(testObject.ID, testObject);
+            collection.UpdateAsync(testObject.Id, testObject);
 
             remoteMethodCall.Verify(
                 x =>
@@ -139,7 +139,7 @@
 
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 101, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 101, StringProperty = "FooBar" };
 
             var collectionChangedCalled = false;
             var propertyChangedCalled = false;
@@ -153,7 +153,7 @@
 
                 Assert.IsNotNull(addedObject);
 
-                Assert.AreEqual(testObject.ID, addedObject.ID);
+                Assert.AreEqual(testObject.Id, addedObject.Id);
                 Assert.AreEqual(testObject.integerField, addedObject.integerField);
                 Assert.AreEqual(testObject.StringProperty, addedObject.StringProperty);
 
@@ -165,7 +165,7 @@
                 propertyChangedCalled = true;
             };
 
-            ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
+            ((IDdpCollection)collection).Added(testObject.Id, JObject.FromObject(testObject));
 
             Assert.IsTrue(collectionChangedCalled);
             Assert.IsTrue(propertyChangedCalled);
@@ -179,15 +179,15 @@
 
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 101, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 101, StringProperty = "FooBar" };
 
-            ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
+            ((IDdpCollection)collection).Added(testObject.Id, JObject.FromObject(testObject));
 
             var objectChanged = collection.First();
 
             Assert.AreEqual(101, objectChanged.integerField);
 
-            ((IDdpCollection) collection).Changed(testObject.ID,
+            ((IDdpCollection) collection).Changed(testObject.Id,
                 new Dictionary<string, JToken>() {{"integerField", 900}}, new string[0]);
 
             Assert.AreEqual(900, objectChanged.integerField);
@@ -200,12 +200,12 @@
 
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 101, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 101, StringProperty = "FooBar" };
 
             var collectionChangedCalled = false;
             var propertyChangedCalled = false;
 
-            ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
+            ((IDdpCollection)collection).Added(testObject.Id, JObject.FromObject(testObject));
 
             Assert.AreEqual(1, collection.Count);
 
@@ -218,7 +218,7 @@
 
                 Assert.IsNotNull(removedItem);
 
-                Assert.AreEqual(testObject.ID, removedItem.ID);
+                Assert.AreEqual(testObject.Id, removedItem.Id);
                 Assert.AreEqual(testObject.integerField, removedItem.integerField);
                 Assert.AreEqual(testObject.StringProperty, removedItem.StringProperty);
 
@@ -230,7 +230,7 @@
                 propertyChangedCalled = true;
             };
 
-            ((IDdpCollection)collection).Removed(testObject.ID);
+            ((IDdpCollection)collection).Removed(testObject.Id);
 
             Assert.IsTrue(collectionChangedCalled);
             Assert.IsTrue(propertyChangedCalled);
@@ -245,16 +245,16 @@
 
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject = new TestDdpObject() { ID = "11", integerField = 101, StringProperty = "FooBar" };
+            var testObject = new TestDdpObject() { Id = "11", integerField = 101, StringProperty = "FooBar" };
 
-            ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
-            ((IDdpCollection)collection).Added(testObject.ID, JObject.FromObject(testObject));
+            ((IDdpCollection)collection).Added(testObject.Id, JObject.FromObject(testObject));
+            ((IDdpCollection)collection).Added(testObject.Id, JObject.FromObject(testObject));
 
             int loopTimes = 0;
             foreach (var itemObject in (IEnumerable)collection)
             {
                 var item = (TestDdpObject) itemObject;
-                Assert.AreEqual(testObject.ID, item.ID);
+                Assert.AreEqual(testObject.Id, item.Id);
                 Assert.AreEqual(testObject.integerField, item.integerField);
                 Assert.AreEqual(testObject.StringProperty, item.StringProperty);
                 loopTimes++;
@@ -269,13 +269,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "3", integerField = 3};
-            var testObject1 = new TestDdpObject() { ID="1", integerField = 1 };
-            var testObject2 = new TestDdpObject() { ID="2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "3", integerField = 3};
+            var testObject1 = new TestDdpObject() { Id="1", integerField = 1 };
+            var testObject2 = new TestDdpObject() { Id="2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var sortedCollection = collection.Filter(sortFilter:(x, y) => x.integerField - y.integerField);
 
@@ -296,16 +296,16 @@
 
             var sortedCollection = collection.Filter(sortFilter: (x, y) => x.integerField - y.integerField);
 
-            var testObject3 = new TestDdpObject() { ID = "3", integerField = 3 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 1 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "3", integerField = 3 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 1 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
 
             Assert.AreEqual(3, collection[0].integerField);
             Assert.AreEqual(3, sortedCollection[0].integerField);
 
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
 
             Assert.AreEqual(3, collection[0].integerField);
             Assert.AreEqual(1, collection[1].integerField);
@@ -313,7 +313,7 @@
             Assert.AreEqual(1, sortedCollection[0].integerField);
             Assert.AreEqual(3, sortedCollection[1].integerField);
 
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             Assert.AreEqual(3, collection[0].integerField);
             Assert.AreEqual(1, collection[1].integerField);
@@ -331,13 +331,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "3", integerField = 3 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 1 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "3", integerField = 3 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 1 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var sortedCollection = collection.Filter(sortFilter:(x, y) => x.integerField - y.integerField);
 
@@ -349,7 +349,7 @@
             Assert.AreEqual(2, sortedCollection[1].integerField);
             Assert.AreEqual(3, sortedCollection[2].integerField);
 
-            ((IDdpCollection)collection).Changed(testObject2.ID, new Dictionary<string, JToken>() {{"integerField", 4}}, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject2.Id, new Dictionary<string, JToken>() {{"integerField", 4}}, new string[0]);
 
             Assert.AreEqual(3, collection[0].integerField);
             Assert.AreEqual(1, collection[1].integerField);
@@ -366,13 +366,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "3", integerField = 3 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 1 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "3", integerField = 3 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 1 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var sortedCollection = collection.Filter(sortFilter: (x, y) => x.integerField - y.integerField);
 
@@ -384,7 +384,7 @@
             Assert.AreEqual(2, sortedCollection[1].integerField);
             Assert.AreEqual(3, sortedCollection[2].integerField);
 
-            ((IDdpCollection)collection).Changed(testObject3.ID, new Dictionary<string, JToken>() { { "integerField", 0 } }, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject3.Id, new Dictionary<string, JToken>() { { "integerField", 0 } }, new string[0]);
 
             Assert.AreEqual(0, collection[0].integerField);
             Assert.AreEqual(1, collection[1].integerField);
@@ -401,13 +401,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 1 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 1 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var sortedCollection = collection.Filter(sortFilter: (x, y) => x.integerField - y.integerField);
 
@@ -419,7 +419,7 @@
             Assert.AreEqual(2, sortedCollection[1].integerField);
             Assert.AreEqual(4, sortedCollection[2].integerField);
 
-            ((IDdpCollection)collection).Changed(testObject1.ID, new Dictionary<string, JToken>() { { "integerField", 3 } }, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject1.Id, new Dictionary<string, JToken>() { { "integerField", 3 } }, new string[0]);
 
             Assert.AreEqual(4, collection[0].integerField);
             Assert.AreEqual(3, collection[1].integerField);
@@ -436,13 +436,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var sortedCollection = collection.Filter(sortFilter: (x, y) => x.integerField - y.integerField);
 
@@ -454,7 +454,7 @@
             Assert.AreEqual(2, sortedCollection[1].integerField);
             Assert.AreEqual(4, sortedCollection[2].integerField);
 
-            ((IDdpCollection)collection).Changed(testObject3.ID, new Dictionary<string, JToken>() { { "integerField", 1 } }, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject3.Id, new Dictionary<string, JToken>() { { "integerField", 1 } }, new string[0]);
 
             Assert.AreEqual(1, collection[0].integerField);
             Assert.AreEqual(0, collection[1].integerField);
@@ -471,13 +471,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => x.integerField == 4);
 
@@ -491,13 +491,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => x.integerField == 5);
 
@@ -510,13 +510,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => true);
 
@@ -529,19 +529,19 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => x.integerField == 4);
 
             Assert.AreEqual(1, filteredCollection.Count);
 
-            ((IDdpCollection)collection).Changed(testObject1.ID, new Dictionary<string, JToken>() { { "integerField", 4 } }, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject1.Id, new Dictionary<string, JToken>() { { "integerField", 4 } }, new string[0]);
 
             Assert.AreEqual(2, filteredCollection.Count);
         }
@@ -552,19 +552,19 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 0 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 2 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 0 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 2 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => x.integerField == 4);
 
             Assert.AreEqual(1, filteredCollection.Count);
 
-            ((IDdpCollection)collection).Changed(testObject3.ID, new Dictionary<string, JToken>() { { "integerField", 1 } }, new string[0]);
+            ((IDdpCollection)collection).Changed(testObject3.Id, new Dictionary<string, JToken>() { { "integerField", 1 } }, new string[0]);
 
             Assert.AreEqual(0, filteredCollection.Count);
         }
@@ -575,13 +575,13 @@
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            var testObject3 = new TestDdpObject() { ID = "4", integerField = 4 };
-            var testObject1 = new TestDdpObject() { ID = "1", integerField = 2 };
-            var testObject2 = new TestDdpObject() { ID = "2", integerField = 1 };
+            var testObject3 = new TestDdpObject() { Id = "4", integerField = 4 };
+            var testObject1 = new TestDdpObject() { Id = "1", integerField = 2 };
+            var testObject2 = new TestDdpObject() { Id = "2", integerField = 1 };
 
-            ((IDdpCollection)collection).Added(testObject3.ID, JObject.FromObject(testObject3));
-            ((IDdpCollection)collection).Added(testObject1.ID, JObject.FromObject(testObject1));
-            ((IDdpCollection)collection).Added(testObject2.ID, JObject.FromObject(testObject2));
+            ((IDdpCollection)collection).Added(testObject3.Id, JObject.FromObject(testObject3));
+            ((IDdpCollection)collection).Added(testObject1.Id, JObject.FromObject(testObject1));
+            ((IDdpCollection)collection).Added(testObject2.Id, JObject.FromObject(testObject2));
 
             var filteredCollection = collection.Filter(whereFilter: x => x.integerField < 4, sortFilter: (x,y) => x.integerField - y.integerField);
 

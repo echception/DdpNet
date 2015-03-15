@@ -33,7 +33,7 @@
 
                     if (this.userSession != null && !string.IsNullOrWhiteSpace(this.userSession.UserId))
                     {
-                        var userObject = this.users.Single(x => x.ID == this.userSession.UserId);
+                        var userObject = this.users.Single(x => x.Id == this.userSession.UserId);
 
                         this.User = userObject;
                     }
