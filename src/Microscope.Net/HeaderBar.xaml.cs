@@ -62,6 +62,9 @@ namespace Microscope.Net
                 case 0:
                     frame.Navigate(typeof (MainPage));
                     break;
+                case 1:
+                    frame.Navigate(typeof (BestPage));
+                    break;
                 case 2:
                     frame.Navigate(typeof (SubmitPost));
                     break;

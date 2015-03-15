@@ -1,14 +1,12 @@
 ﻿<local:BasePage
-    x:Name="pageRoot"
-    x:Class="Microscope.Net.MainPage"
+    x:Class="Microscope.Net.BestPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Microscope.Net"
-    xmlns:common="using:Microscope.Net.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -24,8 +22,8 @@
         </Grid.ColumnDefinitions>
 
         <!-- Back button and page title -->
-        <local:HeaderBar Grid.Row="0" SelectedMenuIndex="0"></local:HeaderBar>
-        
+        <local:HeaderBar Grid.Row="0" SelectedMenuIndex="1"></local:HeaderBar>
+
         <local:PostList Grid.Row="1" x:Name="PostList"></local:PostList>
     </Grid>
 </local:BasePage>

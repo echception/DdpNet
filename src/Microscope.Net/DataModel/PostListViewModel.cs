@@ -4,9 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace Microscope.Net.DataModel
 {
+    using System;
     using DdpNet;
 
-    public class MainPageViewModel : BaseViewModel
+    public class PostListViewModel : BaseViewModel
     {
         private bool showLoadMore;
 
@@ -22,9 +23,9 @@ namespace Microscope.Net.DataModel
             }
         }
 
-        public MainPageViewModel(MeteorClient meteorClient, DdpCollection<Post> posts, bool showLoadMore)
+        public PostListViewModel(MeteorClient meteorClient, DdpCollection<Post> posts, bool showLoadMore, Comparison<Post> sort )
         {
-            this.Posts = posts.Filter(sortFilter: (post1, post2) => post2.Submitted.DateTime.CompareTo(post1.Submitted.DateTime));
+            this.Posts = posts.Filter(sortFilter: sort);
 
             this.ShowLoadMore = showLoadMore;
         }

@@ -106,6 +106,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BasePage.cs" />
+    <Compile Include="BestPage.xaml.cs">
+      <DependentUpon>BestPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
@@ -115,7 +118,7 @@
     <Compile Include="DataModel\Comment.cs" />
     <Compile Include="DataModel\CommentSubmit.cs" />
     <Compile Include="DataModel\LoginPageViewModel.cs" />
-    <Compile Include="DataModel\MainPageViewModel.cs" />
+    <Compile Include="DataModel\PostListViewModel.cs" />
     <Compile Include="DataModel\Post.cs" />
     <Compile Include="DataModel\PostEdit.cs" />
     <Compile Include="DataModel\PostPageViewModel.cs" />
@@ -137,6 +140,9 @@
     <Compile Include="NullToVisibilityConverter.cs" />
     <Compile Include="PostItem.xaml.cs">
       <DependentUpon>PostItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PostList.xaml.cs">
+      <DependentUpon>PostList.xaml</DependentUpon>
     </Compile>
     <Compile Include="PostPage.xaml.cs">
       <DependentUpon>PostPage.xaml</DependentUpon>
@@ -168,6 +174,10 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="BestPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="EditPostPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -185,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PostItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PostList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
