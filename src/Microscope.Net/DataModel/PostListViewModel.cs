@@ -10,8 +10,15 @@ namespace Microscope.Net.DataModel
     public class PostListViewModel : BaseViewModel
     {
         private bool showLoadMore;
+        private DdpFilteredCollection<Post> posts; 
 
-        public DdpFilteredCollection<Post> Posts { get; private set; }
+        public DdpFilteredCollection<Post> Posts {
+            get { return this.posts; }
+            set
+            {
+                this.posts = value;
+                this.OnPropertyChanged();
+            } }
 
         public bool ShowLoadMore
         {
@@ -21,13 +28,6 @@ namespace Microscope.Net.DataModel
                 this.showLoadMore = value;
                 this.OnPropertyChanged();
             }
-        }
-
-        public PostListViewModel(MeteorClient meteorClient, DdpCollection<Post> posts, bool showLoadMore, Comparison<Post> sort )
-        {
-            this.Posts = posts.Filter(sortFilter: sort);
-
-            this.ShowLoadMore = showLoadMore;
         }
     }
 }

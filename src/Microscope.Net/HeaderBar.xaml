@@ -40,9 +40,12 @@
             </ListView.ItemsPanel>
             <TextBlock Text="New" Style="{StaticResource HeaderTextBlockStyle}"></TextBlock>
             <TextBlock Text="Best" Style="{StaticResource HeaderTextBlockStyle}"></TextBlock>
-            <TextBlock Text="Submit" Style="{StaticResource HeaderTextBlockStyle}" Visibility="{Binding Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
+            <TextBlock Text="Submit" Style="{StaticResource HeaderTextBlockStyle}" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
         </ListView>
         <Button Grid.Column="3" Content="Login" x:Name="LoginButton" HorizontalAlignment="Right" Visibility="{Binding Path=Client.User, Converter={StaticResource NullToVisibleConverter}}" Click="LoginButton_OnClick"></Button>
-        <TextBlock Grid.Column="3" Text="{Binding Path=Client.User.UserName}" Style="{StaticResource SubheaderTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Column="3" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}" >
+            <TextBlock Text="{Binding Path=Client.User.UserName}" Style="{StaticResource SubheaderTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
+            <Button Content="Logout" x:Name="LogoutButton" Click="LogoutButton_OnClick" Margin="10,0"></Button>
+        </StackPanel>
     </Grid>
 </UserControl>

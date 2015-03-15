@@ -91,5 +91,16 @@ namespace Microscope.Net
                 }
             }
         }
+
+        private async void LogoutButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            await App.Current.Client.Logout();
+            var frame = Window.Current.Content as Frame;
+
+            var loginManager = new LoginManager();
+            loginManager.ClearToken();
+
+            frame.Navigate(typeof (MainPage));
+        }
     }
 }

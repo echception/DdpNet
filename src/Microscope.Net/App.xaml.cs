@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Microscope.Net
 {
+    using System.Threading.Tasks;
     using DdpNet;
 
     /// <summary>
@@ -43,6 +44,26 @@ namespace Microscope.Net
             this.Suspending += OnSuspending;
         }
 
+        private async Task InitializeClient()
+        {
+             this.Client = new MeteorClient(new Uri("ws://localhost:3000/websocket"));
+            await this.Client.ConnectAsync();
+
+            var manager = new LoginManager();
+            var sessionToken = manager.GetSavedSessionToken();
+            if (!string.IsNullOrWhiteSpace(sessionToken))
+            {
+                try
+                {
+                    await this.Client.LoginResumeSession(sessionToken);
+                }
+                catch (DdpServerException)
+                {
+                   
+                }
+            }
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -58,8 +79,7 @@ namespace Microscope.Net
             }
 #endif
 
-            this.Client = new MeteorClient(new Uri("ws://localhost:3000/websocket"));
-            await this.Client.ConnectAsync();
+           await this.InitializeClient();
 
             Frame rootFrame = Window.Current.Content as Frame;
 

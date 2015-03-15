@@ -6,9 +6,21 @@
 
     public class BaseViewModel : INotifyPropertyChanged
     {
+        private MeteorClient client;
+
+        public BaseViewModel()
+        {
+            this.Client = App.Current.Client;
+        }
+
         public MeteorClient Client
         {
-            get { return App.Current.Client; }
+            get { return client; }
+            set
+            {
+                this.client = value;
+                this.OnPropertyChanged();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -67,6 +67,9 @@ namespace Microscope.Net
             try
             {
                 await client.LoginPassword(this.viewModel.UserName, this.viewModel.Password);
+                var sessionToken = client.UserSession.Token;
+                LoginManager login = new LoginManager();
+                login.SaveSessionToken(sessionToken);
                 NavigationHelper.GoBack();
             }
             catch (DdpServerException e)

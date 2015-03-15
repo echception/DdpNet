@@ -18,20 +18,24 @@ using Windows.UI.Xaml.Navigation;
 namespace Microscope.Net
 {
     using Common;
+    using DataModel;
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class BestPage : BasePage
     {
+        private PostListViewModel viewModel;
         public BestPage()
         {
             this.InitializeComponent();
         }
 
-        protected override void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        protected async override void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.PostList.Initialize(new BestSort() { Votes = -1, ID = -1, Submitted = -1 }, (post1, post2) =>
+            this.viewModel = new PostListViewModel();
+            this.DataContext = this.viewModel;
+            await this.PostList.Initialize(this.viewModel, new BestSort() { Votes = -1, ID = -1, Submitted = -1 }, (post1, post2) =>
             {
                 var votesComparison = post2.Votes.CompareTo(post1.Votes);
 

@@ -23,14 +23,17 @@ namespace Microscope.Net
 
     public sealed partial class MainPage : BasePage
     {
+        private PostListViewModel viewModel;
         public MainPage() : base()
         {
             this.InitializeComponent();
         }
 
-        protected override void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        protected async override void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.PostList.Initialize(new Sort() { ID = -1, Submitted = -1 }, (post1, post2) => post2.Submitted.DateTime.CompareTo(post1.Submitted.DateTime));
+            this.viewModel = new PostListViewModel();
+            this.DataContext = this.viewModel;
+            await this.PostList.Initialize(this.viewModel, new Sort() { ID = -1, Submitted = -1 }, (post1, post2) => post2.Submitted.DateTime.CompareTo(post1.Submitted.DateTime));
         }
 
         protected override void navigationHelper_SaveState(object sender, SaveStateEventArgs e)

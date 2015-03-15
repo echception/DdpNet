@@ -21,18 +21,18 @@
             this.InitializeComponent();
         }
 
-        public async void Initialize(object sort, Comparison<Post> sortMethod )
+        public async Task Initialize(PostListViewModel viewModel, object sort, Comparison<Post> sortMethod )
         {
             var collection = App.Current.Client.GetCollection<Post>("posts");
             this.limit = Increment;
             this.sort = sort;
 
-            this.viewModel = new PostListViewModel(App.Current.Client, collection, false, sortMethod);
+            this.viewModel = viewModel;
+            this.viewModel.ShowLoadMore = false;
+            this.viewModel.Posts = collection.Filter(sortFilter: sortMethod);
 
             ((INotifyCollectionChanged)collection).CollectionChanged +=
     (sender, args) => this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-
-            this.DataContext = this.viewModel;
 
             await this.LoadData();
         }
