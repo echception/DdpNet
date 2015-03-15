@@ -1,7 +1,6 @@
 ﻿using Microscope.Net.Common;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,37 +13,20 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microscope.Net.DataModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
 namespace Microscope.Net
 {
-    using System.Threading.Tasks;
-    using DataModel;
-    using DdpNet;
-
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class SubmitPost : Page
     {
-        private MainPageViewModel viewModel;
+
         private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
-
-        private int limit;
-        private Sort sort;
-        private const int Increment = 5;
-
-        private Subscription currentSubscription;
-
-        /// <summary>
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
-        public ObservableDictionary DefaultViewModel
-        {
-            get { return this.defaultViewModel; }
-        }
+        private PostSubmitViewModel viewModel;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -56,43 +38,13 @@ namespace Microscope.Net
         }
 
 
-        public MainPage()
+        public SubmitPost()
         {
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
-
-        private async void Load()
-        {
-            var collection = App.Current.Client.GetCollection<Post>("posts");
-            this.limit = Increment;
-            this.sort = new Sort() {ID = -1, Submitted = -1};
-
-            this.viewModel = new MainPageViewModel(App.Current.Client, collection, false);
-
-            ((INotifyCollectionChanged)collection).CollectionChanged +=
-    (sender, args) => this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-
-            this.DataContext = this.viewModel;
-
-            await this.LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            var newSubscription = await App.Current.Client.Subscribe("posts", new SubscribeParamters { Limit = this.limit, Sort = this.sort });
-
-            if (this.currentSubscription != null)
-            {
-                await App.Current.Client.Unsubscribe(this.currentSubscription);
-            }
-
-            this.currentSubscription = newSubscription;
-            this.viewModel.ShowLoadMore = this.viewModel.Posts.Count >= this.limit;
-        }
-
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -107,7 +59,8 @@ namespace Microscope.Net
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.Load();
+            this.viewModel = new PostSubmitViewModel();
+            this.DataContext = this.viewModel;
         }
 
         /// <summary>
@@ -133,7 +86,7 @@ namespace Microscope.Net
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
         }
@@ -145,29 +98,28 @@ namespace Microscope.Net
 
         #endregion
 
-        private async void LoadMoreButton_OnClick(object sender, RoutedEventArgs e)
+        private async void SubmitPostButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (this.viewModel.ShowLoadMore)
+            string url = this.UrlTextBox.Text;
+            string title = this.TitleTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(url))
             {
-                this.limit += Increment;
-                await this.LoadData();
+                this.viewModel.Error = "URL required";
+                return;
             }
-        }
 
-        private void LoginButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(typeof (LoginPage));
-        }
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                this.viewModel.Error = "Title required";
+                return;
+            }
 
-        private void Discuss_OnClick(object sender, RoutedEventArgs e)
-        {
-            var post = (Post) ((Button) e.OriginalSource).DataContext;
+            PostSubmit postSubmit = new PostSubmit(title, url);
+
+            PostReturn post = await App.Current.Client.Call<PostReturn>("postInsert", postSubmit);
+
             this.Frame.Navigate(typeof (PostPage), post.ID);
-        }
-
-        private void SubmitPostButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(typeof (SubmitPost));
         }
     }
 }

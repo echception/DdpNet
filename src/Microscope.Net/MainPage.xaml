@@ -39,14 +39,16 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Name="PageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-            <Button Grid.Column="2" Content="Login" x:Name="LoginButton" HorizontalAlignment="Right" Click="LoginButton_OnClick" Visibility="{Binding Path=Client.User, Converter={StaticResource NullToVisibleConverter}}"></Button>
-            <TextBlock Grid.Column="2" Text="{Binding Path=Client.User.UserName}" Style="{StaticResource SubheaderTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
+            <Button Grid.Column="2" Content="Submit Post" x:Name="SubmitPostButton" Click="SubmitPostButton_OnClick" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></Button>
+            <Button Grid.Column="3" Content="Login" x:Name="LoginButton" HorizontalAlignment="Right" Click="LoginButton_OnClick" Visibility="{Binding Path=Client.User, Converter={StaticResource NullToVisibleConverter}}"></Button>
+            <TextBlock Grid.Column="3" Text="{Binding Path=Client.User.UserName}" Style="{StaticResource SubheaderTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Path=Client.User, Converter={StaticResource NotNullToVisibleConverter}}"></TextBlock>
         </Grid>
         
         <ScrollViewer Grid.Row ="1" VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled">
