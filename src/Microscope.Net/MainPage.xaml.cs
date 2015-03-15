@@ -169,5 +169,11 @@ namespace Microscope.Net
         {
             this.Frame.Navigate(typeof (SubmitPost));
         }
+
+        private void EditButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var post = (Post) ((Button) e.OriginalSource).DataContext;
+            this.Frame.Navigate(typeof (EditPostPage), post.ID);
+        }
     }
 }

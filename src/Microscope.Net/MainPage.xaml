@@ -58,6 +58,7 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <local:PostItem></local:PostItem>
+                                <Button x:Name="EditButton" Content="Edit" Click="EditButton_OnClick" Visibility="{Binding OwnsPost, Converter={StaticResource TrueToVisibleConverter}}"></Button>
                                 <Button x:Name="Discuss" Content="Discuss" Click="Discuss_OnClick"></Button>
                             </StackPanel>
                         </DataTemplate>

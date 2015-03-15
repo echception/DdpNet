@@ -66,18 +66,16 @@
             return this.CallConvertNumberToBool(methodName, new IdParameter(id));
         }
 
-        public Task<bool> UpdateAsync(string id, T item)
+        public Task<bool> UpdateAsync(string id, object fieldsToUpdate)
         {
-            Exceptions.ThrowIfNull(item, "item");
+            Exceptions.ThrowIfNull(fieldsToUpdate, "fieldsToUpdate");
             Exceptions.ThrowIfNullOrWhitespace(id, "id");
 
             var methodName = string.Format(@"/{0}/update", this.CollectionName);
             var selector = new IdParameter(id);
-            var set = new Set(item);
-            using (new ForceSerializeDdpObjectId(item, false))
-            {
-                return this.CallConvertNumberToBool(methodName, selector, set);
-            }
+            var set = new Set(fieldsToUpdate);
+
+            return this.CallConvertNumberToBool(methodName, selector, set);
         }
 
         public DdpFilteredCollection<T> Filter(Func<T, bool> whereFilter = null, Comparison<T> sortFilter = null)

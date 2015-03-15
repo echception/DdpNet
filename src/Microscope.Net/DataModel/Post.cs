@@ -136,5 +136,22 @@ namespace Microscope.Net.DataModel
                 return true;
             }
         }
+
+        [JsonIgnore]
+        public bool OwnsPost
+        {
+            get
+            {
+                if (App.Current.Client.User != null)
+                {
+                    if (App.Current.Client.User.ID == this.userId)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using DdpNet;
 using Microscope.Net.DataModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -22,11 +23,13 @@ namespace Microscope.Net
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class SubmitPost : Page
+    public sealed partial class EditPostPage : Page
     {
 
         private NavigationHelper navigationHelper;
         private PostViewModel viewModel;
+        private Subscription subscription;
+        private Post postToEdit;
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -38,7 +41,7 @@ namespace Microscope.Net
         }
 
 
-        public SubmitPost()
+        public EditPostPage()
         {
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
@@ -57,10 +60,16 @@ namespace Microscope.Net
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session. The state will be null the first time a page is visited.</param>
-        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            this.viewModel = new PostViewModel();
+            var postId = e.NavigationParameter as String;
+            this.subscription = await App.Current.Client.Subscribe("singlePost", postId);
+
+            var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
+
+            this.viewModel = new PostViewModel() {Title = post.Title, Url = post.Url};
             this.DataContext = this.viewModel;
+            this.postToEdit = post;
         }
 
         /// <summary>
@@ -71,8 +80,13 @@ namespace Microscope.Net
         /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
         /// <param name="e">Event data that provides an empty dictionary to be populated with
         /// serializable state.</param>
-        private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
+        private async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
+            if (this.subscription != null)
+            {
+                await App.Current.Client.Unsubscribe(this.subscription);
+                this.subscription = null;
+            }
         }
 
         #region NavigationHelper registration
@@ -100,26 +114,32 @@ namespace Microscope.Net
 
         private async void SubmitPostButton_OnClick(object sender, RoutedEventArgs e)
         {
-            string url = this.UrlTextBox.Text;
-            string title = this.TitleTextBox.Text;
-
-            if (string.IsNullOrWhiteSpace(url))
+            if (string.IsNullOrWhiteSpace(this.viewModel.Url))
             {
-                this.viewModel.Error = "URL required";
+                this.viewModel.Error = "Url Required";
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(this.viewModel.Title))
             {
-                this.viewModel.Error = "Title required";
+                this.viewModel.Error = "Title Required";
                 return;
             }
 
-            PostSubmit postSubmit = new PostSubmit(title, url);
+            PostEdit post = new PostEdit(this.viewModel.Url, this.viewModel.Title);
 
-            PostReturn post = await App.Current.Client.Call<PostReturn>("postInsert", postSubmit);
+            var posts = App.Current.Client.GetCollection<Post>("posts");
+            await posts.UpdateAsync(this.postToEdit.ID, post);
 
-            this.Frame.Navigate(typeof (PostPage), post.ID);
+            this.Frame.Navigate(typeof (PostPage), this.postToEdit.ID);
+        }
+
+        private async void DeletePostButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var posts = App.Current.Client.GetCollection<Post>("posts");
+            await posts.RemoveAsync(this.postToEdit.ID);
+
+            this.Frame.Navigate(typeof (MainPage));
         }
     }
 }
