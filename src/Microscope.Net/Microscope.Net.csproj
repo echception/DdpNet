@@ -105,11 +105,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BasePage.cs" />
     <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="DataModel\BaseViewModel.cs" />
     <Compile Include="DataModel\Comment.cs" />
     <Compile Include="DataModel\CommentSubmit.cs" />
     <Compile Include="DataModel\LoginPageViewModel.cs" />
@@ -122,6 +124,9 @@
     <Compile Include="DataModel\PostViewModel.cs" />
     <Compile Include="EditPostPage.xaml.cs">
       <DependentUpon>EditPostPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HeaderBar.xaml.cs">
+      <DependentUpon>HeaderBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
@@ -167,6 +172,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="HeaderBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -182,6 +191,11 @@
     <Page Include="PostPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="SubmitPost.xaml">
       <SubType>Designer</SubType>

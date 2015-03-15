@@ -3,10 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace Microscope.Net.DataModel
 {
-    public class LoginPageViewModel : INotifyPropertyChanged
+    public class LoginPageViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private bool createUser;
         private string errorText;
         private string userName;
@@ -54,12 +52,6 @@ namespace Microscope.Net.DataModel
         public LoginPageViewModel()
         {
             this.createUser = false;
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

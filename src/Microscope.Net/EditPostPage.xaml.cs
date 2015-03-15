@@ -16,37 +16,17 @@ using Windows.UI.Xaml.Navigation;
 using DdpNet;
 using Microscope.Net.DataModel;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
-
 namespace Microscope.Net
 {
-    /// <summary>
-    /// A basic page that provides characteristics common to most applications.
-    /// </summary>
-    public sealed partial class EditPostPage : Page
+    public sealed partial class EditPostPage : BasePage
     {
-
-        private NavigationHelper navigationHelper;
         private PostViewModel viewModel;
         private Subscription subscription;
         private Post postToEdit;
 
-        /// <summary>
-        /// NavigationHelper is used on each page to aid in navigation and 
-        /// process lifetime management
-        /// </summary>
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
-        }
-
-
         public EditPostPage()
         {
             this.InitializeComponent();
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += navigationHelper_LoadState;
-            this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
         /// <summary>
@@ -60,7 +40,7 @@ namespace Microscope.Net
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session. The state will be null the first time a page is visited.</param>
-        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        protected override async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             var postId = e.NavigationParameter as String;
             this.subscription = await App.Current.Client.Subscribe("singlePost", postId);
@@ -80,7 +60,7 @@ namespace Microscope.Net
         /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
         /// <param name="e">Event data that provides an empty dictionary to be populated with
         /// serializable state.</param>
-        private async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
+        protected override async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
             if (this.subscription != null)
             {
@@ -88,29 +68,6 @@ namespace Microscope.Net
                 this.subscription = null;
             }
         }
-
-        #region NavigationHelper registration
-
-        /// The methods provided in this section are simply used to allow
-        /// NavigationHelper to respond to the page's navigation methods.
-        /// 
-        /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
-        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
-        /// The navigation parameter is available in the LoadState method 
-        /// in addition to page state preserved during an earlier session.
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            navigationHelper.OnNavigatedTo(e);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            navigationHelper.OnNavigatedFrom(e);
-        }
-
-        #endregion
 
         private async void SubmitPostButton_OnClick(object sender, RoutedEventArgs e)
         {

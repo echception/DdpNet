@@ -23,46 +23,19 @@ namespace Microscope.Net
     /// <summary>
     /// A basic page that provides characteristics common to most applications.
     /// </summary>
-    public sealed partial class PostPage : Page
+    public sealed partial class PostPage : BasePage
     {
-
-        private NavigationHelper navigationHelper;
-
         private List<Subscription> subscriptions;
 
         private PostPageViewModel viewModel;
 
-        /// <summary>
-        /// NavigationHelper is used on each page to aid in navigation and 
-        /// process lifetime management
-        /// </summary>
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
-        }
-
-
         public PostPage()
         {
             this.InitializeComponent();
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += navigationHelper_LoadState;
-            this.navigationHelper.SaveState += navigationHelper_SaveState;
             this.subscriptions = new List<Subscription>();
         }
 
-        /// <summary>
-        /// Populates the page with content passed during navigation. Any saved state is also
-        /// provided when recreating a page from a prior session.
-        /// </summary>
-        /// <param name="sender">
-        /// The source of the event; typically <see cref="NavigationHelper"/>
-        /// </param>
-        /// <param name="e">Event data that provides both the navigation parameter passed to
-        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
-        /// a dictionary of state preserved by this page during an earlier
-        /// session. The state will be null the first time a page is visited.</param>
-        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        protected override async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             var postId = e.NavigationParameter as String;
             this.subscriptions.Add(await App.Current.Client.Subscribe("singlePost", postId));
@@ -74,19 +47,11 @@ namespace Microscope.Net
             var post = App.Current.Client.GetCollection<Post>("posts").Single(x => x.ID == postId);
             var comments = commentCollection.Filter(whereFilter: x => x.PostId == postId);
 
-            this.viewModel = new PostPageViewModel() {Comments = comments, Post = post, Client = App.Current.Client};
+            this.viewModel = new PostPageViewModel() { Comments = comments, Post = post };
             this.DataContext = this.viewModel;
         }
 
-        /// <summary>
-        /// Preserves state associated with this page in case the application is suspended or the
-        /// page is discarded from the navigation cache.  Values must conform to the serialization
-        /// requirements of <see cref="SuspensionManager.SessionState"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
-        /// <param name="e">Event data that provides an empty dictionary to be populated with
-        /// serializable state.</param>
-        private async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
+        protected override async void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
             if (this.subscriptions != null)
             {
@@ -97,29 +62,6 @@ namespace Microscope.Net
                 this.subscriptions.Clear();
             }
         }
-
-        #region NavigationHelper registration
-
-        /// The methods provided in this section are simply used to allow
-        /// NavigationHelper to respond to the page's navigation methods.
-        /// 
-        /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="Common.NavigationHelper.LoadState"/>
-        /// and <see cref="Common.NavigationHelper.SaveState"/>.
-        /// The navigation parameter is available in the LoadState method 
-        /// in addition to page state preserved during an earlier session.
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            navigationHelper.OnNavigatedTo(e);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            navigationHelper.OnNavigatedFrom(e);
-        }
-
-        #endregion
 
         private async void AddCommentButton_OnClick(object sender, RoutedEventArgs e)
         {
