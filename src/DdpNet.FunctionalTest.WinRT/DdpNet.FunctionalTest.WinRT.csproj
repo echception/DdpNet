@@ -153,13 +153,9 @@
     <Reference Include="PCLCommandBase">
       <HintPath>..\packages\PCLCommandBase.0.2.2\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10\PCLCommandBase.dll</HintPath>
     </Reference>
-    <Reference Include="PCLCrypto, Version=0.5.0.0, Culture=neutral, PublicKeyToken=d4421c8a4786956c, processorArchitecture=MSIL">
+    <Reference Include="PCLCrypto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d4421c8a4786956c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLCrypto.0.5.2.14286\lib\win81\PCLCrypto.dll</HintPath>
-    </Reference>
-    <Reference Include="PCLCrypto.Abstractions, Version=0.5.0.0, Culture=neutral, PublicKeyToken=d4421c8a4786956c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PCLCrypto.0.5.2.14286\lib\win81\PCLCrypto.Abstractions.dll</HintPath>
+      <HintPath>..\packages\PCLCrypto.1.0.0.15071\lib\win81\PCLCrypto.dll</HintPath>
     </Reference>
     <Reference Include="PCLTesting">
       <HintPath>..\packages\PCLTesting.0.2.2\lib\win8\PCLTesting.dll</HintPath>
