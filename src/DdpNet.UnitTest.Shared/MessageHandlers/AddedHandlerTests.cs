@@ -24,7 +24,7 @@
             var resultHandlerMock = new Mock<IResultHandler>();
 
             var testObject = new SimpleDdpObject {IsTrue = false};
-            var added = new Added {Collection = "Tests", Fields = JObject.FromObject(testObject),ID = "1"};
+            var added = new Added {Collection = "Tests", Fields = JObject.FromObject(testObject),Id = "1"};
 
             var handler = new AddedHandler();
 

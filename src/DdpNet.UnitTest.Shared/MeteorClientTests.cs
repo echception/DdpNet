@@ -59,8 +59,8 @@
                 }
             }
 
-            websocket.Reply(JsonConvert.SerializeObject(new Result() { ID = method.ID }));
-            websocket.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new []{method.ID}}));
+            websocket.Reply(JsonConvert.SerializeObject(new Result() { Id = method.Id }));
+            websocket.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new []{method.Id}}));
 
             loginTask.Wait();
 

@@ -23,7 +23,7 @@
             var collectionMock = new Mock<ICollectionManager>();
             var resultHandlerMock = new Mock<IResultHandler>();
 
-            var pingMessage = new Ping {ID = "testPing"};
+            var pingMessage = new Ping {Id = "testPing"};
 
             var handler = new PingHandler();
 

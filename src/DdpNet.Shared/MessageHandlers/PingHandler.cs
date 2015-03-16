@@ -30,7 +30,7 @@
         public override Task HandleMessage(IDdpConnectionSender client, ICollectionManager collectionManager, IResultHandler resultHandler, string message)
         {
             var pingMessage = JsonConvert.DeserializeObject<Ping>(message);
-            var pongReply = new Pong() {ID = pingMessage.ID};
+            var pongReply = new Pong() {Id = pingMessage.Id};
 
             return client.SendObject(pongReply);
         }

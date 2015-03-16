@@ -121,7 +121,7 @@
             var entryCollection = meteorClient.GetCollection<Entry>("entries");
             await meteorClient.Subscribe("entries");
 
-            var inserts = 100;
+            var inserts = 1000;
             var currentCount = entryCollection.Count;
 
             List<Task> startedTasks = new List<Task>();

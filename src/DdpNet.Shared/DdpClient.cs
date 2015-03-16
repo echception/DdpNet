@@ -360,7 +360,7 @@ namespace DdpNet
             var resultWaitHandler =
                 this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));
 
-            var method = new Method() { MethodName = methodName, Parameters = parameters, ID = id };
+            var method = new Method() { MethodName = methodName, Parameters = parameters, Id = id };
             await this.SendObject(method);
 
             var result = await this.ResultHandler.WaitForResult(resultWaitHandler);

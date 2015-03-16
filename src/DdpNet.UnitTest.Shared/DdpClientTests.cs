@@ -59,8 +59,8 @@
 
             var method = JsonConvert.DeserializeObject<Method>(methodString);
 
-            connection.Reply(JsonConvert.SerializeObject(new Result() {ID = method.ID}));
-            connection.Reply(JsonConvert.SerializeObject(new Updated() {Methods = new[] {method.ID}}));
+            connection.Reply(JsonConvert.SerializeObject(new Result() {Id = method.Id}));
+            connection.Reply(JsonConvert.SerializeObject(new Updated() {Methods = new[] {method.Id}}));
 
             task.Wait();
 
@@ -88,10 +88,10 @@
             connection.Reply(
                 JsonConvert.SerializeObject(new Result()
                 {
-                    ID = method.ID,
+                    Id = method.Id,
                     ResultObject = JToken.FromObject(new SimpleField() {integerField = 11, boolField = false, stringField = "ReturnObject"})
                 }));
-            connection.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new[] { method.ID } }));
+            connection.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new[] { method.Id } }));
 
             task.Wait();
 
@@ -125,10 +125,10 @@
             connection.Reply(
                 JsonConvert.SerializeObject(new Result()
                 {
-                    ID = method.ID,
+                    Id = method.Id,
                     Error = new Error() {Details = "Failed", ErrorMessage = "TestFailed", Reason = "ReasonFailed"}
                 }));
-            connection.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new[] { method.ID } }));
+            connection.Reply(JsonConvert.SerializeObject(new Updated() { Methods = new[] { method.Id } }));
 
             ExceptionAssert.ExpectAggregateException(() => task.Wait(), typeof(DdpServerException));
 
@@ -155,7 +155,7 @@
             var subscribeString = connection.GetSentMessage();
             var subscribe = JsonConvert.DeserializeObject<Subscribe>(subscribeString);
 
-            connection.Reply(JsonConvert.SerializeObject(new Ready() { SubscriptionsReady = new []{subscribe.ID}}));
+            connection.Reply(JsonConvert.SerializeObject(new Ready() { SubscriptionsReady = new []{subscribe.Id}}));
 
             task.Wait();
 

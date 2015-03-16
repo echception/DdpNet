@@ -32,13 +32,13 @@
             var pongReply = JsonConvert.DeserializeObject<Pong>(sentMessage);
 
             Assert.AreEqual("pong", pongReply.MessageType);
-            Assert.IsTrue(String.IsNullOrEmpty(pongReply.ID));
+            Assert.IsTrue(String.IsNullOrEmpty(pongReply.Id));
         }
 
         [TestMethod]
         public void DdpClient_SendPingMessageWithId_ReturnsPongMessageWithId()
         {
-            var ping = new Ping {ID = "TestID"};
+            var ping = new Ping {Id = "TestID"};
             this.testConnection.Reply(JsonConvert.SerializeObject(ping));
 
             this.client.ReceiveAsync().Wait();
@@ -48,7 +48,7 @@
             var pongReply = JsonConvert.DeserializeObject<Pong>(sentMessage);
 
             Assert.AreEqual("pong", pongReply.MessageType);
-            Assert.AreEqual("TestID", pongReply.ID);
+            Assert.AreEqual("TestID", pongReply.Id);
         }
     }
 }

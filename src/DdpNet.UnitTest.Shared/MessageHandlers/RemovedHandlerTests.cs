@@ -23,7 +23,7 @@
             var resultHandlerMock = new Mock<IResultHandler>();
 
             var testObject = new SimpleDdpObject { IsTrue = false };
-            var added = new Removed() {Collection = "Test", ID = "ID"};
+            var added = new Removed() {Collection = "Test", Id = "ID"};
 
             var handler = new RemovedHandler();
 

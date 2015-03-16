@@ -9,7 +9,6 @@
     /// Manages all the collections the client knows about.
     /// This class can be called from two different threads; the receive thread will call Added, Changed and Removed when it receives the respective message from the server.
     /// The GetCollection method can be called from the user thread, to get an instance of a collection
-    /// 
     /// Some notes about the class:
     /// The typed DdpCollection is only ever created on the user thread, when they call GetCollection
     /// The UntypedCollection can be modified on either the user or the receive thread though, so there is a potential for conflicts
@@ -60,7 +59,7 @@
 
             if (this.typedCollections.TryGetValue(message.Collection, out collection))
             {
-                collection.Added(message.ID, message.Fields);
+                collection.Added(message.Id, message.Fields);
             }
             else
             {
@@ -70,7 +69,7 @@
                     // so we need to check the typed collections again
                     if (this.typedCollections.TryGetValue(message.Collection, out collection))
                     {
-                        collection.Added(message.ID, message.Fields);
+                        collection.Added(message.Id, message.Fields);
                     }
                     else
                     {
@@ -81,7 +80,7 @@
                             this.untypedCollections.Add(message.Collection, untypedCollection);
                         }
 
-                        untypedCollection.Added(message.ID, message.Fields);
+                        untypedCollection.Added(message.Id, message.Fields);
                     }
                 }
             }
@@ -135,7 +134,7 @@
 
             if (this.typedCollections.TryGetValue(message.Collection, out collection))
             {
-                collection.Removed(message.ID);
+                collection.Removed(message.Id);
             }
             else
             {
@@ -145,7 +144,7 @@
                     // so we need to check the typed collections again
                     if (this.typedCollections.TryGetValue(message.Collection, out collection))
                     {
-                        collection.Removed(message.ID);
+                        collection.Removed(message.Id);
                     }
                     else
                     {
@@ -155,7 +154,7 @@
                             throw new InvalidOperationException("Collection to change was not present");
                         }
 
-                        untypedCollection.Removed(message.ID);
+                        untypedCollection.Removed(message.Id);
                     }
                 }
             }            
@@ -185,7 +184,7 @@
                     if (!this.untypedCollections.TryGetValue(collectionName, out untypedCollection))
                     {
                         typedCollection = new DdpCollection<T>(this.client, collectionName);
-                        this.typedCollections.Add(collectionName, collection);
+                        this.typedCollections.Add(collectionName, typedCollection);
                     }
                     else
                     {

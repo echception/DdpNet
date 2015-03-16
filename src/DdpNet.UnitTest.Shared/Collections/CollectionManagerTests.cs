@@ -25,7 +25,7 @@
 
             var objectToAdd = new TestDdpObject {integerField = 101, StringProperty = "addedTest"};
 
-            collectionManager.Added(new Added {Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1"});
+            collectionManager.Added(new Added {Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1"});
 
             var collection = collectionManager.GetCollection<TestDdpObject>("Test");
 
@@ -44,8 +44,8 @@
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
 
-            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1" });
-            collectionManager.Removed(new Removed() { Collection = "Test", ID="1"});
+            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1" });
+            collectionManager.Removed(new Removed() { Collection = "Test", Id="1"});
 
             var collection = collectionManager.GetCollection<TestDdpObject>("Test");
 
@@ -61,7 +61,7 @@
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
 
-            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1" });
+            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1" });
 
             var changed = new Changed
             {
@@ -93,9 +93,9 @@
             var objectToAdd2 = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
             var objectToAdd3 = new TestDdpObject { integerField = 101, StringProperty = "addedTest"};
 
-            collectionManager.Added(new Added { Collection = "Test1", Fields = JObject.FromObject(objectToAdd1), ID = "1" });
-            collectionManager.Added(new Added { Collection = "Test2", Fields = JObject.FromObject(objectToAdd2), ID = "2" });
-            collectionManager.Added(new Added { Collection = "Test3", Fields = JObject.FromObject(objectToAdd3), ID = "3" });
+            collectionManager.Added(new Added { Collection = "Test1", Fields = JObject.FromObject(objectToAdd1), Id = "1" });
+            collectionManager.Added(new Added { Collection = "Test2", Fields = JObject.FromObject(objectToAdd2), Id = "2" });
+            collectionManager.Added(new Added { Collection = "Test3", Fields = JObject.FromObject(objectToAdd3), Id = "3" });
 
             var collection1 = collectionManager.GetCollection<TestDdpObject>("Test1");
             var collection2 = collectionManager.GetCollection<TestDdpObject>("Test2");
@@ -140,7 +140,7 @@
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest" };
 
-            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1" });
+            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1" });
 
             Assert.AreEqual(1, collection.Count);
 
@@ -159,11 +159,11 @@
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest" };
 
-            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1" });
+            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1" });
 
             Assert.AreEqual(1, collection.Count);
 
-            collectionManager.Removed(new Removed() { Collection = "Test", ID = "1" });
+            collectionManager.Removed(new Removed() { Collection = "Test", Id = "1" });
 
             Assert.AreEqual(0, collection.Count);
         }
@@ -179,7 +179,7 @@
 
             var objectToAdd = new TestDdpObject { integerField = 101, StringProperty = "addedTest" };
 
-            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), ID = "1" });
+            collectionManager.Added(new Added { Collection = "Test", Fields = JObject.FromObject(objectToAdd), Id = "1" });
 
             Assert.AreEqual(1, collection.Count);
 
@@ -215,9 +215,9 @@
             var objectToAdd2 = new TestDdpObject { integerField = 101, StringProperty = "addedTest" };
             var objectToAdd3 = new TestDdpObject { integerField = 101, StringProperty = "addedTest" };
 
-            collectionManager.Added(new Added { Collection = "Test1", Fields = JObject.FromObject(objectToAdd1), ID = "1" });
-            collectionManager.Added(new Added { Collection = "Test2", Fields = JObject.FromObject(objectToAdd2), ID = "2" });
-            collectionManager.Added(new Added { Collection = "Test3", Fields = JObject.FromObject(objectToAdd3), ID = "3" });
+            collectionManager.Added(new Added { Collection = "Test1", Fields = JObject.FromObject(objectToAdd1), Id = "1" });
+            collectionManager.Added(new Added { Collection = "Test2", Fields = JObject.FromObject(objectToAdd2), Id = "2" });
+            collectionManager.Added(new Added { Collection = "Test3", Fields = JObject.FromObject(objectToAdd3), Id = "3" });
 
             Assert.AreEqual(1, collection1.Count);
             Assert.AreEqual(1, collection2.Count);
@@ -253,7 +253,7 @@
         {
             var collectionManager = new CollectionManager(null);
 
-            ExceptionAssert.Throws<InvalidOperationException>(() => collectionManager.Removed(new Removed() { Collection = "Test", ID = "1" }));
+            ExceptionAssert.Throws<InvalidOperationException>(() => collectionManager.Removed(new Removed() { Collection = "Test", Id = "1" }));
         }
 
         private void AssertDdpObjectsEqual(TestDdpObject expected, TestDdpObject actual)

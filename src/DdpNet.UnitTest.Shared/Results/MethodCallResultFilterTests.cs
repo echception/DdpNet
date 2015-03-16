@@ -15,7 +15,7 @@
         {
             var resultFilter = new MethodCallResultFilter("10");
 
-            var message = new Result() {ID = "10"};
+            var message = new Result() {Id = "10"};
             var updated = new Updated() {Methods = new[] {"10"}};
 
             var resultReturnedObject = new ReturnedObject("result", JObject.FromObject(message),
@@ -39,7 +39,7 @@
         {
             var resultFilter = new MethodCallResultFilter("10");
 
-            var message = new Result() { ID = "10" };
+            var message = new Result() { Id = "10" };
             var updated = new Updated() { Methods = new[] { "10" } };
 
             var resultReturnedObject = new ReturnedObject("result", JObject.FromObject(message),
@@ -63,7 +63,7 @@
         {
             var resultFilter = new MethodCallResultFilter("11");
 
-            var message = new Result() { ID = "10" };
+            var message = new Result() { Id = "10" };
             var updated = new Updated() { Methods = new[] { "10" } };
 
             var resultReturnedObject = new ReturnedObject("result", JObject.FromObject(message),
