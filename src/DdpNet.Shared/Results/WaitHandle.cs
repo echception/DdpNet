@@ -12,7 +12,7 @@ namespace DdpNet.Results
     /// <summary>
     /// When making a method call that needs to wait for a result, we first register a WaitHandle.
     /// The call to register the WaitHandle takes the ResultFilter to wait for
-    /// After registering, the actual method call can be made, then the WaitHandle bassed back to the ResultHandler
+    /// After registering, the actual method call can be made, then the WaitHandle passed back to the ResultHandler
     /// to wait for the result.
     /// </summary>
     internal class WaitHandle

@@ -133,7 +133,7 @@ namespace DdpNet
 
             if (string.IsNullOrWhiteSpace(item.Id))
             {
-                item.Id = Utilities.GenerateID();
+                item.Id = Utilities.GenerateId();
             }
 
             var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/insert", this.CollectionName);

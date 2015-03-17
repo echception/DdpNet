@@ -279,7 +279,7 @@ namespace DdpNet
         /// Return object is a handle to the subscription</returns>
         private async Task<Subscription> SubscribeWithParameters(string subscriptionName, object[] parameters)
         {
-            var id = Utilities.GenerateID();
+            var id = Utilities.GenerateId();
             var sub = new Subscribe(id, subscriptionName, parameters);
 
             var readyWaitHandler =
@@ -355,7 +355,7 @@ namespace DdpNet
         /// Return object is the object returned from the server, in an unparsed form.</returns>
         private async Task<Result> CallGetResult(string methodName, object[] parameters)
         {
-            var id = Utilities.GenerateID();
+            var id = Utilities.GenerateId();
 
             var resultWaitHandler =
                 this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));

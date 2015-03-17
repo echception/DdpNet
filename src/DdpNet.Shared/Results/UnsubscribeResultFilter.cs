@@ -12,7 +12,7 @@ namespace DdpNet.Results
     using DdpNet.Messages;
 
     /// <summary>
-    /// ResultFilter that waits for the result of a 'unsub' message sent to the server
+    /// ResultFilter that waits for the result of a 'unsubscribe' message sent to the server
     /// </summary>
     internal class UnsubscribeResultFilter : ResultFilter
     {

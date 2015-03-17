@@ -122,7 +122,7 @@
 
         private void AddObject(DdpCollection<TestDdpObject> collection, int value)
         {
-            var id = Utilities.GenerateID();
+            var id = Utilities.GenerateId();
 
             ((IDdpCollection)collection).Added(id, JObject.FromObject(new TestDdpObject() { integerField = value}));
         }
