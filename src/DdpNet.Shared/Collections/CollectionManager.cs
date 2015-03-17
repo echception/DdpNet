@@ -1,9 +1,18 @@
-﻿namespace DdpNet.Collections
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CollectionManager.cs" company="Chris Amert">
+//   Copyright (c) 2015
+// </copyright>
+// <summary>
+//   Contains the CollectionManager type
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace DdpNet.Collections
 {
     using System;
     using System.Collections.Generic;
-    using Messages;
-    using Newtonsoft.Json.Linq;
+
+    using DdpNet.Messages;
 
     /// <summary>
     /// Manages all the collections the client knows about.
@@ -17,15 +26,17 @@
     /// </summary>
     internal class CollectionManager : ICollectionManager
     {
-        /// <summary>
-        /// The untyped collections being managed
-        /// </summary>
-        private readonly Dictionary<string, UntypedCollection> untypedCollections;
+        #region Fields
 
         /// <summary>
         /// The typed collections being managed
         /// </summary>
         private readonly Dictionary<string, IDdpCollection> typedCollections;
+
+        /// <summary>
+        /// The untyped collections being managed
+        /// </summary>
+        private readonly Dictionary<string, UntypedCollection> untypedCollections;
 
         /// <summary>
         /// The DdpClient used to communicate with the server
@@ -37,10 +48,17 @@
         /// </summary>
         private object collectionsSyncObject = new object();
 
+        #endregion
+
+        #region Constructors and Destructors
+
         /// <summary>
+        /// Initializes a new instance of the <see cref="CollectionManager"/> class. 
         /// Creates a new CollectionManager
         /// </summary>
-        /// <param name="client">The DdpClient to use</param>
+        /// <param name="client">
+        /// The DdpClient to use
+        /// </param>
         public CollectionManager(IDdpRemoteMethodCall client)
         {
             this.typedCollections = new Dictionary<string, IDdpCollection>();
@@ -48,11 +66,17 @@
             this.client = client;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
         /// <summary>
         /// Adds an object to a collection
         /// If the collection does not yet exist, an UntypedCollection will be created to store the object in
         /// </summary>
-        /// <param name="message">The Added message to process</param>
+        /// <param name="message">
+        /// The Added message to process
+        /// </param>
         public void Added(Added message)
         {
             IDdpCollection collection;
@@ -90,7 +114,9 @@
         /// Changes an object in a collection
         /// If the collection does not exist, will throw InvalidOperationException
         /// </summary>
-        /// <param name="message">The Changed message to process</param>
+        /// <param name="message">
+        /// The Changed message to process
+        /// </param>
         public void Changed(Changed message)
         {
             IDdpCollection collection;
@@ -124,10 +150,67 @@
         }
 
         /// <summary>
+        /// Gets a typed instance of a collection.
+        /// Only one instance is kept of each collection, so repeated calls to this with the same parameters will return the same object
+        /// If it is called again with the same collectionName, but a different type, an error will be thrown
+        /// If the collection does not exist, a new one will be created
+        /// If it exists, but is untyped, it will be converted to a typed collection
+        /// If a typed collection exists, it will be returned directly
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the collection
+        /// </typeparam>
+        /// <param name="collectionName">
+        /// The name of the collection
+        /// </param>
+        /// <returns>
+        /// A DdpCollection
+        /// </returns>
+        public DdpCollection<T> GetCollection<T>(string collectionName) where T : DdpObject
+        {
+            // Prevent any UntypedCollections from being modfified, in case we need to convert them to a typed collection
+            lock (this.collectionsSyncObject)
+            {
+                IDdpCollection collection;
+                DdpCollection<T> typedCollection = null;
+                if (!this.typedCollections.TryGetValue(collectionName, out collection))
+                {
+                    UntypedCollection untypedCollection;
+                    if (!this.untypedCollections.TryGetValue(collectionName, out untypedCollection))
+                    {
+                        typedCollection = new DdpCollection<T>(this.client, collectionName);
+                        this.typedCollections.Add(collectionName, typedCollection);
+                    }
+                    else
+                    {
+                        var convertedCollection = this.ConvertToTypedCollection<T>(collectionName, untypedCollection);
+                        typedCollection = convertedCollection;
+                    }
+                }
+                else
+                {
+                    typedCollection = collection as DdpCollection<T>;
+                }
+
+                if (typedCollection == null)
+                {
+                    throw new InvalidCollectionTypeException(
+                        collectionName, 
+                        collection.GetType(), 
+                        typeof(DdpCollection<T>));
+                }
+
+                return typedCollection;
+            }
+        }
+
+        /// <summary>
         /// Removes an object from a collection
         /// If the collection does not exist, throws an InvalidOperationException
         /// </summary>
-        /// <param name="message">The Removed message to process</param>
+        /// <param name="message">
+        /// The Removed message to process
+        /// </param>
         public void Removed(Removed message)
         {
             IDdpCollection collection;
@@ -157,67 +240,34 @@
                         untypedCollection.Removed(message.Id);
                     }
                 }
-            }            
-        }
-
-        /// <summary>
-        /// Gets a typed instance of a collection.
-        /// Only one instance is kept of each collection, so repeated calls to this with the same parameters will return the same object
-        /// If it is called again with the same collectionName, but a different type, an error will be thrown
-        /// If the collection does not exist, a new one will be created
-        /// If it exists, but is untyped, it will be converted to a typed collection
-        /// If a typed collection exists, it will be returned directly
-        /// </summary>
-        /// <typeparam name="T">The type of the collection</typeparam>
-        /// <param name="collectionName">The name of the collection</param>
-        /// <returns>A DdpCollection</returns>
-        public DdpCollection<T> GetCollection<T>(string collectionName) where T: DdpObject
-        {
-            // Prevent any UntypedCollections from being modfified, in case we need to convert them to a typed collection
-            lock (this.collectionsSyncObject)
-            {
-                IDdpCollection collection;
-                DdpCollection<T> typedCollection = null;
-                if (!this.typedCollections.TryGetValue(collectionName, out collection))
-                {
-                    UntypedCollection untypedCollection;
-                    if (!this.untypedCollections.TryGetValue(collectionName, out untypedCollection))
-                    {
-                        typedCollection = new DdpCollection<T>(this.client, collectionName);
-                        this.typedCollections.Add(collectionName, typedCollection);
-                    }
-                    else
-                    {
-                        var convertedCollection = this.ConvertToTypedCollection<T>(collectionName, untypedCollection);
-                        typedCollection = convertedCollection;
-                    }
-                }
-                else
-                {
-                    typedCollection = collection as DdpCollection<T>;
-                }
-
-                if(typedCollection == null)
-                {
-                    throw new InvalidCollectionTypeException(collectionName, collection.GetType(), typeof(DdpCollection<T>));
-                }
-
-                return typedCollection;
             }
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Converts the given untyped collection to a typed collection, and updates the respective properties
         /// </summary>
-        /// <typeparam name="T">The type of the new typed collection</typeparam>
-        /// <param name="collectionName">The name of the collection</param>
-        /// <param name="collection">The untyped collection to convert</param>
-        /// <returns>The new typed collection</returns>
-        private DdpCollection<T> ConvertToTypedCollection<T>(string collectionName, UntypedCollection collection) where T: DdpObject
+        /// <typeparam name="T">
+        /// The type of the new typed collection
+        /// </typeparam>
+        /// <param name="collectionName">
+        /// The name of the collection
+        /// </param>
+        /// <param name="collection">
+        /// The untyped collection to convert
+        /// </param>
+        /// <returns>
+        /// The new typed collection
+        /// </returns>
+        private DdpCollection<T> ConvertToTypedCollection<T>(string collectionName, UntypedCollection collection)
+            where T : DdpObject
         {
             var typedCollection = new DdpCollection<T>(this.client, collection.CollectionName);
 
-            var ddpCollection = (IDdpCollection) typedCollection;
+            var ddpCollection = (IDdpCollection)typedCollection;
 
             foreach (var item in collection.Objects)
             {
@@ -229,5 +279,7 @@
 
             return typedCollection;
         }
+
+        #endregion
     }
 }

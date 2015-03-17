@@ -2,6 +2,8 @@
   <GlobalSettings>
     <CollectionProperty Name="RecognizedWords">
       <Value>Ddp</Value>
+      <Value>Json</Value>
+      <Value>Untyped</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

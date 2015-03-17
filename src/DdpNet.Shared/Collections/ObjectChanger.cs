@@ -1,12 +1,21 @@
-﻿namespace DdpNet.Collections
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ObjectChanger.cs" company="Chris Amert">
+//   Copyright (c) 2015
+// </copyright>
+// <summary>
+//   Contains the ObjectChanger type
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace DdpNet.Collections
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// This class uses reflection to change the specified fields or properties on an object.
@@ -15,17 +24,24 @@
     /// </summary>
     internal class ObjectChanger
     {
+        #region Public Methods and Operators
+
         /// <summary>
         /// For the given object, this will set all the fields/properties specified in fields, and clear all fields/properties specified in 'Cleared'
         /// It will match fields/properties with case sensitivity. It will also look at any present JsonProperty attributes to determine property name.
         /// If no matching property is found, the change is skipped.
         /// If there is a matching property, but it doesn't have a public accessor, it is skipped
         /// </summary>
-        /// <param name="objectToChange">The object to change</param>
-        /// <param name="fields">The fields to set on the object, with their new values</param>
-        /// <param name="cleared">The fields/properties to clear</param>
-        public void ChangeObject(object objectToChange, Dictionary<string, JToken> fields,
-            string[] cleared)
+        /// <param name="objectToChange">
+        /// The object to change
+        /// </param>
+        /// <param name="fields">
+        /// The fields to set on the object, with their new values
+        /// </param>
+        /// <param name="cleared">
+        /// The fields/properties to clear
+        /// </param>
+        public void ChangeObject(object objectToChange, Dictionary<string, JToken> fields, string[] cleared)
         {
             if (fields != null)
             {
@@ -70,20 +86,30 @@
             }
         }
 
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Attempts to find a field on the object with the given name. If no field is found, it will look at any
         /// JsonPropertyAttribute, and attempt to match on the PropertyName. 
         /// </summary>
-        /// <param name="fieldName">The name of the field to find</param>
-        /// <param name="change">The object to find the property on</param>
-        /// <returns>The FieldInfo if found, otherwise returns null</returns>
+        /// <param name="fieldName">
+        /// The name of the field to find
+        /// </param>
+        /// <param name="change">
+        /// The object to find the property on
+        /// </param>
+        /// <returns>
+        /// The FieldInfo if found, otherwise returns null
+        /// </returns>
         private FieldInfo FindField(string fieldName, object change)
         {
             Type changeType = change.GetType();
 
             TypeInfo info = changeType.GetTypeInfo();
 
-            //var fields = changeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            // var fields = changeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var fields = info.DeclaredFields.Where(x => !x.IsStatic);
 
             foreach (var field in fields)
@@ -93,11 +119,11 @@
                     return field;
                 }
 
-                var attribute = field.GetCustomAttribute(typeof (JsonPropertyAttribute));
+                var attribute = field.GetCustomAttribute(typeof(JsonPropertyAttribute));
 
                 if (attribute != null)
                 {
-                    var propertyAttribute = (JsonPropertyAttribute) attribute;
+                    var propertyAttribute = (JsonPropertyAttribute)attribute;
 
                     if (propertyAttribute.PropertyName == fieldName)
                     {
@@ -111,11 +137,17 @@
 
         /// <summary>
         /// Attempts to find a property on the object with the given name. If no property is found, it will look at any
-        /// JsonPropertyAttribute, and attempt to match on the PropertyNAme
+        /// JsonPropertyAttribute, and attempt to match on the PropertyName
         /// </summary>
-        /// <param name="propertyName">The name of the property to find</param>
-        /// <param name="change">The object to find the property on</param>
-        /// <returns>The PropertyInfo if found, otherwise returns null</returns>
+        /// <param name="propertyName">
+        /// The name of the property to find
+        /// </param>
+        /// <param name="change">
+        /// The object to find the property on
+        /// </param>
+        /// <returns>
+        /// The PropertyInfo if found, otherwise returns null
+        /// </returns>
         private PropertyInfo FindProperty(string propertyName, object change)
         {
             Type changeType = change.GetType();
@@ -146,5 +178,7 @@
 
             return null;
         }
+
+        #endregion
     }
 }

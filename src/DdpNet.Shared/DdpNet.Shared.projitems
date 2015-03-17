@@ -12,7 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\CollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\ICollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\IDdpCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Collections\InactiveCollectionException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\ObjectChanger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\InvalidCollectionTypeException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\UntypedCollection.cs" />

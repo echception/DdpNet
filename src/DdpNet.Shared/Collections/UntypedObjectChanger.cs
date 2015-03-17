@@ -1,22 +1,40 @@
-﻿namespace DdpNet.Collections
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="UntypedObjectChanger.cs" company="Chris Amert">
+//   Copyright (c) 2015
+// </copyright>
+// <summary>
+//   Contains the UntypedObjectChanger
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace DdpNet.Collections
 {
     using System.Collections.Generic;
     using System.Linq;
+
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Similiar to the ObjectChanger, but works on the JToken objects from an untyped collection.
+    /// Similar to the ObjectChanger, but works on the JToken objects from an untyped collection.
     /// The ObjectChanger uses reflection to change the objects, which does not work on the JTokens.
     /// This uses the JToken specific methods to apply the changes
     /// </summary>
     internal class UntypedObjectChanger
     {
+        #region Public Methods and Operators
+
         /// <summary>
         /// Applies changes to a JToken
         /// </summary>
-        /// <param name="objectToChange">The object to change</param>
-        /// <param name="fields">The fields that changed</param>
-        /// <param name="cleared">The fields that were cleared</param>
+        /// <param name="objectToChange">
+        /// The object to change
+        /// </param>
+        /// <param name="fields">
+        /// The fields that changed
+        /// </param>
+        /// <param name="cleared">
+        /// The fields that were cleared
+        /// </param>
         public void ChangeObject(JToken objectToChange, Dictionary<string, JToken> fields, string[] cleared)
         {
             if (fields != null)
@@ -37,8 +55,8 @@
             {
                 foreach (var clearedField in cleared)
                 {
-                    var fieldToRemove =
-                        objectToChange.Children<JProperty>().SingleOrDefault(x => x.Name == clearedField);
+                    var fieldToRemove = objectToChange.Children<JProperty>()
+                        .SingleOrDefault(x => x.Name == clearedField);
 
                     if (fieldToRemove != null)
                     {
@@ -47,5 +65,7 @@
                 }
             }
         }
+
+        #endregion
     }
 }
