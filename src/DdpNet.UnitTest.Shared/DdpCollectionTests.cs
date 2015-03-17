@@ -88,7 +88,7 @@
             remoteMethodCall.Verify(
                 x =>
                     x.Call<int>(It.Is<string>(s => s.Equals(@"/TestCollection/remove")),
-                        It.Is<object[]>(c => c.Length == 1 && ((IdParameter) c.First()).ID == "1")));
+                        It.Is<object[]>(c => c.Length == 1 && ((IdParameter) c.First()).Id == "1")));
         }
 
         [TestMethod]
@@ -129,7 +129,7 @@
                     x.Call<int>(It.Is<string>(s => s.Equals(@"/TestCollection/update")),
                         It.Is<object[]>(
                             c =>
-                                c.Length == 2 && ((IdParameter) c[0]).ID == "11" && ((Set) c[1]).ObjectToSet == testObject)));
+                                c.Length == 2 && ((IdParameter) c[0]).Id == "11" && ((Set) c[1]).ObjectToSet == testObject)));
         }
 
         [TestMethod]
