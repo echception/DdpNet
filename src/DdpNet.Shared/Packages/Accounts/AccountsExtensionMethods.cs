@@ -36,8 +36,8 @@ namespace DdpNet.Packages.Accounts
         public static Task CreateUserWithUserName(this MeteorClient client, string userName, string password)
         {
             Exceptions.ThrowIfNull(client, "client");
-            Exceptions.ThrowIfNullOrWhitespace(userName, "userName");
-            Exceptions.ThrowIfNullOrWhitespace(password, "password");
+            Exceptions.ThrowIfNullOrWhiteSpace(userName, "userName");
+            Exceptions.ThrowIfNullOrWhiteSpace(password, "password");
 
             var passwordParameters = Utilities.GetPassword(password);
             var parameters = new CreateUserUserNameParameters(userName, passwordParameters);

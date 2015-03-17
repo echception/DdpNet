@@ -47,14 +47,14 @@ namespace DdpNet.Collections
             {
                 foreach (var changedField in fields)
                 {
-                    var property = this.FindProperty(changedField.Key, objectToChange);
+                    var property = FindProperty(changedField.Key, objectToChange);
 
                     if (property != null && property.SetMethod != null)
                     {
                         property.SetValue(objectToChange, changedField.Value.ToObject(property.PropertyType));
                     }
 
-                    var field = this.FindField(changedField.Key, objectToChange);
+                    var field = FindField(changedField.Key, objectToChange);
 
                     if (field != null)
                     {
@@ -68,7 +68,7 @@ namespace DdpNet.Collections
             {
                 foreach (var clearedField in cleared)
                 {
-                    var field = this.FindField(clearedField, objectToChange);
+                    var field = FindField(clearedField, objectToChange);
 
                     if (field != null)
                     {
@@ -76,7 +76,7 @@ namespace DdpNet.Collections
                         continue;
                     }
 
-                    var property = this.FindProperty(clearedField, objectToChange);
+                    var property = FindProperty(clearedField, objectToChange);
 
                     if (property != null)
                     {
@@ -103,7 +103,7 @@ namespace DdpNet.Collections
         /// <returns>
         /// The FieldInfo if found, otherwise returns null
         /// </returns>
-        private FieldInfo FindField(string fieldName, object change)
+        private static FieldInfo FindField(string fieldName, object change)
         {
             Type changeType = change.GetType();
 
@@ -148,7 +148,7 @@ namespace DdpNet.Collections
         /// <returns>
         /// The PropertyInfo if found, otherwise returns null
         /// </returns>
-        private PropertyInfo FindProperty(string propertyName, object change)
+        private static PropertyInfo FindProperty(string propertyName, object change)
         {
             Type changeType = change.GetType();
 

@@ -76,19 +76,19 @@ namespace DdpNet.Results
         /// <summary>
         /// Handles a message received from the server
         /// </summary>
-        /// <param name="returnedObject">
+        /// <param name="messageReturned">
         /// The returned object.
         /// </param>
-        internal override void HandleReturnObject(ReturnedObject returnedObject)
+        internal override void HandleReturnObject(ReturnedObject messageReturned)
         {
-            if (returnedObject.MessageType == "result" && ((string)returnedObject.ParsedObject["id"]) == this.methodId)
+            if (messageReturned.MessageType == "result" && ((string)messageReturned.ParsedObject["id"]) == this.methodId)
             {
                 this.resultCalled = true;
-                this.returnedObject = returnedObject;
+                this.returnedObject = messageReturned;
             }
-            else if (returnedObject.MessageType == "updated")
+            else if (messageReturned.MessageType == "updated")
             {
-                var updatedObject = returnedObject.ParsedObject.ToObject<Updated>();
+                var updatedObject = messageReturned.ParsedObject.ToObject<Updated>();
 
                 if (updatedObject.Methods.Contains(this.methodId))
                 {

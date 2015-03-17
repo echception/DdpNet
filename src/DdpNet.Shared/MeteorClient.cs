@@ -149,10 +149,11 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="Task"/> which completes when the server returns the result of the login attempt.
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "Using the same terms Meteor does")]
         public Task LoginPassword(string userName, string password)
         {
-            Exceptions.ThrowIfNullOrWhitespace(userName, "userName");
-            Exceptions.ThrowIfNullOrWhitespace(password, "password");
+            Exceptions.ThrowIfNullOrWhiteSpace(userName, "userName");
+            Exceptions.ThrowIfNullOrWhiteSpace(password, "password");
 
             var passwordParameter = Utilities.GetPassword(password);
             var userParameter = new UserLogin(userName);
@@ -171,9 +172,10 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="Task"/> which completes when the server returns the result of the resume attempt
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "Using same terms as Meteor")]
         public Task LoginResumeSession(string token)
         {
-            Exceptions.ThrowIfNullOrWhitespace(token, "token");
+            Exceptions.ThrowIfNullOrWhiteSpace(token, "token");
 
             var loginResume = new LoginResume(token);
 
@@ -186,6 +188,7 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="Task"/>, which completes when the server returns the result of the logout
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout", Justification = "Using same terms Meteor does")]
         public Task Logout()
         {
             return this.CallLogoutMethod();
@@ -234,6 +237,7 @@ namespace DdpNet
         /// <param name="propertyName">
         /// The property name.
         /// </param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Default parameter needed for the CallerMemberNameAttribute")]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler1 = this.PropertyChanged;

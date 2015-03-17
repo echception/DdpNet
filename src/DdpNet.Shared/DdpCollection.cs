@@ -85,7 +85,7 @@ namespace DdpNet
             : this(new ObservableCollection<T>())
         {
             Exceptions.ThrowIfNull(client, "client");
-            Exceptions.ThrowIfNullOrWhitespace(collectionName, "collectionName");
+            Exceptions.ThrowIfNullOrWhiteSpace(collectionName, "collectionName");
 
             this.CollectionName = collectionName;
             this.client = client;
@@ -205,7 +205,7 @@ namespace DdpNet
         /// </returns>
         public Task<bool> RemoveAsync(string id)
         {
-            Exceptions.ThrowIfNullOrWhitespace(id, "id");
+            Exceptions.ThrowIfNullOrWhiteSpace(id, "id");
 
             var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/remove", this.CollectionName);
             return this.CallConvertNumberToBool(methodName, new IdParameter(id));
@@ -226,7 +226,7 @@ namespace DdpNet
         public Task<bool> UpdateAsync(string id, object fieldsToUpdate)
         {
             Exceptions.ThrowIfNull(fieldsToUpdate, "fieldsToUpdate");
-            Exceptions.ThrowIfNullOrWhitespace(id, "id");
+            Exceptions.ThrowIfNullOrWhiteSpace(id, "id");
 
             var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/update", this.CollectionName);
             var selector = new IdParameter(id);

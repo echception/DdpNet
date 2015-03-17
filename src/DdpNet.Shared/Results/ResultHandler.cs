@@ -128,6 +128,7 @@ namespace DdpNet.Results
         /// <returns>
         /// The registered WaitHandle
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "RegisteredResultWait will manage the lifetime of the ManualResetEvent")]
         public WaitHandle RegisterWaitHandler(ResultFilter filter)
         {
             var waitEvent = new ManualResetEvent(false);
@@ -151,6 +152,7 @@ namespace DdpNet.Results
         /// <returns>
         /// Task that completes when the result of a function call is returned
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "WaitHandle", Justification = "WaitHandle is a valid class name")]
         public Task<ReturnedObject> WaitForResult(WaitHandle waitHandle)
         {
             RegisteredResultWait wait;

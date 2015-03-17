@@ -99,7 +99,7 @@ namespace DdpNet
         /// </param>
         internal void OnAdded(string id, SynchronizationContext synchronizationContext)
         {
-            Exceptions.ThrowIfNullOrWhitespace(id, "id");
+            Exceptions.ThrowIfNullOrWhiteSpace(id, "id");
 
             this.Id = id;
             this.SynchronizationContext = synchronizationContext;

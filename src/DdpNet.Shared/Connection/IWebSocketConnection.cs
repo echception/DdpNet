@@ -9,12 +9,13 @@
 
 namespace DdpNet.Connection
 {
+    using System;
     using System.Threading.Tasks;
 
     /// <summary>
     /// The WebSocketConnection interface, which supports WebSocket operations 
     /// </summary>
-    public interface IWebSocketConnection
+    public interface IWebSocketConnection : IDisposable
     {
         #region Public Methods and Operators
 

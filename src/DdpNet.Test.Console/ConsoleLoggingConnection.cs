@@ -45,5 +45,10 @@
             Console.WriteLine(message);
             Console.ForegroundColor = oldColor;
         }
+
+        public void Dispose()
+        {
+            
+        }
     }
 }

@@ -1,24 +1,70 @@
-﻿namespace DdpNet
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WebSocketConnection.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The web socket connection.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace DdpNet
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Text;
-    using System.Threading;
     using System.Threading.Tasks;
+
+    using DdpNet.Connection;
+
     using Windows.Networking.Sockets;
     using Windows.Storage.Streams;
-    using Connection;
-    using UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding;
 
+    /// <summary>
+    /// The web socket connection.
+    /// </summary>
     internal class WebSocketConnection : IWebSocketConnection
     {
-        private MessageWebSocket messageWebSocket;
+        #region Fields
+
+        /// <summary>
+        /// The server uri.
+        /// </summary>
         private readonly Uri serverUri;
 
+        /// <summary>
+        /// Indicates if this has been disposed
+        /// </summary>
+        private bool disposed = false;
+
+        /// <summary>
+        /// The message web socket.
+        /// </summary>
+        private MessageWebSocket messageWebSocket;
+
+        /// <summary>
+        /// The receive queue.
+        /// </summary>
+        private BlockingCollection<string> receiveQueue;
+
+        /// <summary>
+        /// The send queue.
+        /// </summary>
         private BlockingCollection<string> sendQueue;
-        private BlockingCollection<string> receiveQueue; 
+
+        /// <summary>
+        /// The sending thread.
+        /// </summary>
         private Task sendingThread;
 
+        #endregion
+
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebSocketConnection"/> class.
+        /// </summary>
+        /// <param name="serverUri">
+        /// The server uri.
+        /// </param>
         public WebSocketConnection(Uri serverUri)
         {
             this.serverUri = serverUri;
@@ -28,27 +74,25 @@
             this.receiveQueue = new BlockingCollection<string>();
         }
 
-        public async Task ConnectAsync()
+        /// <summary>
+        /// Finalizes an instance of the <see cref="WebSocketConnection"/> class. 
+        /// Finalizer to cleanup resources
+        /// </summary>
+        ~WebSocketConnection()
         {
-            this.messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-            this.messageWebSocket.MessageReceived += MessageWebSocketOnMessageReceived;
-
-            await this.messageWebSocket.ConnectAsync(this.serverUri);
-            
-            this.sendingThread = new Task(this.BackgroundSend, TaskCreationOptions.LongRunning);
-            this.sendingThread.Start();
+            this.Dispose(false);
         }
 
-        private void MessageWebSocketOnMessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
-        {
-            using (var reader = args.GetDataReader())
-            {
-                reader.UnicodeEncoding = UnicodeEncoding.Utf8;
-                var stringRead = reader.ReadString(reader.UnconsumedBufferLength);
-                this.receiveQueue.Add(stringRead);
-            }
-        }
+        #endregion
 
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// The close async.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public Task CloseAsync()
         {
             this.sendQueue.CompleteAdding();
@@ -57,17 +101,86 @@
             return Task.FromResult(true);
         }
 
+        /// <summary>
+        /// The connect async.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task ConnectAsync()
+        {
+            this.messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+            this.messageWebSocket.MessageReceived += this.MessageWebSocketOnMessageReceived;
+
+            await this.messageWebSocket.ConnectAsync(this.serverUri);
+
+            this.sendingThread = new Task(this.BackgroundSend, TaskCreationOptions.LongRunning);
+            this.sendingThread.Start();
+        }
+
+        /// <summary>
+        /// Cleanup resources
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// The receive async.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public Task<string> ReceiveAsync()
+        {
+            return Task.Run(() => this.receiveQueue.Take());
+        }
+
+        /// <summary>
+        /// The send async.
+        /// </summary>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public Task SendAsync(string text)
         {
             this.sendQueue.Add(text);
             return Task.FromResult(true);
         }
 
-        public Task<string> ReceiveAsync()
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Cleanup resources
+        /// </summary>
+        /// <param name="disposing">
+        /// True if called from user code, false if called from the finalizer
+        /// </param>
+        protected virtual void Dispose(bool disposing)
         {
-            return Task.Run(() => this.receiveQueue.Take());
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.messageWebSocket.Dispose();
+                    this.receiveQueue.Dispose();
+                    this.sendQueue.Dispose();
+                }
+
+                this.disposed = true;
+            }
         }
 
+        /// <summary>
+        /// The background send.
+        /// </summary>
         private async void BackgroundSend()
         {
             DataWriter messageWriter = new DataWriter(this.messageWebSocket.OutputStream);
@@ -79,5 +192,28 @@
                 await messageWriter.StoreAsync();
             }
         }
+
+        /// <summary>
+        /// The message web socket on message received.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void MessageWebSocketOnMessageReceived(
+            MessageWebSocket sender, 
+            MessageWebSocketMessageReceivedEventArgs args)
+        {
+            using (var reader = args.GetDataReader())
+            {
+                reader.UnicodeEncoding = UnicodeEncoding.Utf8;
+                var stringRead = reader.ReadString(reader.UnconsumedBufferLength);
+                this.receiveQueue.Add(stringRead);
+            }
+        }
+
+        #endregion
     }
 }

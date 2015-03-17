@@ -88,6 +88,7 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="string"/> representation.
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.DateTime.ToString(System.String)", Justification = "Mirroring the DateTime ToString methods")]
         public string ToString(string format)
         {
             return this.DateTime.ToString(format);

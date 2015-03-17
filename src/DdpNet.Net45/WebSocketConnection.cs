@@ -6,7 +6,6 @@
 //   Contains the WebSocketConnection class
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace DdpNet
 {
     using System;
@@ -21,7 +20,7 @@ namespace DdpNet
     /// <summary>
     /// Implementation of IWebSocketConnection that uses the .NET 4.5 ClientWebSocket class for communication
     /// </summary>
-    internal class WebSocketConnection : IWebSocketConnection
+    internal class WebSocketConnection : IWebSocketConnection, IDisposable
     {
         #region Fields
 
@@ -39,6 +38,11 @@ namespace DdpNet
         /// The read buffer.
         /// </summary>
         private ArraySegment<byte> buffer;
+
+        /// <summary>
+        /// Indicates if the object has been disposed
+        /// </summary>
+        private bool disposed = false;
 
         /// <summary>
         /// The send queue.
@@ -71,6 +75,14 @@ namespace DdpNet
             this.buffer = new ArraySegment<byte>(new byte[1024]);
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="WebSocketConnection"/> class. 
+        /// </summary>
+        ~WebSocketConnection()
+        {
+            this.Dispose(false);
+        }
+
         #endregion
 
         #region Public Methods and Operators
@@ -98,6 +110,15 @@ namespace DdpNet
             await this.client.ConnectAsync(this.serverUri, CancellationToken.None);
             this.sendingThread = new Task(this.BackgroundSend, TaskCreationOptions.LongRunning);
             this.sendingThread.Start();
+        }
+
+        /// <summary>
+        /// Disposes of resources
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -141,6 +162,26 @@ namespace DdpNet
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Cleanup resources
+        /// </summary>
+        /// <param name="disposing">
+        /// True if Dispose has been called from user code, false if called from the finalizer
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.sendQueue.Dispose();
+                    this.client.Dispose();
+                }
+
+                this.disposed = true;
+            }
+        }
 
         /// <summary>
         /// The background send method. Will continually take items from the BlockingCollection and send them over the client connection

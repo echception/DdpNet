@@ -71,5 +71,10 @@
                 this.receiveQueue.Enqueue(message);
             }
         }
+
+        public void Dispose()
+        {
+           
+        }
     }
 }

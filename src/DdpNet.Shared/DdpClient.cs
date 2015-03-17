@@ -6,28 +6,26 @@
 //   Defines the DdpClient type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace DdpNet
 {
     using System;
     using System.Threading.Tasks;
-    using Collections;
-    using Connection;
-    using MessageHandlers;
-    using Messages;
+
+    using DdpNet.Collections;
+    using DdpNet.Connection;
+    using DdpNet.MessageHandlers;
+    using DdpNet.Messages;
+    using DdpNet.Results;
+
     using Newtonsoft.Json;
-    using Results;
 
     /// <summary>
     /// A client for communicating with a DDP server.  This implements only the DDP protocol, it does not include account methods.
     /// For the account method, use the MeteorClient
     /// </summary>
-    public class DdpClient : IDdpConnectionSender, IDdpRemoteMethodCall
+    public class DdpClient : IDdpConnectionSender, IDdpRemoteMethodCall, IDisposable
     {
-        /// <summary>
-        /// The versions this client supports
-        /// </summary>
-        private readonly string[] supportedVersions = new[] { "1" };
+        #region Fields
 
         /// <summary>
         /// The preferred version for the client
@@ -35,9 +33,24 @@ namespace DdpNet
         private readonly string preferredVersion = "1";
 
         /// <summary>
+        /// The versions this client supports
+        /// </summary>
+        private readonly string[] supportedVersions = new[] { "1" };
+
+        /// <summary>
         /// The web socket connection.
         /// </summary>
         private readonly IWebSocketConnection webSocketConnection;
+
+        /// <summary>
+        /// Indicates if the object has been disposed
+        /// </summary>
+        private bool disposed = false;
+
+        /// <summary>
+        /// The MessageHandler for handling incoming messages
+        /// </summary>
+        private MessageHandler handler;
 
         /// <summary>
         /// The background task that processes incoming messages
@@ -49,10 +62,9 @@ namespace DdpNet
         /// </summary>
         private DdpClientState state;
 
-        /// <summary>
-        /// The MessageHandler for handling incoming messages
-        /// </summary>
-        private MessageHandler handler;
+        #endregion
+
+        #region Constructors and Destructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DdpClient"/> class.
@@ -60,7 +72,8 @@ namespace DdpNet
         /// <param name="serverUri">
         /// The server uri.
         /// </param>
-        public DdpClient(Uri serverUri) : this(new WebSocketConnection(serverUri))
+        public DdpClient(Uri serverUri)
+            : this(new WebSocketConnection(serverUri))
         {
         }
 
@@ -80,9 +93,27 @@ namespace DdpNet
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="DdpClient"/> class. 
+        /// Finalizer to cleanup resources
+        /// </summary>
+        ~DdpClient()
+        {
+            this.Dispose(false);
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
         /// Gets the current DDP session ID. This will be set after a successful connection
         /// </summary>
         internal string SessionId { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the CollectionManager for this client
+        /// </summary>
+        private CollectionManager CollectionManager { get; set; }
 
         /// <summary>
         /// Gets or sets the ResultHandler for handling results
@@ -91,10 +122,50 @@ namespace DdpNet
         /// </summary>
         private ResultHandler ResultHandler { get; set; }
 
+        #endregion
+
+        #region Public Methods and Operators
+
         /// <summary>
-        /// Gets or sets the CollectionManager for this client
+        /// Calls a method on the server with the given parameters
         /// </summary>
-        private CollectionManager CollectionManager { get; set; }
+        /// <param name="methodName">
+        /// The name of the server method to call
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to pass to the method
+        /// </param>
+        /// <returns>
+        /// Task that completes when the method has been fully processed
+        /// </returns>
+        public Task Call(string methodName, params object[] parameters)
+        {
+            this.VerifyConnected();
+
+            return this.CallGetResult(methodName, parameters);
+        }
+
+        /// <summary>
+        /// Calls a method on the server with the given parameters, and returns the result
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the return value
+        /// </typeparam>
+        /// <param name="methodName">
+        /// The name of the server method to call
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to pass to the method
+        /// </param>
+        /// <returns>
+        /// Task that completes when the method has been fully processed, and the result is available
+        /// </returns>
+        public Task<T> Call<T>(string methodName, params object[] parameters)
+        {
+            this.VerifyConnected();
+
+            return this.CallParseResult<T>(methodName, parameters);
+        }
 
         /// <summary>
         /// Connect the client to the server. This must be called prior to any other DdpClient methods.
@@ -110,10 +181,10 @@ namespace DdpNet
             await this.webSocketConnection.ConnectAsync();
 
             var connectMessage = new Connect
-            {
-                Version = this.preferredVersion,
-                VersionsSupported = this.supportedVersions
-            };
+                                     {
+                                         Version = this.preferredVersion, 
+                                         VersionsSupported = this.supportedVersions
+                                     };
 
             var waitHandle = this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateConnectResultFilter());
 
@@ -136,39 +207,46 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// Calls a method on the server with the given parameters
+        /// Cleanup resources
         /// </summary>
-        /// <param name="methodName">The name of the server method to call</param>
-        /// <param name="parameters">The parameters to pass to the method</param>
-        /// <returns>Task that completes when the method has been fully processed</returns>
-        public Task Call(string methodName, params object[] parameters)
+        public void Dispose()
         {
-            this.VerifyConnected();
-
-            return this.CallGetResult(methodName, parameters);
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        /// Calls a method on the server with the given parameters, and returns the result
+        /// Gets a typed collection. A collection name can have only one type.
         /// </summary>
-        /// <typeparam name="T">The type of the return value</typeparam>
-        /// <param name="methodName">The name of the server method to call</param>
-        /// <param name="parameters">The parameters to pass to the method</param>
-        /// <returns>Task that completes when the method has been fully processed, and the result is available</returns>
-        public Task<T> Call<T>(string methodName, params object[] parameters)
+        /// <typeparam name="T">
+        /// The type of the collection
+        /// </typeparam>
+        /// <param name="collectionName">
+        /// The name of the collection
+        /// </param>
+        /// <returns>
+        /// The typed collection. Note that the client will store objects in an un-typed state if it doesn't know the type.
+        /// Once this has been called with a type, it will convert the un-typed objects to a typed collection.
+        /// This means it is slightly faster to call GetCollection prior to a collection having objects added (i.e. prior to subscribing)
+        /// </returns>
+        public DdpCollection<T> GetCollection<T>(string collectionName) where T : DdpObject
         {
-            this.VerifyConnected();
-
-            return this.CallParseResult<T>(methodName, parameters);
+            return this.CollectionManager.GetCollection<T>(collectionName);
         }
 
         /// <summary>
         /// Subscribes to a subscription with the given parameters
         /// </summary>
-        /// <param name="subscriptionName">The name of the subscription</param>
-        /// <param name="parameters">The parameters to subscript with</param>
-        /// <returns>Task that completes when the subscription is complete (client has all the objects in the subscription).
-        /// Return object is a handle to the subscription that can be passed to Unsubscribe </returns>
+        /// <param name="subscriptionName">
+        /// The name of the subscription
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to subscript with
+        /// </param>
+        /// <returns>
+        /// Task that completes when the subscription is complete (client has all the objects in the subscription).
+        /// Return object is a handle to the subscription that can be passed to Unsubscribe 
+        /// </returns>
         public Task<Subscription> Subscribe(string subscriptionName, params object[] parameters)
         {
             this.VerifyConnected();
@@ -179,35 +257,38 @@ namespace DdpNet
         /// <summary>
         /// Unsubscribes from a subscription.
         /// </summary>
-        /// <param name="subscription">The subscription to unsubscribe</param>
-        /// <returns>Task that completes when the unsubscribe is complete (client has removed all objects in the subscription)</returns>
+        /// <param name="subscription">
+        /// The subscription to unsubscribe
+        /// </param>
+        /// <returns>
+        /// Task that completes when the unsubscribe is complete (client has removed all objects in the subscription)
+        /// </returns>
         public Task Unsubscribe(Subscription subscription)
         {
             return this.UnsubscribeInternal(subscription);
         }
 
-        /// <summary>
-        /// Gets a typed collection. A collection name can have only one type.
-        /// </summary>
-        /// <typeparam name="T">The type of the collection</typeparam>
-        /// <param name="collectionName">The name of the collection</param>
-        /// <returns>The typed collection. Note that the client will store objects in an un-typed state if it doesn't know the type.
-        /// Once this has been called with a type, it will convert the un-typed objects to a typed collection.
-        /// This means it is slightly faster to call GetCollection prior to a collection having objects added (i.e. prior to subscribing)</returns>
-        public DdpCollection<T> GetCollection<T>(string collectionName) where T : DdpObject
-        {
-            return this.CollectionManager.GetCollection<T>(collectionName);
-        }
+        #endregion
+
+        #region Explicit Interface Methods
 
         /// <summary>
         /// Serializes an object and sends the serialized form to the server.
         /// </summary>
-        /// <param name="objectToSend">The object to serialize and send</param>
-        /// <returns>Task that completes when the object has been serialized and queued for sending</returns>
+        /// <param name="objectToSend">
+        /// The object to serialize and send
+        /// </param>
+        /// <returns>
+        /// Task that completes when the object has been serialized and queued for sending
+        /// </returns>
         Task IDdpConnectionSender.SendObject(object objectToSend)
         {
             return this.webSocketConnection.SendAsync(JsonConvert.SerializeObject(objectToSend));
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Waits for a single message to be received, and processes that message.
@@ -224,27 +305,22 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// Serializes an object and sends the serialized form to the server.
+        /// Cleanup resources
         /// </summary>
-        /// <param name="objectToSend">The object to serialize and send</param>
-        /// <returns>Task that completes when the object has been serialized and queued for sending</returns>
-        private Task SendObject(object objectToSend)
+        /// <param name="disposing">
+        /// True if dispose was called from user code, false if called from the finalizer
+        /// </param>
+        protected virtual void Dispose(bool disposing)
         {
-            return ((IDdpConnectionSender)this).SendObject(objectToSend);
-        }
-
-        /// <summary>
-        /// Sets the client's current Session ID
-        /// </summary>
-        /// <param name="session">The current Session ID</param>
-        private void SetSession(string session)
-        {
-            if (!string.IsNullOrWhiteSpace(this.SessionId))
+            if (!this.disposed)
             {
-                throw new InvalidOperationException("Session has already been set.");
-            }
+                if (disposing)
+                {
+                    this.webSocketConnection.Dispose();
+                }
 
-            this.SessionId = session;
+                this.disposed = true;
+            }
         }
 
         /// <summary>
@@ -259,24 +335,111 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// Verifies the client is connected. Throws an exception if the client is not connected
+        /// Calls a method on the server, with the given parameters
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ConnectAsync", Justification = "Async is a valid word in this context")]
-        private void VerifyConnected()
+        /// <param name="methodName">
+        /// Name of the method to call
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to call the method with
+        /// </param>
+        /// <returns>
+        /// Task that completes when the method call is complete (server returns a value for the call).
+        /// Return object is the object returned from the server, in an unparsed form.
+        /// </returns>
+        private async Task<Result> CallGetResult(string methodName, object[] parameters)
         {
-            if (this.state != DdpClientState.Connected)
+            var id = Utilities.GenerateId();
+
+            var resultWaitHandler =
+                this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));
+
+            var method = new Method() { MethodName = methodName, Parameters = parameters, Id = id };
+            await this.SendObject(method);
+
+            var result = await this.ResultHandler.WaitForResult(resultWaitHandler);
+
+            var resultObject = JsonConvert.DeserializeObject<Result>(result.Message);
+
+            if (resultObject.Error != null)
             {
-                throw new InvalidOperationException("ConnectAsync() must be called before any client methods can be called");
+                throw new DdpServerException(resultObject.Error);
             }
+
+            return resultObject;
+        }
+
+        /// <summary>
+        /// Calls a method on the server, and parses the return value to the specified type
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type to parse the return object to
+        /// </typeparam>
+        /// <param name="methodName">
+        /// The name of the method to call
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to call the method with
+        /// </param>
+        /// <returns>
+        /// Task that completes when the method call is complete (server returns a value for the call).
+        /// Return object is the object returned from the server, parsed to the given type.
+        /// </returns>
+        private async Task<T> CallParseResult<T>(string methodName, object[] parameters)
+        {
+            var resultObject = await this.CallGetResult(methodName, parameters);
+
+            if (resultObject.ResultObject == null)
+            {
+                throw new InvalidOperationException("Server did not return an object when a return value was expected");
+            }
+
+            return resultObject.ResultObject.ToObject<T>();
+        }
+
+        /// <summary>
+        /// Serializes an object and sends the serialized form to the server.
+        /// </summary>
+        /// <param name="objectToSend">
+        /// The object to serialize and send
+        /// </param>
+        /// <returns>
+        /// Task that completes when the object has been serialized and queued for sending
+        /// </returns>
+        private Task SendObject(object objectToSend)
+        {
+            return ((IDdpConnectionSender)this).SendObject(objectToSend);
+        }
+
+        /// <summary>
+        /// Sets the client's current Session ID
+        /// </summary>
+        /// <param name="session">
+        /// The current Session ID
+        /// </param>
+        private void SetSession(string session)
+        {
+            if (!string.IsNullOrWhiteSpace(this.SessionId))
+            {
+                throw new InvalidOperationException("Session has already been set.");
+            }
+
+            this.SessionId = session;
         }
 
         /// <summary>
         /// Subscribes to a subscription with the given parameters
         /// </summary>
-        /// <param name="subscriptionName">The name of the subscription</param>
-        /// <param name="parameters">The parameters to subscribe with</param>
-        /// <returns>Task that completes when the subscription is complete (all objects are synced to the client).
-        /// Return object is a handle to the subscription</returns>
+        /// <param name="subscriptionName">
+        /// The name of the subscription
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters to subscribe with
+        /// </param>
+        /// <returns>
+        /// Task that completes when the subscription is complete (all objects are synced to the client).
+        /// Return object is a handle to the subscription
+        /// </returns>
         private async Task<Subscription> SubscribeWithParameters(string subscriptionName, object[] parameters)
         {
             var id = Utilities.GenerateId();
@@ -304,8 +467,12 @@ namespace DdpNet
         /// <summary>
         /// Unsubscribes from a subscription
         /// </summary>
-        /// <param name="subscription">The subscription to unsubscribe from</param>
-        /// <returns>Task that completes when the unsubscribe is complete (all objects in the subscription are removed from the client store)</returns>
+        /// <param name="subscription">
+        /// The subscription to unsubscribe from
+        /// </param>
+        /// <returns>
+        /// Task that completes when the unsubscribe is complete (all objects in the subscription are removed from the client store)
+        /// </returns>
         private async Task UnsubscribeInternal(Subscription subscription)
         {
             var unsubscribe = new Unsubscribe(subscription.Id);
@@ -327,52 +494,20 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// Calls a method on the server, and parses the return value to the specified type
+        /// Verifies the client is connected. Throws an exception if the client is not connected
         /// </summary>
-        /// <typeparam name="T">The type to parse the return object to</typeparam>
-        /// <param name="methodName">The name of the method to call</param>
-        /// <param name="parameters">The parameters to call the method with</param>
-        /// <returns>Task that completes when the method call is complete (server returns a value for the call).
-        /// Return object is the object returned from the server, parsed to the given type.</returns>
-        private async Task<T> CallParseResult<T>(string methodName, object[] parameters)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", 
+            "CA2204:Literals should be spelled correctly", MessageId = "ConnectAsync", 
+            Justification = "Async is a valid word in this context")]
+        private void VerifyConnected()
         {
-            var resultObject = await this.CallGetResult(methodName, parameters);
-
-            if (resultObject.ResultObject == null)
+            if (this.state != DdpClientState.Connected)
             {
-                throw new InvalidOperationException("Server did not return an object when a return value was expected");
+                throw new InvalidOperationException(
+                    "ConnectAsync() must be called before any client methods can be called");
             }
-
-            return resultObject.ResultObject.ToObject<T>();
         }
 
-        /// <summary>
-        /// Calls a method on the server, with the given parameters
-        /// </summary>
-        /// <param name="methodName">Name of the method to call</param>
-        /// <param name="parameters">The parameters to call the method with</param>
-        /// <returns>Task that completes when the method call is complete (server returns a value for the call).
-        /// Return object is the object returned from the server, in an unparsed form.</returns>
-        private async Task<Result> CallGetResult(string methodName, object[] parameters)
-        {
-            var id = Utilities.GenerateId();
-
-            var resultWaitHandler =
-                this.ResultHandler.RegisterWaitHandler(ResultFilterFactory.CreateCallResultFilter(id));
-
-            var method = new Method() { MethodName = methodName, Parameters = parameters, Id = id };
-            await this.SendObject(method);
-
-            var result = await this.ResultHandler.WaitForResult(resultWaitHandler);
-
-            var resultObject = JsonConvert.DeserializeObject<Result>(result.Message);
-
-            if (resultObject.Error != null)
-            {
-                throw new DdpServerException(resultObject.Error);
-            }
-
-            return resultObject;
-        }
+        #endregion
     }
 }

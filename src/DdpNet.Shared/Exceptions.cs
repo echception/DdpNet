@@ -48,7 +48,7 @@ namespace DdpNet
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when the value is null or whitespace
         /// </exception>
-        public static void ThrowIfNullOrWhitespace(string value, string parameterName)
+        public static void ThrowIfNullOrWhiteSpace(string value, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

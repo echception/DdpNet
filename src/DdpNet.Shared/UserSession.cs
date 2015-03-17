@@ -52,7 +52,7 @@ namespace DdpNet
         /// Gets or sets when the token expires.
         /// </summary>
         [JsonProperty(PropertyName = "tokenExpires")]
-        private DdpDate TokenExpires { get; set; }
+        public DdpDate TokenExpires { get; set; }
 
         #endregion
     }

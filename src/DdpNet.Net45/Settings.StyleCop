@@ -2,21 +2,15 @@
   <GlobalSettings>
     <CollectionProperty Name="RecognizedWords">
       <Value>Ddp</Value>
+      <Value>finalizer</Value>
+      <Value>Finalizer</Value>
       <Value>Json</Value>
       <Value>nosub</Value>
       <Value>Untyped</Value>
     </CollectionProperty>
   </GlobalSettings>
-  <Analyzers>
-    <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
-      <AnalyzerSettings>
-        <StringProperty Name="CompanyName">Chris Amert</StringProperty>
-        <StringProperty Name="Copyright">Copyright (c) 2015</StringProperty>
-      </AnalyzerSettings>
-    </Analyzer>
-  </Analyzers>
   <Parsers>
-    <Parser ParserId="Microsoft.StyleCop.CSharp.CsParser">
+    <Parser ParserId="StyleCop.CSharp.CsParser">
       <ParserSettings>
         <BooleanProperty Name="AnalyzeDesignerFiles">False</BooleanProperty>
         <CollectionProperty Name="GeneratedFileFilters">
@@ -28,4 +22,12 @@
       </ParserSettings>
     </Parser>
   </Parsers>
+  <Analyzers>
+    <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
+      <AnalyzerSettings>
+        <StringProperty Name="CompanyName">Chris Amert</StringProperty>
+        <StringProperty Name="Copyright">Copyright (c) 2015</StringProperty>
+      </AnalyzerSettings>
+    </Analyzer>
+  </Analyzers>
 </StyleCopSettings>

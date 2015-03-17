@@ -14,6 +14,7 @@ namespace DdpNet
     /// <summary>
     /// Data object sent to the server to resume a previous session
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification = "Using the same terms Meteor does")]
     public class LoginResume
     {
         #region Constructors and Destructors

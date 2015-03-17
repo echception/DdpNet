@@ -67,19 +67,19 @@ namespace DdpNet.Results
         /// <summary>
         /// The handle return object.
         /// </summary>
-        /// <param name="returnedObject">
+        /// <param name="returnedMessage">
         /// The returned object.
         /// </param>
-        internal override void HandleReturnObject(ReturnedObject returnedObject)
+        internal override void HandleReturnObject(ReturnedObject returnedMessage)
         {
-            if (returnedObject.MessageType == "nosub")
+            if (returnedMessage.MessageType == "nosub")
             {
-                var noSubObject = returnedObject.ParsedObject.ToObject<NoSubscribe>();
+                var noSubObject = returnedMessage.ParsedObject.ToObject<NoSubscribe>();
 
                 if (noSubObject.ID == this.subscriptionId)
                 {
                     this.nosubCalled = true;
-                    this.returnedObject = returnedObject;
+                    this.returnedObject = returnedMessage;
                 }
             }
         }

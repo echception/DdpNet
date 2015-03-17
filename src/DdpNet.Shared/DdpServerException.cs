@@ -10,12 +10,14 @@
 namespace DdpNet
 {
     using System;
+    using System.Globalization;
 
     using DdpNet.ReturnedObjects;
 
     /// <summary>
     /// Wraps errors returned from the DDP server
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "Serializable is not available in WinRT")]
     public class DdpServerException : Exception
     {
         #region Constructors and Destructors
@@ -29,7 +31,8 @@ namespace DdpNet
         internal DdpServerException(Error error)
             : base(
                 string.Format(
-                    "Server returned an error {0}. Details: {1}. Reason: {2}", 
+                    CultureInfo.CurrentCulture,
+                    "Server returned an error {0}. Details: {1}. Reason: {2}",
                     error.ErrorMessage, 
                     error.Details, 
                     error.Reason))

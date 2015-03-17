@@ -10,6 +10,7 @@
 namespace DdpNet
 {
     using System;
+    using System.Globalization;
     using System.Text;
 
     using DdpNet.ParameterObjects;
@@ -52,7 +53,7 @@ namespace DdpNet
 
             foreach (var x in hashedPassword)
             {
-                hashedString += string.Format("{0:x2}", x);
+                hashedString += string.Format(CultureInfo.InvariantCulture, "{0:x2}", x);
             }
 
             return new Password(hashedString, "sha-256");
