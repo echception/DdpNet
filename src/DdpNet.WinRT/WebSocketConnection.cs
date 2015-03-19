@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebSocketConnection.cs" company="">
-//   
+// <copyright file="WebSocketConnection.cs" company="Chris Amert">
+//   Copyright (c) 2015
 // </copyright>
 // <summary>
-//   The web socket connection.
+//   Contains the WebSocketConnection class
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace DdpNet
     using Windows.Storage.Streams;
 
     /// <summary>
-    /// The web socket connection.
+    /// Implementation of IWebSocketConnection for WinRT
     /// </summary>
     internal class WebSocketConnection : IWebSocketConnection
     {
@@ -88,7 +88,7 @@ namespace DdpNet
         #region Public Methods and Operators
 
         /// <summary>
-        /// The close async.
+        /// Closes the connection
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -102,7 +102,7 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// The connect async.
+        /// Starts the connection
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -128,7 +128,7 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// The receive async.
+        /// The background receive thread entry point
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -139,10 +139,10 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// The send async.
+        /// Sends an item to the server
         /// </summary>
         /// <param name="text">
-        /// The text.
+        /// The text to send.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -179,7 +179,7 @@ namespace DdpNet
         }
 
         /// <summary>
-        /// The background send.
+        /// The background send method.
         /// </summary>
         private async void BackgroundSend()
         {

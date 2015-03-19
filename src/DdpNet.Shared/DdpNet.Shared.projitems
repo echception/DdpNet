@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Connection\IWebSocketConnection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DdpServerException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDdpRemoteMethodCall.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoginResume.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ChangedHandler.cs" />
@@ -81,5 +82,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="$(MSBuildThisFileDirectory)CustomDictionary.xml" />
   </ItemGroup>
 </Project>
