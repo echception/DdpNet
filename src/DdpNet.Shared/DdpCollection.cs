@@ -127,7 +127,7 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="Task"/> will complete the add is completed on the server, and if necessary, changes are synced to this client.
         /// </returns>
-        public Task AddAsync(T item)
+        public async Task<string> AddAsync(T item)
         {
             Exceptions.ThrowIfNull(item, "item");
 
@@ -137,7 +137,9 @@ namespace DdpNet
             }
 
             var methodName = string.Format(CultureInfo.InvariantCulture, @"/{0}/insert", this.CollectionName);
-            return this.client.Call(methodName, item);
+            await this.client.Call(methodName, item);
+
+            return item.Id;
         }
 
         /// <summary>

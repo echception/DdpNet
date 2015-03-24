@@ -36,12 +36,12 @@
         }
 
         [TestMethod]
-        public void DdpCollection_AddAsync_NullItem()
+        public async Task DdpCollection_AddAsync_NullItem()
         {
             var remoteMethodCall = new Mock<IDdpRemoteMethodCall>();
             var collection = new DdpCollection<TestDdpObject>(remoteMethodCall.Object, "TestCollection");
 
-            PCLTesting.ExceptionAssert.Throws<ArgumentNullException>(() => collection.AddAsync(null));
+            ExceptionAssert.ExpectAggregateException(() => collection.AddAsync(null).Wait(), typeof(ArgumentNullException));
         }
 
         [TestMethod]

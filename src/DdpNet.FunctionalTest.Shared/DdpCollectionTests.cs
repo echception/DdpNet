@@ -37,6 +37,27 @@
 
         [TestMethod]
         [TestCategory("Functional")]
+        public async Task DdpCollection_Add_ReturnsItemID()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
+
+            var firstEntry = new Entry() { Count = 12, IsActive = false, Name = "FirstEntry" };
+
+            string id = await entryCollection.AddAsync(firstEntry);
+
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(id));
+
+            var itemAdded = entryCollection.Single(x => x.Id == id);
+
+            Assert.IsNotNull(itemAdded);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
         public async Task DdpCollection_Remove_ValidObject()
         {
             var meteorClient = TestEnvironment.GetClient();
