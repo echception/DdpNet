@@ -108,6 +108,38 @@
 
         [TestMethod]
         [TestCategory("Functional")]
+        public async Task DdpCollection_Update_DictionaryObject()
+        {
+            var meteorClient = TestEnvironment.GetClient();
+            await meteorClient.ConnectAsync();
+
+            var entryCollection = meteorClient.GetCollection<Entry>("entries");
+            await meteorClient.Subscribe("entries");
+
+            var entry = new Entry() { Count = 101, IsActive = true, Name = "Entry Name" };
+
+            await entryCollection.AddAsync(entry);
+
+            Dictionary<string, object> fieldsToUpdate = new Dictionary<string, object>()
+                                                            {
+                                                                { "Count", 102 },
+                                                                { "IsActive", false },
+                                                                { "Name", "New Name" }
+                                                            };
+
+            bool wasUpdated = await entryCollection.UpdateAsync(entry.Id, fieldsToUpdate);
+
+            Assert.IsTrue(wasUpdated);
+
+            var updatedEntry = entryCollection.Single(x => x.Id == entry.Id);
+
+            Assert.AreEqual(fieldsToUpdate["Count"], updatedEntry.Count);
+            Assert.AreEqual(fieldsToUpdate["IsActive"], updatedEntry.IsActive);
+            Assert.AreEqual(fieldsToUpdate["Name"], updatedEntry.Name);
+        }
+
+        [TestMethod]
+        [TestCategory("Functional")]
         public async Task DdpCollection_Added_RaisesCollectionChangedEvent()
         {
             var meteorClient = TestEnvironment.GetClient();
