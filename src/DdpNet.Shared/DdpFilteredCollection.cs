@@ -46,6 +46,11 @@ namespace DdpNet
         /// </summary>
         private readonly Func<T, bool> whereFilter;
 
+        /// <summary>
+        /// Used to lock the InternalCollection.
+        /// </summary>
+        private readonly object internalCollectionLock = new object();
+
         #endregion
 
         #region Constructors and Destructors
@@ -118,14 +123,17 @@ namespace DdpNet
                 return;
             }
 
-            if (this.sortComparison == null)
+            lock (this.internalCollectionLock)
             {
-                this.internalCollection.Add(item);
-            }
-            else
-            {
-                int insertIndex = this.FindIndexForItem(item);
-                this.internalCollection.Insert(insertIndex, item);
+                if (this.sortComparison == null)
+                {
+                    this.internalCollection.Add(item);
+                }
+                else
+                {
+                    int insertIndex = this.FindIndexForItem(item);
+                    this.internalCollection.Insert(insertIndex, item);
+                }
             }
         }
 
@@ -146,13 +154,21 @@ namespace DdpNet
                 }
                 else if (this.sortComparison != null)
                 {
-                    var newIndex = this.FindIndexForItem(item);
-                    if (this.internalCollection.IndexOf(item) < newIndex)
+                    lock (this.internalCollectionLock)
                     {
-                        newIndex--;
-                    }
+                        var newIndex = this.FindIndexForItem(item);
+                        if (this.internalCollection.IndexOf(item) < newIndex)
+                        {
+                            newIndex--;
+                        }
 
-                    this.internalCollection.Move(this.internalCollection.IndexOf(item), newIndex);
+                        var currentIndex = this.internalCollection.IndexOf(item);
+
+                        if (currentIndex != newIndex)
+                        {
+                            this.internalCollection.Move(currentIndex, newIndex);
+                        }
+                    }
                 }
             }
             else
@@ -169,7 +185,10 @@ namespace DdpNet
         /// </param>
         internal void OnRemoved(T item)
         {
-            this.internalCollection.Remove(item);
+            lock (this.internalCollectionLock)
+            {
+                this.internalCollection.Remove(item);
+            }
         }
 
         /// <summary>
@@ -300,7 +319,38 @@ namespace DdpNet
         /// </param>
         private void RaiseCollectionChanged(object param)
         {
-            base.OnCollectionChanged((NotifyCollectionChangedEventArgs)param);
+            var eventArgs = (NotifyCollectionChangedEventArgs)param;
+
+            lock (this.internalCollectionLock)
+            {
+                if (eventArgs.Action == NotifyCollectionChangedAction.Add)
+                {
+                    var itemAdded = (T)eventArgs.NewItems[0];
+                    var currentIndex = this.internalCollection.IndexOf(itemAdded);
+
+                    if (currentIndex != eventArgs.NewStartingIndex)
+                    {
+                        eventArgs = new NotifyCollectionChangedEventArgs(eventArgs.Action, eventArgs.NewItems, currentIndex);
+                    }
+                }
+                else if (eventArgs.Action == NotifyCollectionChangedAction.Move)
+                {
+                    var itemMoved = (T)eventArgs.NewItems[0];
+
+                    var currentIndex = this.internalCollection.IndexOf(itemMoved);
+
+                    if (currentIndex != eventArgs.NewStartingIndex)
+                    {
+                        eventArgs = new NotifyCollectionChangedEventArgs(
+                            eventArgs.Action,
+                            eventArgs.NewItems,
+                            currentIndex,
+                            eventArgs.OldStartingIndex);
+                    }
+                }
+            }
+
+            base.OnCollectionChanged(eventArgs);
         }
 
         /// <summary>
