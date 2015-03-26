@@ -29,7 +29,7 @@ namespace DdpNet
     /// The DdpClient will automatically sync changes to this collection
     /// </summary>
     /// <typeparam name="T">The type to parse the objects into</typeparam>
-    public class DdpCollection<T> : ReadOnlyObservableCollection<T>, IDdpCollection
+    public class DdpCollection<T> : ThreadSafeObservableCollection<T>, IDdpCollection
         where T : DdpObject
     {
         #region Fields
@@ -57,17 +57,6 @@ namespace DdpNet
         /// </summary>
         private readonly List<DdpFilteredCollection<T>> filteredCollections;
 
-        /// <summary>
-        /// The internal ObservableCollection. This is where changes, and is exposed through the ReadOnlyObservableCollection
-        /// this class inherits from
-        /// </summary>
-        private readonly ObservableCollection<T> internalList;
-
-        /// <summary>
-        /// The synchronization context. Ensures the Collection/Property changed events are always raised on the correct thread.
-        /// </summary>
-        private readonly SynchronizationContext synchronizationContext;
-
         #endregion
 
         #region Constructors and Destructors
@@ -82,27 +71,13 @@ namespace DdpNet
         /// The name of the collection
         /// </param>
         internal DdpCollection(IDdpRemoteMethodCall client, string collectionName)
-            : this(new ObservableCollection<T>())
         {
             Exceptions.ThrowIfNull(client, "client");
             Exceptions.ThrowIfNullOrWhiteSpace(collectionName, "collectionName");
 
             this.CollectionName = collectionName;
             this.client = client;
-            this.synchronizationContext = SynchronizationContext.Current;
             this.filteredCollections = new List<DdpFilteredCollection<T>>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DdpCollection{T}"/> class.
-        /// </summary>
-        /// <param name="internalList">
-        /// The internal list.
-        /// </param>
-        private DdpCollection(ObservableCollection<T> internalList)
-            : base(internalList)
-        {
-            this.internalList = internalList;
         }
 
         #endregion
@@ -167,33 +142,20 @@ namespace DdpNet
             lock (this.filterLock)
             {
                 var filteredCollection = new DdpFilteredCollection<T>(
-                    this.CollectionName, 
-                    this.synchronizationContext, 
+                    this.CollectionName,
+                    this.SynchronizationContext,
                     whereFilter, 
                     sortFilter);
 
                 this.filteredCollections.Add(filteredCollection);
 
-                foreach (var item in this.internalList)
+                foreach (var item in this)
                 {
                     filteredCollection.OnAdded(item);
                 }
 
                 return filteredCollection;
             }
-        }
-
-        /// <summary>
-        /// The get enumerator. Overridden to return a snapshot, as the collection can be modified on multiple threads.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IEnumerator"/>.
-        /// </returns>
-        public new IEnumerator<T> GetEnumerator()
-        {
-            var snapshot = this.internalList.ToList();
-
-            return snapshot.GetEnumerator();
         }
 
         /// <summary>
@@ -255,9 +217,9 @@ namespace DdpNet
             lock (this.filterLock)
             {
                 var typedObject = deserializedObject.ToObject<T>();
-                typedObject.OnAdded(id, this.synchronizationContext);
+                typedObject.OnAdded(id, this.SynchronizationContext);
 
-                this.internalList.Add(typedObject);
+                this.Add(typedObject);
 
                 foreach (var filteredCollection in this.filteredCollections)
                 {
@@ -282,7 +244,7 @@ namespace DdpNet
         {
             lock (this.filterLock)
             {
-                var objectToChange = this.internalList.SingleOrDefault(x => x.Id == id);
+                var objectToChange = this.SingleOrDefault(x => x.Id == id);
 
                 if (objectToChange == null)
                 {
@@ -312,7 +274,7 @@ namespace DdpNet
 
                 if (objectToRemove != null)
                 {
-                    this.internalList.Remove(objectToRemove);
+                    this.Remove(objectToRemove);
                 }
 
                 foreach (var filteredCollection in this.filteredCollections)
@@ -325,51 +287,7 @@ namespace DdpNet
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Called when the collection has changed. Overridden to ensure the event is raised on the correct thread.
-        /// This is necessary because the collection is modified on the internal Receive thread,
-        /// but the events need to be raised on the user/UI thread.
-        /// </summary>
-        /// <param name="args">
-        /// The args for the event
-        /// </param>
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            if (SynchronizationContext.Current == this.synchronizationContext)
-            {
-                // Execute the CollectionChanged event on the current thread
-                this.RaiseCollectionChanged(args);
-            }
-            else
-            {
-                // Raises the CollectionChanged event on the creator thread
-                this.synchronizationContext.Post(this.RaiseCollectionChanged, args);
-            }
-        }
-
-        /// <summary>
-        /// Called when a property has changed. Ensures the event is raised on the correct thread.
-        /// This is necessary because properties can be changed on the internal Receive thread,
-        /// but the events need to be raised on the user/UI thread
-        /// </summary>
-        /// <param name="args">
-        /// The args for the event
-        /// </param>
-        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            if (SynchronizationContext.Current == this.synchronizationContext)
-            {
-                // Execute the PropertyChanged event on the current thread
-                this.RaisePropertyChanged(args);
-            }
-            else
-            {
-                // Raises the PropertyChanged event on the creator thread
-                this.synchronizationContext.Post(this.RaisePropertyChanged, args);
-            }
-        }
-
+        
         /// <summary>
         /// Calls a method, and converts the integer result to an integer.
         /// This is useful because most of the collection modification functions return the number of items added/removed/updated.
@@ -403,29 +321,6 @@ namespace DdpNet
             throw new InvalidOperationException("Unexpected number of documents were updated");
         }
 
-        /// <summary>
-        /// Raises the OnCollectionChanged event with the given arguments
-        /// </summary>
-        /// <param name="param">
-        /// The parameters to raise the event with. This must be a NotifyCollectionChangedEventArgs, however
-        /// the parameter is generic so it can be invoked with SynchronizationContext.Post 
-        /// </param>
-        private void RaiseCollectionChanged(object param)
-        {
-            base.OnCollectionChanged((NotifyCollectionChangedEventArgs)param);
-        }
-
-        /// <summary>
-        /// Raises the OnPropertyChanged event with the given arguments
-        /// </summary>
-        /// <param name="param">
-        /// The parameters to raise the event with. This must be a PropertyChangedEventArgs, however
-        /// the parameter is generic so it can be invoked with SynchronizationContext.Post 
-        /// </param>
-        private void RaisePropertyChanged(object param)
-        {
-            base.OnPropertyChanged((PropertyChangedEventArgs)param);
-        }
         #endregion
     }
 }

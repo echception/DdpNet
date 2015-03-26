@@ -9,6 +9,7 @@
     <Import_RootNamespace>DdpNet</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)InsertParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\CollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\ICollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\IDdpCollection.cs" />
@@ -43,6 +44,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connected.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MeteorUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MoveParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThreadSafeObservableCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Error.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Failed.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\NoSubscribe.cs" />

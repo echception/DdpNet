@@ -21,15 +21,10 @@ namespace DdpNet
     /// <typeparam name="T">
     /// The type of item the collection stores
     /// </typeparam>
-    public class DdpFilteredCollection<T> : ReadOnlyObservableCollection<T>
+    public class DdpFilteredCollection<T> : ThreadSafeObservableCollection<T>
         where T : DdpObject
     {
         #region Fields
-
-        /// <summary>
-        /// The internal collection.
-        /// </summary>
-        private readonly ObservableCollection<T> internalCollection;
 
         /// <summary>
         /// The sort comparison.
@@ -37,19 +32,9 @@ namespace DdpNet
         private readonly Comparison<T> sortComparison;
 
         /// <summary>
-        /// The synchronization context.
-        /// </summary>
-        private readonly SynchronizationContext synchronizationContext;
-
-        /// <summary>
         /// The where filter.
         /// </summary>
         private readonly Func<T, bool> whereFilter;
-
-        /// <summary>
-        /// Used to lock the InternalCollection.
-        /// </summary>
-        private readonly object internalCollectionLock = new object();
 
         #endregion
 
@@ -74,26 +59,12 @@ namespace DdpNet
             string collectionName, 
             SynchronizationContext context, 
             Func<T, bool> whereFilter, 
-            Comparison<T> sort)
-            : this(new ObservableCollection<T>())
+            Comparison<T> sort) : base(context)
         {
             this.CollectionName = collectionName;
-            this.synchronizationContext = context;
 
             this.whereFilter = whereFilter;
             this.sortComparison = sort;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DdpFilteredCollection{T}"/> class.
-        /// </summary>
-        /// <param name="internalCollection">
-        /// The internal collection.
-        /// </param>
-        private DdpFilteredCollection(ObservableCollection<T> internalCollection)
-            : base(internalCollection)
-        {
-            this.internalCollection = internalCollection;
         }
 
         #endregion
@@ -123,17 +94,14 @@ namespace DdpNet
                 return;
             }
 
-            lock (this.internalCollectionLock)
+            if (this.sortComparison == null)
             {
-                if (this.sortComparison == null)
-                {
-                    this.internalCollection.Add(item);
-                }
-                else
-                {
-                    int insertIndex = this.FindIndexForItem(item);
-                    this.internalCollection.Insert(insertIndex, item);
-                }
+                this.Add(item);
+            }
+            else
+            {
+                int insertIndex = this.FindIndexForItem(item);
+                this.Insert(insertIndex, item);
             }
         }
 
@@ -146,7 +114,7 @@ namespace DdpNet
         /// </param>
         internal void OnChanged(T item)
         {
-            if (this.internalCollection.Contains(item))
+            if (this.Contains(item))
             {
                 if (this.whereFilter != null && !this.whereFilter(item))
                 {
@@ -154,20 +122,17 @@ namespace DdpNet
                 }
                 else if (this.sortComparison != null)
                 {
-                    lock (this.internalCollectionLock)
+                    var newIndex = this.FindIndexForItem(item);
+                    if (this.IndexOf(item) < newIndex)
                     {
-                        var newIndex = this.FindIndexForItem(item);
-                        if (this.internalCollection.IndexOf(item) < newIndex)
-                        {
-                            newIndex--;
-                        }
+                        newIndex--;
+                    }
 
-                        var currentIndex = this.internalCollection.IndexOf(item);
+                    var currentIndex = this.IndexOf(item);
 
-                        if (currentIndex != newIndex)
-                        {
-                            this.internalCollection.Move(currentIndex, newIndex);
-                        }
+                    if (currentIndex != newIndex)
+                    {
+                        this.Move(currentIndex, newIndex);
                     }
                 }
             }
@@ -185,50 +150,7 @@ namespace DdpNet
         /// </param>
         internal void OnRemoved(T item)
         {
-            lock (this.internalCollectionLock)
-            {
-                this.internalCollection.Remove(item);
-            }
-        }
-
-        /// <summary>
-        /// Raises the CollectionChanged event on the correct thread.
-        /// </summary>
-        /// <param name="args">
-        /// The event arguments.
-        /// </param>
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            if (SynchronizationContext.Current == this.synchronizationContext)
-            {
-                // Execute the CollectionChanged event on the current thread
-                this.RaiseCollectionChanged(args);
-            }
-            else
-            {
-                // Raises the CollectionChanged event on the creator thread
-                this.synchronizationContext.Post(this.RaiseCollectionChanged, args);
-            }
-        }
-
-        /// <summary>
-        /// Raises the PropertyChanged event on the correct thread
-        /// </summary>
-        /// <param name="args">
-        /// The event arguments.
-        /// </param>
-        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            if (SynchronizationContext.Current == this.synchronizationContext)
-            {
-                // Execute the PropertyChanged event on the current thread
-                this.RaisePropertyChanged(args);
-            }
-            else
-            {
-                // Raises the PropertyChanged event on the creator thread
-                this.synchronizationContext.Post(this.RaisePropertyChanged, args);
-            }
+            this.Remove(item);
         }
 
         /// <summary>
@@ -245,24 +167,24 @@ namespace DdpNet
         private int BinarySearch(T item)
         {
             int min = 0;
-            int max = this.internalCollection.Count - 1;
+            int max = this.Count - 1;
 
             while (min <= max)
             {
                 int mid = (min + max) / 2;
-                T midItem = this.internalCollection[mid];
+                T midItem = this[mid];
 
                 if (midItem == item)
                 {
                     if (mid + 1 <= max)
                     {
                         mid = mid + 1;
-                        midItem = this.internalCollection[mid];
+                        midItem = this[mid];
                     }
                     else if (mid - 1 >= min)
                     {
                         mid = mid - 1;
-                        midItem = this.internalCollection[mid];
+                        midItem = this[mid];
                     }
                     else
                     {
@@ -302,66 +224,13 @@ namespace DdpNet
         private int FindIndexForItem(T item)
         {
             var index = this.BinarySearch(item);
-            while (index < this.internalCollection.Count
-                   && this.sortComparison(this.internalCollection[index], item) == 0)
+            while (index < this.Count
+                   && this.sortComparison(this[index], item) == 0)
             {
                 index++;
             }
 
             return index;
-        }
-
-        /// <summary>
-        /// Raises the CollectionChanged event
-        /// </summary>
-        /// <param name="param">
-        /// The parameter. Must be a NotifyCollectionChangedEventArgs
-        /// </param>
-        private void RaiseCollectionChanged(object param)
-        {
-            var eventArgs = (NotifyCollectionChangedEventArgs)param;
-
-            lock (this.internalCollectionLock)
-            {
-                if (eventArgs.Action == NotifyCollectionChangedAction.Add)
-                {
-                    var itemAdded = (T)eventArgs.NewItems[0];
-                    var currentIndex = this.internalCollection.IndexOf(itemAdded);
-
-                    if (currentIndex != eventArgs.NewStartingIndex)
-                    {
-                        eventArgs = new NotifyCollectionChangedEventArgs(eventArgs.Action, eventArgs.NewItems, currentIndex);
-                    }
-                }
-                else if (eventArgs.Action == NotifyCollectionChangedAction.Move)
-                {
-                    var itemMoved = (T)eventArgs.NewItems[0];
-
-                    var currentIndex = this.internalCollection.IndexOf(itemMoved);
-
-                    if (currentIndex != eventArgs.NewStartingIndex)
-                    {
-                        eventArgs = new NotifyCollectionChangedEventArgs(
-                            eventArgs.Action,
-                            eventArgs.NewItems,
-                            currentIndex,
-                            eventArgs.OldStartingIndex);
-                    }
-                }
-            }
-
-            base.OnCollectionChanged(eventArgs);
-        }
-
-        /// <summary>
-        /// Raises the PropertyChanged event
-        /// </summary>
-        /// <param name="param">
-        /// The parameter. Must be a PropertyChangedEventArgs.
-        /// </param>
-        private void RaisePropertyChanged(object param)
-        {
-            base.OnPropertyChanged((PropertyChangedEventArgs)param);
         }
 
         #endregion
