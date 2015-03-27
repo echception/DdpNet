@@ -10,10 +10,10 @@ namespace DdpNet
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
@@ -28,8 +28,10 @@ namespace DdpNet
     /// Typed collection that inherits from ReadOnlyObservableCollection. Managed by a DdpClient.
     /// The DdpClient will automatically sync changes to this collection
     /// </summary>
-    /// <typeparam name="T">The type to parse the objects into</typeparam>
-    public class DdpCollection<T> : ThreadSafeObservableCollection<T>, IDdpCollection
+    /// <typeparam name="T">
+    /// The type to parse the objects into
+    /// </typeparam>
+    public class DdpCollection<T> : ReadOnlyObservableCollection<T>, IDdpCollection
         where T : DdpObject
     {
         #region Fields
@@ -57,6 +59,26 @@ namespace DdpNet
         /// </summary>
         private readonly List<DdpFilteredCollection<T>> filteredCollections;
 
+        /// <summary>
+        /// The internal collection.
+        /// </summary>
+        private readonly ObservableCollection<T> internalCollection;
+
+        /// <summary>
+        /// The modification lock. Ensures only one modification occurs at a time
+        /// </summary>
+        private readonly object modificationLock = new object();
+
+        /// <summary>
+        /// The queued modifications.
+        /// </summary>
+        private readonly ConcurrentQueue<IModificationParameter> modifications;
+
+        /// <summary>
+        /// The synchronization context.
+        /// </summary>
+        private readonly SynchronizationContext synchronizationContext;
+
         #endregion
 
         #region Constructors and Destructors
@@ -71,6 +93,7 @@ namespace DdpNet
         /// The name of the collection
         /// </param>
         internal DdpCollection(IDdpRemoteMethodCall client, string collectionName)
+            : this(new ObservableCollection<T>())
         {
             Exceptions.ThrowIfNull(client, "client");
             Exceptions.ThrowIfNullOrWhiteSpace(collectionName, "collectionName");
@@ -78,6 +101,20 @@ namespace DdpNet
             this.CollectionName = collectionName;
             this.client = client;
             this.filteredCollections = new List<DdpFilteredCollection<T>>();
+            this.modifications = new ConcurrentQueue<IModificationParameter>();
+            this.synchronizationContext = SynchronizationContext.Current;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DdpCollection{T}"/> class.
+        /// </summary>
+        /// <param name="internalCollection">
+        /// The internal collection.
+        /// </param>
+        private DdpCollection(ObservableCollection<T> internalCollection)
+            : base(internalCollection)
+        {
+            this.internalCollection = internalCollection;
         }
 
         #endregion
@@ -129,9 +166,11 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="DdpFilteredCollection"/>.
         /// </returns>
-        /// <exception cref="ArgumentException">Thrown when both whereFilter and sortFilter are null
+        /// <exception cref="ArgumentException">
+        /// Thrown when both whereFilter and sortFilter are null
         /// </exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Easier than creating overrides for each combination")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", 
+            Justification = "Easier than creating overrides for each combination")]
         public DdpFilteredCollection<T> Filter(Func<T, bool> whereFilter = null, Comparison<T> sortFilter = null)
         {
             if (whereFilter == null && sortFilter == null)
@@ -142,8 +181,7 @@ namespace DdpNet
             lock (this.filterLock)
             {
                 var filteredCollection = new DdpFilteredCollection<T>(
-                    this.CollectionName,
-                    this.SynchronizationContext,
+                    this.CollectionName, 
                     whereFilter, 
                     sortFilter);
 
@@ -156,6 +194,19 @@ namespace DdpNet
 
                 return filteredCollection;
             }
+        }
+
+        /// <summary>
+        /// The get enumerator. Overridden to return a snapshot, as the collection can be modified on multiple threads.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IEnumerator"/>.
+        /// </returns>
+        public new IEnumerator<T> GetEnumerator()
+        {
+            var snapshot = this.internalCollection.ToList();
+
+            return snapshot.GetEnumerator();
         }
 
         /// <summary>
@@ -214,18 +265,11 @@ namespace DdpNet
         /// </param>
         void IDdpCollection.Added(string id, JObject deserializedObject)
         {
-            lock (this.filterLock)
-            {
-                var typedObject = deserializedObject.ToObject<T>();
-                typedObject.OnAdded(id, this.SynchronizationContext);
+            var addedParameter = new AddedParameter(id, deserializedObject);
 
-                this.Add(typedObject);
+            this.modifications.Enqueue(addedParameter);
 
-                foreach (var filteredCollection in this.filteredCollections)
-                {
-                    filteredCollection.OnAdded(typedObject);
-                }
-            }
+            this.RaiseModification();
         }
 
         /// <summary>
@@ -242,22 +286,11 @@ namespace DdpNet
         /// </param>
         void IDdpCollection.Changed(string id, Dictionary<string, JToken> fields, string[] cleared)
         {
-            lock (this.filterLock)
-            {
-                var objectToChange = this.SingleOrDefault(x => x.Id == id);
+            var changed = new ChangedParameter(id, fields, cleared);
 
-                if (objectToChange == null)
-                {
-                    return;
-                }
+            this.modifications.Enqueue(changed);
 
-                this.changer.ChangeObject(objectToChange, fields, cleared);
-
-                foreach (var filteredCollection in this.filteredCollections)
-                {
-                    filteredCollection.OnChanged(objectToChange);
-                }
-            }
+            this.RaiseModification();
         }
 
         /// <summary>
@@ -268,26 +301,17 @@ namespace DdpNet
         /// </param>
         void IDdpCollection.Removed(string id)
         {
-            lock (this.filterLock)
-            {
-                var objectToRemove = this.SingleOrDefault(x => x.Id == id);
+            var removed = new RemovedParameter(id);
 
-                if (objectToRemove != null)
-                {
-                    this.Remove(objectToRemove);
-                }
+            this.modifications.Enqueue(removed);
 
-                foreach (var filteredCollection in this.filteredCollections)
-                {
-                    filteredCollection.OnRemoved(objectToRemove);
-                }
-            }
+            this.RaiseModification();
         }
 
         #endregion
 
         #region Methods
-        
+
         /// <summary>
         /// Calls a method, and converts the integer result to an integer.
         /// This is useful because most of the collection modification functions return the number of items added/removed/updated.
@@ -304,7 +328,9 @@ namespace DdpNet
         /// <returns>
         /// The <see cref="Task"/>. This will return when the method call completes, and the result is returned
         /// </returns>
-        /// <exception cref="InvalidOperationException">Thrown when an internal error occurs</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when an internal error occurs
+        /// </exception>
         private async Task<bool> CallConvertNumberToBool(string methodName, params object[] parameters)
         {
             int numberUpdated = await this.client.Call<int>(methodName, parameters);
@@ -319,6 +345,152 @@ namespace DdpNet
             }
 
             throw new InvalidOperationException("Unexpected number of documents were updated");
+        }
+
+        /// <summary>
+        /// Adds an object to the collection. This must be called from the user thread
+        /// </summary>
+        /// <param name="added">
+        /// Information about the addition
+        /// </param>
+        private void InternalAdded(AddedParameter added)
+        {
+            lock (this.filterLock)
+            {
+                var typedObject = added.DeserializedObject.ToObject<T>();
+                typedObject.OnAdded(added.Id, this.synchronizationContext);
+
+                this.internalCollection.Add(typedObject);
+
+                foreach (var filteredCollection in this.filteredCollections)
+                {
+                    filteredCollection.OnAdded(typedObject);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Changes an object in the collection. Must be called from the user thread
+        /// </summary>
+        /// <param name="changed">
+        /// Information about the change
+        /// </param>
+        private void InternalChanged(ChangedParameter changed)
+        {
+            lock (this.filterLock)
+            {
+                var objectToChange = this.SingleOrDefault(x => x.Id == changed.Id);
+
+                if (objectToChange == null)
+                {
+                    return;
+                }
+
+                this.changer.ChangeObject(objectToChange, changed.Fields, changed.Cleared);
+
+                foreach (var filteredCollection in this.filteredCollections)
+                {
+                    filteredCollection.OnChanged(objectToChange);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes an item from the collection. Must be called from the user thread
+        /// </summary>
+        /// <param name="removed">
+        /// Information about the removal
+        /// </param>
+        private void InternalRemoved(RemovedParameter removed)
+        {
+            lock (this.filterLock)
+            {
+                var objectToRemove = this.SingleOrDefault(x => x.Id == removed.Id);
+
+                if (objectToRemove != null)
+                {
+                    this.internalCollection.Remove(objectToRemove);
+                }
+
+                foreach (var filteredCollection in this.filteredCollections)
+                {
+                    filteredCollection.OnRemoved(objectToRemove);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Processes a modification. Must be called on the user thread.
+        /// </summary>
+        /// <param name="state">
+        /// The state.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when an invalid modification type is passed
+        /// </exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Argument is on one of the inner proeprties")]
+        private void ProcessModification(object state)
+        {
+            lock (this.modificationLock)
+            {
+                IModificationParameter parameter;
+                if (this.modifications.TryDequeue(out parameter))
+                {
+                    switch (parameter.ModificationType)
+                    {
+                        case ModificationType.Added:
+                            this.InternalAdded((AddedParameter)parameter);
+                            break;
+                        case ModificationType.Changed:
+                            this.InternalChanged((ChangedParameter)parameter);
+                            break;
+                        case ModificationType.Removed:
+                            this.InternalRemoved((RemovedParameter)parameter);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException("ModificationType");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Raises the ProcessModification method on the correct Synchronization context.
+        /// Some context: there is a background receive thread that receives messages from the server.
+        /// It then needs to apply those changes to the collection. Since this is an ObservableCollection,
+        /// changes trigger the CollectionChanged and PropertyChanged events. However, WPF/XAML applications
+        /// expect those events to come from the UI thread.
+        /// One option would be to raise just the event on the UI thread, but process the change on the receive thread.
+        /// This would be doable if SynchronizationContext.Send was available on all platforms. It is not available on 
+        /// WinRT however, only Post is available. Post executes the event asynchronously, and because of this, 
+        /// additional changes can happen after the Post, before the Post method actually executes to raise the event,
+        /// resulting in an invalid event (for an example, if a item changes position, it would trigger a move event. Another item also
+        /// moving before the event fires would result in an exception in the event).
+        /// This necessitates that the event occur synchronously after the modification. Thus, the entire add/change/remove is done on the
+        /// UI thread using the SynchronizationContext.Post method.
+        /// That would be the end of that if we could make a couple assumptions:
+        ///     Post delegates execute in queue order
+        ///     Post delegates execute one at a time
+        /// However, according to https://msdn.microsoft.com/en-us/magazine/gg598924.aspx,
+        /// neither of these can be assumed depending on the platform.
+        /// We need them to execute in order so the changes are processed in the correct order,
+        /// and we don't want different changes to be applied at the same time.
+        /// Thus we maintain our own internal queue of modifications to process, and wrap everything in a lock so only one executes at a time.
+        /// When the collection receives a change from the receive thread, it puts it in the queue, and then calls Post to process the notification.
+        /// It doesn't matter what order they execute in, since they will just take the next item from the queue.
+        /// This is a round about way to achieve our goal, however, I haven't found another way to accomplish it in a cross-platform way.
+        /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
+        private void RaiseModification()
+        {
+            if (this.synchronizationContext == SynchronizationContext.Current)
+            {
+                this.ProcessModification(null);
+            }
+            else
+            {
+                this.synchronizationContext.Post(this.ProcessModification, null);
+            }
         }
 
         #endregion

@@ -6,13 +6,12 @@
 //   Contains the DdpFilteredCollection clas
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace DdpNet
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.ComponentModel;
+    using System.Linq;
     using System.Threading;
 
     /// <summary>
@@ -21,7 +20,7 @@ namespace DdpNet
     /// <typeparam name="T">
     /// The type of item the collection stores
     /// </typeparam>
-    public class DdpFilteredCollection<T> : ThreadSafeObservableCollection<T>
+    public class DdpFilteredCollection<T> : ReadOnlyObservableCollection<T>
         where T : DdpObject
     {
         #region Fields
@@ -36,6 +35,11 @@ namespace DdpNet
         /// </summary>
         private readonly Func<T, bool> whereFilter;
 
+        /// <summary>
+        /// Internal collection
+        /// </summary>
+        private ObservableCollection<T> internalCollection;
+
         #endregion
 
         #region Constructors and Destructors
@@ -46,9 +50,6 @@ namespace DdpNet
         /// <param name="collectionName">
         /// The collection name.
         /// </param>
-        /// <param name="context">
-        /// The context.
-        /// </param>
         /// <param name="whereFilter">
         /// The where filter.
         /// </param>
@@ -57,14 +58,26 @@ namespace DdpNet
         /// </param>
         internal DdpFilteredCollection(
             string collectionName, 
-            SynchronizationContext context, 
             Func<T, bool> whereFilter, 
-            Comparison<T> sort) : base(context)
+            Comparison<T> sort)
+            : this(new ObservableCollection<T>())
         {
             this.CollectionName = collectionName;
 
             this.whereFilter = whereFilter;
             this.sortComparison = sort;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DdpFilteredCollection{T}"/> class.
+        /// </summary>
+        /// <param name="internalCollection">
+        /// The internal collection.
+        /// </param>
+        private DdpFilteredCollection(ObservableCollection<T> internalCollection)
+            : base(internalCollection)
+        {
+            this.internalCollection = internalCollection;
         }
 
         #endregion
@@ -75,6 +88,23 @@ namespace DdpNet
         /// Gets the collection name.
         /// </summary>
         public string CollectionName { get; private set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// The get enumerator. Overridden to return a snapshot, as the collection can be modified on multiple threads.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IEnumerator"/>.
+        /// </returns>
+        public new IEnumerator<T> GetEnumerator()
+        {
+            var snapshot = this.internalCollection.ToList();
+
+            return snapshot.GetEnumerator();
+        }
 
         #endregion
 
@@ -96,12 +126,12 @@ namespace DdpNet
 
             if (this.sortComparison == null)
             {
-                this.Add(item);
+                this.internalCollection.Add(item);
             }
             else
             {
                 int insertIndex = this.FindIndexForItem(item);
-                this.Insert(insertIndex, item);
+                this.internalCollection.Insert(insertIndex, item);
             }
         }
 
@@ -132,7 +162,7 @@ namespace DdpNet
 
                     if (currentIndex != newIndex)
                     {
-                        this.Move(currentIndex, newIndex);
+                        this.internalCollection.Move(currentIndex, newIndex);
                     }
                 }
             }
@@ -150,7 +180,7 @@ namespace DdpNet
         /// </param>
         internal void OnRemoved(T item)
         {
-            this.Remove(item);
+            this.internalCollection.Remove(item);
         }
 
         /// <summary>
@@ -224,8 +254,7 @@ namespace DdpNet
         private int FindIndexForItem(T item)
         {
             var index = this.BinarySearch(item);
-            while (index < this.Count
-                   && this.sortComparison(this[index], item) == 0)
+            while (index < this.Count && this.sortComparison(this[index], item) == 0)
             {
                 index++;
             }

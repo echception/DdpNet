@@ -9,7 +9,8 @@
     <Import_RootNamespace>DdpNet</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)InsertParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AddedParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ChangedParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\CollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\ICollectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\IDdpCollection.cs" />
@@ -29,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDdpRemoteMethodCall.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IModificationParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoginResume.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\ChangedHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageHandlers\MessageHandler.cs" />
@@ -44,8 +46,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Connected.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MeteorUser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MoveParameter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ThreadSafeObservableCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModificationType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RemovedParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnedObjects\Error.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\Failed.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Messages\NoSubscribe.cs" />
