@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MainWindow.xaml.cs" company="Chris Amert">
+//   Copyright (c) 2015
+// </copyright>
+// <summary>
+//   Interaction logic for MainWindow.xaml
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Leaderboard
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using System.Windows;
+
     using DdpNet;
 
     /// <summary>
@@ -22,19 +21,66 @@ namespace Leaderboard
     /// </summary>
     public partial class MainWindow : Window
     {
-        private LeaderboardViewModel viewModel;
+        #region Fields
 
-        private DdpCollection<Player> players;
-
+        /// <summary>
+        /// The client.
+        /// </summary>
         private MeteorClient client;
 
+        /// <summary>
+        /// The players.
+        /// </summary>
+        private DdpCollection<Player> players;
+
+        /// <summary>
+        /// The view model.
+        /// </summary>
+        private LeaderboardViewModel viewModel;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// </summary>
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.Initialize();
         }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// The add points button_ on click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private async void AddPointsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (this.viewModel.SelectedPlayer != null)
+            {
+                var update = new Dictionary<string, object>() { { "score", this.viewModel.SelectedPlayer.Score + 5 } };
+
+                await this.players.UpdateAsync(this.viewModel.SelectedPlayer.Id, update);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the ViewModel from  Meteor
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         private async Task Initialize()
         {
             this.client = new MeteorClient(new Uri("ws://localhost:3000/websocket"));
@@ -59,14 +105,6 @@ namespace Leaderboard
             this.DataContext = this.viewModel;
         }
 
-        private async void AddPointsButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (this.viewModel.SelectedPlayer != null)
-            {
-                var update = new Dictionary<string, object>() { { "score", this.viewModel.SelectedPlayer.Score + 5 } };
-
-                await players.UpdateAsync(this.viewModel.SelectedPlayer.Id, update);
-            }
-        }
+        #endregion
     }
 }
