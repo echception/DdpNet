@@ -71,6 +71,8 @@ Head to the [Wiki](https://github.com/echception/DdpNet/wiki) for more informati
 
 The source code also includes a couple sample applications using Ddp.NET.  One is a WPF application that connects to the Meteor Leaderboard example. The other is a Windows 8.1 application that connects to a Microscope application (The application built in The Meteor Book). 
 
+Building Ddp.NET will require Visual Studio 2013 and >= .NET 4.5
+
 
 
 
