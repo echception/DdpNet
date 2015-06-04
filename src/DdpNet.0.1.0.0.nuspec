@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>DdpNet</id>
+        <version>0.1.0.0</version>
+        <title>Ddp.Net</title>
+        <authors>echception</authors>
+        <owners>echception</owners>
+        <licenseUrl>https://github.com/echception/DdpNet/blob/master/LICENSE.md</licenseUrl>
+        <projectUrl>https://github.com/echception/DdpNet</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A library for connecting your .NET applications to a Meteor server</description>
+        <copyright>Copyright 2015</copyright>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="6.0.8" />
+            <dependency id="PCLCrypto" version="1.0.0.15071" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="DdpNet.Net45\bin\Release\DdpNet.dll" target="lib\net45\DdpNet.dll" />
+        <file src="DdpNet.WinRT\bin\Release\DdpNet.dll" target="lib\portable-win81+wpa81\DdpNet.dll" />
+    </files>
+</package>
