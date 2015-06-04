@@ -19,6 +19,11 @@ Ddp.NET works on the following platforms:
 * Collections events are handled automatically in the background; Ddp.NET will keep all the collections up to date with the latest events from the server
 * Easy integration with WPF/XAML- Ddp.NET collections are ObservableCollections, meaning the UI can easily react to changes, and provides easy integration into existing frameworks
 
+## Installing ##
+Easiest method to get started is to use nuget:
+
+    Install-Package DdpNet
+
 ## Examples ##
 
 Here are a couple of quick examples of how to perform common Ddp.NET operations:
